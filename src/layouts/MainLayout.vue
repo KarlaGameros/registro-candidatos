@@ -1,5 +1,5 @@
 <template>
-  <q-layout view="lHh Lpr lFf">
+  <q-layout view="lHh LpR lff">
     <q-header elevated class="bg-pink-1">
       <q-toolbar>
         <q-btn
@@ -11,7 +11,7 @@
           @click="toggleLeftDrawer"
         />
 
-        <q-toolbar-title> Registro de candidatos </q-toolbar-title>
+        <q-toolbar-title> Registro de candidaturas </q-toolbar-title>
 
         <div>v.1</div>
       </q-toolbar>
@@ -45,7 +45,20 @@
             <q-icon name="groups" />
           </q-item-section>
 
-          <q-item-section> Registro de candidatos </q-item-section>
+          <q-item-section> Registro de candidaturas </q-item-section>
+        </q-item>
+        <q-item
+          clickable
+          v-ripple
+          class="text-grey-8"
+          :to="{ name: 'historial_sustituciones' }"
+          active-class="text-pink-ieen-1"
+        >
+          <q-item-section avatar>
+            <q-icon name="sync_alt" />
+          </q-item-section>
+
+          <q-item-section> Historial de sustituciones </q-item-section>
         </q-item>
       </q-list>
     </q-drawer>
@@ -53,6 +66,16 @@
     <q-page-container>
       <router-view />
     </q-page-container>
+
+    <q-footer elevated class="bg-pink-1 text-white">
+      <q-toolbar>
+        <q-toolbar-title
+          ><div class="text-body1">
+            &#169; Unidad Técnica de Informática y Estadística
+          </div>
+        </q-toolbar-title>
+      </q-toolbar>
+    </q-footer>
   </q-layout>
 </template>
 
