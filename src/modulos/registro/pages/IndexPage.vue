@@ -24,76 +24,25 @@
         </div>
       </div>
     </div>
-    <div class="q-pt-md">
-      <q-card>
-        <q-tabs
-          v-model="tab"
-          dense
-          class="bg-grey-2 text-grey-7"
-          active-color="blue-grey-4"
-          indicator-color="blue-grey-4"
-          align="justify"
-        >
-          <q-tab name="diputaciones" label="Diputaciones" />
-          <q-tab
-            name="presidenciaSindicatura"
-            label="Presidencia y Sindicaturas"
-          />
-          <q-tab name="regidurias" label="Regidurias" />
-        </q-tabs>
-
-        <q-tab-panels v-model="tab" animated class="text-white">
-          <q-tab-panel name="diputaciones">
-            <TablaTipoEleccion :tab="'diputaciones'" />
-          </q-tab-panel>
-
-          <q-tab-panel name="presidenciaSindicatura">
-            <TablaTipoEleccion :tab="'presidenciaSindicatura'" />
-          </q-tab-panel>
-
-          <q-tab-panel name="regidurias">
-            <TablaTipoEleccion :tab="'regidurias'" />
-          </q-tab-panel>
-        </q-tab-panels>
-      </q-card>
-    </div>
-    <ModalComp :tab="tab" />
+    <div class="q-pt-md"></div>
+    <TablaPrincipalTipoEleccion />
   </q-page>
 </template>
 <script setup>
-import { useExampleStore } from "src/stores/example-store";
-import { ref } from "vue";
-import TablaTipoEleccion from "../components/TablaTipoEleccion.vue";
-import ModalComp from "../components/ModalComp.vue";
+import { useCandidatosStore } from "src/stores/candidatos-store";
+import TablaPrincipalTipoEleccion from "../components/TablaPrincipalTipoEleccion.vue";
 
 //--------------------------------------------------------------------
 
-const exampleStore = useExampleStore();
-const tab = ref("diputaciones");
+const candidatoStore = useCandidatosStore();
 
 //--------------------------------------------------------------------
 
 const actualizarModal = () => {
-  exampleStore.actualizarModal(true);
+  candidatoStore.actualizarModal(true);
 };
 
 //--------------------------------------------------------------------
 </script>
 
-<style scope>
-.user__info {
-  display: flex;
-  align-items: left;
-  gap: 12px;
-}
-.user__name {
-  font-size: 14px;
-  font-weight: 600;
-  color: #111827;
-  text-align: left;
-}
-.user__email {
-  font-size: 12px;
-  color: #4b5563;
-}
-</style>
+<style scope></style>

@@ -68,13 +68,16 @@
     </q-page-container>
 
     <q-footer elevated class="bg-pink-1 text-white">
-      <q-toolbar>
-        <q-toolbar-title
-          ><div class="text-body1">
-            &#169; Unidad Técnica de Informática y Estadística
-          </div>
-        </q-toolbar-title>
-      </q-toolbar>
+      <q-card class="no-shadow bg-pink-1 text-white" bordered>
+        <q-card-section class="row">
+          <span class="text-body1 text-weight-bold">
+            © Unidad Técnica de Informática y Estadística
+          </span>
+          <q-space></q-space>
+          <q-btn icon="apartment" flat dense></q-btn>
+          <q-btn icon="phone" flat dense></q-btn>
+        </q-card-section>
+      </q-card>
     </q-footer>
   </q-layout>
 </template>
