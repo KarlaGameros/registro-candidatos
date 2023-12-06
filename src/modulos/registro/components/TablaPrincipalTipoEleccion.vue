@@ -27,7 +27,7 @@
             :grid="$q.screen.xs"
             flat
             bordered
-            :rows="list_Candidatos"
+            :rows="list_Candidatos_Filtro"
             :columns="columns"
             :visible-columns="visisble_columns"
             row-key="name"
@@ -179,17 +179,13 @@
                         alt=""
                       />
                     </q-avatar>
-                    <q-avatar size="md">
-                      <img
-                        v-if="props.row.imgPartido3"
-                        :src="props.row.imgPartido3"
-                        alt=""
-                      />
-                    </q-avatar>
                   </div>
                   <div v-else-if="col.name === 'partido'">
                     <q-avatar>
-                      <img :src="props.row.imgPartido" alt="" />
+                      <img
+                        :src="props.row.url_Logo_Partido_Propietario"
+                        alt=""
+                      />
                       <q-tooltip>{{ props.row.partido }}</q-tooltip>
                     </q-avatar>
                   </div>
@@ -257,7 +253,10 @@
                     <div class="col-1">{{ candidato.tipo_Candidato }}</div>
                     <div class="col-1">
                       <q-avatar>
-                        <img :src="candidato.imgPartido" alt="" />
+                        <img
+                          :src="candidato.url_Logo_Partido_Partido_Suplente"
+                          alt=""
+                        />
                         <q-tooltip>{{ candidato.partido_Suplente }}</q-tooltip>
                       </q-avatar>
                     </div>
@@ -289,7 +288,10 @@
                     <div class="col-1">{{ candidato.tipo_Candidato }}</div>
                     <div class="col-1">
                       <q-avatar>
-                        <img :src="candidato.imgPartido" alt="" />
+                        <img
+                          :src="candidato.url_Logo_Partido_Propietario_2"
+                          alt=""
+                        />
                         <q-tooltip>{{
                           candidato.partido_Propietario_2
                         }}</q-tooltip>
@@ -323,7 +325,10 @@
                     <div class="col-1">{{ candidato.tipo_Candidato }}</div>
                     <div class="col-1">
                       <q-avatar>
-                        <img :src="candidato.imgPartido" alt="" />
+                        <img
+                          :src="candidato.url_Logo_Partido_Partido_Suplente_2"
+                          alt=""
+                        />
                         <q-tooltip>{{
                           candidato.partido_Suplente_2
                         }}</q-tooltip>
@@ -350,7 +355,7 @@
 import { storeToRefs } from "pinia";
 import { useQuasar } from "quasar";
 import { useCandidatosStore } from "src/stores/candidatos-store";
-import { computed, ref, onBeforeMount } from "vue";
+import { computed, ref, onBeforeMount, watch } from "vue";
 import { useConfiguracionStore } from "src/stores/configuracion-store";
 import ModalRegistro from "../components/ModalRegistro.vue";
 import ModalSustituir from "../components/ModalSustituir.vue";
@@ -365,17 +370,28 @@ const { list_Candidatos, candidato } = storeToRefs(candidatoStore);
 const visisble_columns = ref("");
 const expandedRow = ref(null);
 const tab = ref("DIP");
-
+const list_Candidatos_Filtro = ref({ ...list_Candidatos.value });
 //--------------------------------------------------------------------
 
-onBeforeMount(() => {
+onBeforeMount(async () => {
   $q.loading.show();
-  candidatoStore.loadCandidatos();
+  await candidatoStore.loadCandidatos();
   configuracionStore.loadTipoElecciones();
   cargarColumnas(tab.value);
   $q.loading.hide();
 });
 
+//--------------------------------------------------------------------
+
+watch(tab, (val) => {
+  cargarColumnas(val);
+});
+
+watch(list_Candidatos, (val) => {
+  if (val != null) {
+    cargarColumnas(tab.value);
+  }
+});
 //--------------------------------------------------------------------
 
 const cargarColumnas = (tab) => {
@@ -393,7 +409,9 @@ const cargarColumnas = (tab) => {
         "orden",
         "id",
       ];
-      list_Candidatos.value.filter((x) => x.tipo_Eleccion == "Gubernatura");
+      list_Candidatos_Filtro.value = list_Candidatos.value.filter(
+        (x) => x.tipo_Eleccion == "Gubernatura"
+      );
       break;
     }
     case "DIP": {
@@ -410,7 +428,9 @@ const cargarColumnas = (tab) => {
         "orden",
         "id",
       ];
-      list_Candidatos.value.filter((x) => x.tipo_Eleccion == "Diputaciones");
+      list_Candidatos_Filtro.value = list_Candidatos.value.filter(
+        (x) => x.tipo_Eleccion == "Diputaciones"
+      );
       break;
     }
     case "PYS": {
@@ -425,7 +445,7 @@ const cargarColumnas = (tab) => {
         "fecha_registro",
         "id",
       ];
-      list_Candidatos.value.filter(
+      list_Candidatos_Filtro.value = list_Candidatos.value.filter(
         (x) => x.tipo_Eleccion == "Presidencias y Sindicaturas"
       );
       break;
@@ -445,16 +465,18 @@ const cargarColumnas = (tab) => {
         "orden",
         "id",
       ];
-      list_Candidatos.value.filter((x) => x.tipo_Eleccion == "Regidurias");
+      list_Candidatos_Filtro.value = list_Candidatos.value.filter(
+        (x) => x.tipo_Eleccion == "Regidurias"
+      );
       break;
     }
   }
 };
 
-const editar = (id) => {
+const editar = async (id) => {
   candidatoStore.actualizarModal(true);
   candidatoStore.updateEditar(true);
-  candidatoStore.loadCandidato(id);
+  await candidatoStore.loadCandidato(id);
 };
 
 const modalSustituir = (id) => {
@@ -475,7 +497,7 @@ const isRowExpanded = (row) => {
 };
 
 const pagesNumber = computed(() =>
-  Math.ceil(list_Candidatos.value.length / pagination.value.rowsPerPage)
+  Math.ceil(list_Candidatos_Filtro.value.length / pagination.value.rowsPerPage)
 );
 
 //--------------------------------------------------------------------
@@ -573,7 +595,6 @@ const columns = [
     sortable: true,
   },
 ];
-
 const filter = ref("");
 const pagination = ref({
   sortBy: "desc",

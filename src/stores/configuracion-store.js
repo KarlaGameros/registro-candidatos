@@ -4,6 +4,17 @@ import { api } from "src/boot/axios";
 export const useConfiguracionStore = defineStore("useConfiguracionStore", {
   state: () => ({
     tipo_Elecciones: [],
+    eleccion: {
+      id: null,
+      nombre: null,
+      siglas: null,
+      activo: null,
+      propietario_1: null,
+      propietario_2: null,
+      suplente_1: null,
+      suplente_2: null,
+      fecha_Registro: null,
+    },
     list_Municipios: [],
     list_Distritos: [],
     list_Demarcaciones: [],
@@ -26,10 +37,40 @@ export const useConfiguracionStore = defineStore("useConfiguracionStore", {
             nombre: tipo.nombre,
             siglas: tipo.siglas,
             activo: tipo.activo,
+            propietario_1: tipo.propietario_1,
+            propietario_2: tipo.propietario_2,
+            suplente_1: tipo.suplente_1,
+            suplente_2: tipo.suplente_2,
+            fecha_Registro: tipo.fecha_Registro,
           };
         });
 
         this.tipo_Elecciones = listTipoElecciones;
+      } catch (error) {
+        return {
+          success: false,
+          data: "Ocurrió un error, inténtelo de nuevo. Si el error persiste, contacte a soporte",
+        };
+      }
+    },
+
+    async loadEleccionId(id) {
+      try {
+        let resp = await api.get(`/Tipos_Elecciones/${id}`);
+        if (resp.status == 200) {
+          const { success, data } = resp.data;
+          if (success == true) {
+            this.eleccion.id = data.id;
+            this.eleccion.nombre = data.nombre;
+            this.eleccion.siglas = data.siglas;
+            this.eleccion.activo = data.activo;
+            this.eleccion.propietario_1 = data.propietario_1;
+            this.eleccion.propietario_2 = data.propietario_2;
+            this.eleccion.suplente_1 = data.suplente_1;
+            this.eleccion.suplente_2 = data.suplente_2;
+            this.eleccion.fecha_Registro = data.fecha_Registro;
+          }
+        }
       } catch (error) {
         return {
           success: false,

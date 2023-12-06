@@ -18,15 +18,8 @@
         />
         <div class="bg-blue-grey-4" style="border-radius: 5px; width: 1100px">
           <div class="text-h6 text-center text-white">
-            {{
-              tab == "GUB"
-                ? "Registro de candidatos a Gubernatura"
-                : tab == "DIP"
-                ? "Registro de candidatos a Diputaciones"
-                : tab == "PYS"
-                ? "Registro de candidatos a Presidencia y Sindicaturas"
-                : "Registro de candidatos a Regidurias"
-            }}
+            {{ isEditar == true ? "Actualizar " : "Registro de "
+            }}{{ getTitle() }}
           </div>
         </div>
       </q-card-section>
@@ -202,8 +195,7 @@
                         />
                       </div>
                     </div>
-                    <PropietarioDatosGenerales :coalicion="is_Coalicion" />
-                    <TablaRP v-if="cargo_Id == 'RP'" />
+                    <FormularioDatosGenerales :tabTipo="tabTab" />
                   </q-expansion-item>
                   <q-expansion-item
                     v-model="expansion2"
@@ -213,7 +205,7 @@
                     icon="folder_open"
                     label="Documentación Requerida"
                   >
-                    <PropietarioDocumentacion />
+                    <FormularioDocumentacion />
                   </q-expansion-item>
                 </q-list>
               </q-tab-panel>
@@ -241,7 +233,7 @@
                         />
                       </div>
                     </div>
-                    <SuplenteDatosGenerales :coalicion="is_Coalicion" />
+                    <FormularioDatosGenerales :tabTipo="tabTab" />
                   </q-expansion-item>
 
                   <q-expansion-item
@@ -252,7 +244,7 @@
                     icon="folder_open"
                     label="Documentación Requerida"
                   >
-                    <SuplenteDocumentacion />
+                    <FormularioDocumentacion />
                   </q-expansion-item>
                 </q-list>
               </q-tab-panel>
@@ -280,7 +272,7 @@
                         />
                       </div>
                     </div>
-                    <SindicoPropDatosGenerales :coalicion="is_Coalicion" />
+                    <FormularioDatosGenerales :tabTipo="tabTab" />
                   </q-expansion-item>
 
                   <q-expansion-item
@@ -291,7 +283,7 @@
                     icon="folder_open"
                     label="Documentación Requerida"
                   >
-                    <SindicoPropDocumentacion />
+                    <FormularioDocumentacion />
                   </q-expansion-item>
                 </q-list>
               </q-tab-panel>
@@ -319,7 +311,7 @@
                         />
                       </div>
                     </div>
-                    <SindicoSupDatosGenerales :coalicion="is_Coalicion" />
+                    <FormularioDatosGenerales :tabTipo="tabTab" />
                   </q-expansion-item>
 
                   <q-expansion-item
@@ -330,7 +322,7 @@
                     icon="folder_open"
                     label="Documentación Requerida"
                   >
-                    <SindicoSupDocumentacion />
+                    <FormularioDocumentacion />
                   </q-expansion-item>
                 </q-list>
               </q-tab-panel>
@@ -366,14 +358,8 @@ import { storeToRefs } from "pinia";
 import { useCandidatosStore } from "src/stores/candidatos-store";
 import { useConfiguracionStore } from "src/stores/configuracion-store";
 import { ref, defineProps, onBeforeMount, watch } from "vue";
-import PropietarioDatosGenerales from "./PropietarioDatosGenerales.vue";
-import PropietarioDocumentacion from "./PropietarioDocumentacion.vue";
-import SuplenteDatosGenerales from "./SuplenteDatosGenerales.vue";
-import SuplenteDocumentacion from "./SuplenteDocumentacion.vue";
-import SindicoPropDatosGenerales from "./SindicoPropDatosGenerales.vue";
-import SindicoSupDatosGenerales from "./SindicoSupDatosGenerales.vue";
-import SindicoPropDocumentacion from "./SindicoPropDocumentacion.vue";
-import SindicoSupDocumentacion from "./SindicoSupDocumentacion.vue";
+import FormularioDatosGenerales from "./FormularioDatosGenerales.vue";
+import FormularioDocumentacion from "./FormularioDocumentacion.vue";
 import TablaRP from "./TablaRP.vue";
 
 //--------------------------------------------------------------------
@@ -382,7 +368,15 @@ const $q = useQuasar();
 const configuracionStore = useConfiguracionStore();
 const candidatoStore = useCandidatosStore();
 
-const { modal, candidato, isEditar } = storeToRefs(candidatoStore);
+const {
+  modal,
+  candidato,
+  isEditar,
+  propietario_1,
+  propietario_2,
+  suplente_1,
+  suplente_2,
+} = storeToRefs(candidatoStore);
 const {
   list_Municipios,
   list_Distritos,
@@ -390,7 +384,6 @@ const {
   list_Partidos_Politicos,
   list_Coaliciones,
 } = storeToRefs(configuracionStore);
-const is_Coalicion = ref(false);
 const coalicion_Id = ref(null);
 const cargo_Id = ref(null);
 const tipos_Cargos = ref(["MR", "RP"]);
@@ -524,6 +517,18 @@ const cargarDemarcacion = (val) => {
   }
 };
 
+const getTitle = () => {
+  if (props.tab == "GUB") {
+    return "candidatos a Gubernatura";
+  } else if (props.tab == "DIP") {
+    return "candidatos a Diputaciones";
+  } else if (props.tab == "PYS") {
+    return "candidatos a Presidencia y Sindicaturas";
+  } else {
+    return "candidatos a Regidurias";
+  }
+};
+
 const actualizarModal = (valor) => {
   $q.loading.show();
   candidatoStore.actualizarModal(valor);
@@ -532,12 +537,11 @@ const actualizarModal = (valor) => {
 };
 
 const limpiar = () => {
-  is_Coalicion.value = false;
   cargo_Id.value = null;
   distrito_Id.value = null;
   municipio_Id.value = null;
   demarcacion_Id.value = null;
-  candidatoStore.initiCandidato();
+  candidatoStore.initCandidato();
 };
 
 const onSubmit = async () => {
@@ -562,87 +566,77 @@ const onSubmit = async () => {
   if (candidato.value.orden != null)
     candidatoFormData.append("Orden", candidato.value.orden);
   //------------PROPIETARIO------------
-  if (candidato.value.nombres_Propietario != null)
+  if (propietario_1.value.nombres != null)
     candidatoFormData.append(
       "Nombres_Propietario",
-      candidato.value.nombres_Propietario
+      propietario_1.value.nombres
     );
-  if (candidato.value.apellido_Paterno_Propietario != null)
+  if (propietario_1.value.apellido_Paterno != null)
     candidatoFormData.append(
       "Apellido_Paterno_Propietario",
-      candidato.value.apellido_Paterno_Propietario
+      propietario_1.value.apellido_Paterno
     );
-  if (candidato.value.apellido_Materno_Propietario != null)
+  if (propietario_1.value.apellido_Materno != null)
     candidatoFormData.append(
       "Apellido_Materno_Propietario",
-      candidato.value.apellido_Materno_Propietario
+      propietario_1.value.apellido_Materno
     );
-  if (candidato.value.mote_Propietario != null)
-    candidatoFormData.append(
-      "Mote_Propietario",
-      candidato.value.mote_Propietario
-    );
-  if (candidato.value.sexo_Propietario != null)
-    candidatoFormData.append(
-      "Sexo_Propietario",
-      candidato.value.sexo_Propietario
-    );
-  if (candidato.value.url_Foto_Propietario != null)
-    candidatoFormData.append(
-      "Foto_Propietario",
-      candidato.value.url_Foto_Propietario
-    );
-  if (candidato.value.clave_Elector_Propietario != null)
+  if (propietario_1.value.mote != null)
+    candidatoFormData.append("Mote_Propietario", propietario_1.value.mote);
+  if (propietario_1.value.sexo != null)
+    candidatoFormData.append("Sexo_Propietario", propietario_1.value.sexo);
+  if (propietario_1.value.url_Foto != null)
+    candidatoFormData.append("Foto_Propietario", propietario_1.value.url_Foto);
+  if (propietario_1.value.clave_Elector != null)
     candidatoFormData.append(
       "Clave_Elector_Propietario",
-      candidato.value.clave_Elector_Propietario
+      propietario_1.value.clave_Elector
     );
-  if (candidato.value.rfc_Propietario != null)
-    candidatoFormData.append(
-      "RFC_Propietario",
-      candidato.value.rfc_Propietario
-    );
-  if (candidato.value.curp_Propietario != null)
-    candidatoFormData.append(
-      "CURP_Propietario",
-      candidato.value.curp_Propietario
-    );
-  if (candidato.value.fecha_Nacimiento_Propietario != null)
+  if (propietario_1.value.rfc != null)
+    candidatoFormData.append("RFC_Propietario", propietario_1.value.rfc);
+  if (propietario_1.value.curp != null)
+    candidatoFormData.append("CURP_Propietario", propietario_1.value.curp);
+  if (propietario_1.value.fecha_Nacimiento != null)
     candidatoFormData.append(
       "Fecha_Nacimiento_Propietario",
-      candidato.value.fecha_Nacimiento_Propietario
+      propietario_1.value.fecha_Nacimiento
     );
-  if (candidato.value.ocupacion_Propietario != null)
+  if (propietario_1.value.ocupacion != null)
     candidatoFormData.append(
       "Ocupacion_Propietario",
-      candidato.value.ocupacion_Propietario
+      propietario_1.value.ocupacion
     );
-  if (candidato.value.telefono_Propietario != null) {
-    console.log("entrooo");
-    if (candidato.value.extension_Prop != null) {
-      candidatoFormData.append(
-        "Telefono_Propietario",
-        `${candidato.value.telefono_Propietario}, ${candidato.value.extension_Prop}`
-      );
-    } else {
-      candidatoFormData.append(
-        "Telefono_Propietario",
-        candidato.value.telefono_Propietario
-      );
-    }
-  }
-  if (candidato.value.correo_Propietario != null)
+  if (propietario_1.value.telefono != null) {
     candidatoFormData.append(
-      "Correo_Propietario",
-      candidato.value.correo_Propietario
+      "Telefono_Propietario",
+      propietario_1.value.telefono
     );
-  if (candidato.value.pertenece_Grupo_Vulnerable_Propietario == true) {
+  }
+  if (propietario_1.value.correo != null)
+    candidatoFormData.append("Correo_Propietario", propietario_1.value.correo);
+  if (propietario_1.value.pertenece_Grupo_Vulnerable == true) {
     candidatoFormData.append(
       "Pertenece_Grupo_Vulnerable_Propietario",
-      candidato.value.pertenece_Grupo_Vulnerable_Propietario
+      propietario_1.value.pertenece_Grupo_Vulnerable
     );
-    const grupos = candidato.value.grupoProp_1.concat(
-      `${candidato.value.grupoProp_1}|${candidato.value.grupoProp_2}|${candidato.value.grupoProp_3}|${candidato.value.grupoProp_4}`
+    const grupos = `${
+      propietario_1.value.grupo_Vulnerable_1 != null
+        ? propietario_1.value.grupo_Vulnerable_1
+        : ""
+    }`.concat(
+      `|${
+        propietario_1.value.grupo_Vulnerable_2 != null
+          ? propietario_1.value.grupo_Vulnerable_2
+          : ""
+      }|${
+        propietario_1.value.grupo_Vulnerable_3 != null
+          ? propietario_1.value.grupo_Vulnerable_3
+          : ""
+      }|${
+        propietario_1.value.grupo_Vulnerable_4 != null
+          ? propietario_1.value.grupo_Vulnerable_4
+          : ""
+      }`
     );
     candidatoFormData.append("Grupo_Vulnerable_Propietario", grupos);
   } else {
@@ -651,232 +645,248 @@ const onSubmit = async () => {
   }
 
   //------------PROPIETARIO 2------------
-  if (candidato.value.nombres_Propietario_2 != null)
+  if (propietario_2.value.nombres != null)
     candidatoFormData.append(
       "Nombres_Propietario_2",
-      candidato.value.nombres_Propietario_2
+      propietario_2.value.nombres
     );
-  if (candidato.value.apellido_Paterno_Propietario_2 != null)
+  if (propietario_2.value.apellido_Paterno != null)
     candidatoFormData.append(
       "Apellido_Paterno_Propietario_2",
-      candidato.value.apellido_Paterno_Propietario_2
+      propietario_2.value.apellido_Paterno
     );
-  if (candidato.value.apellido_Materno_Propietario_2 != null)
+  if (propietario_2.value.apellido_Materno != null)
     candidatoFormData.append(
       "Apellido_Materno_Propietario_2",
-      candidato.value.apellido_Materno_Propietario_2
+      propietario_2.value.apellido_Materno
     );
-  if (candidato.value.mote_Propietario_2 != null)
-    candidatoFormData.append(
-      "Mote_Propietario_2",
-      candidato.value.mote_Propietario_2
-    );
-  if (candidato.value.sexo_Propietario_2 != null)
-    candidatoFormData.append(
-      "Sexo_Propietario_2",
-      candidato.value.sexo_Propietario_2
-    );
-  if (candidato.value.url_Foto_Propietario_2 != null)
+  if (propietario_2.value.mote != null)
+    candidatoFormData.append("Mote_Propietario_2", propietario_2.value.mote);
+  if (propietario_2.value.sexo != null)
+    candidatoFormData.append("Sexo_Propietario_2", propietario_2.value.sexo);
+  if (propietario_2.value.url_Foto != null)
     candidatoFormData.append(
       "Foto_Propietario_2",
-      candidato.value.url_Foto_Propietario_2
+      propietario_2.value.url_Foto
     );
-  if (candidato.value.clave_Elector_Propietario_2 != null)
+  if (propietario_2.value.clave_Elector != null)
     candidatoFormData.append(
       "Clave_Elector_Propietario_2",
-      candidato.value.clave_Elector_Propietario_2
+      propietario_2.value.clave_Elector
     );
-  if (candidato.value.rfc_Propietario_2 != null)
-    candidatoFormData.append(
-      "RFC_Propietario_2",
-      candidato.value.rfc_Propietario_2
-    );
-  if (candidato.value.curp_Propietario_2 != null)
-    candidatoFormData.append(
-      "CURP_Propietario_2",
-      candidato.value.curp_Propietario_2
-    );
-  if (candidato.value.fecha_Nacimiento_Propietario_2 != null)
+  if (propietario_2.value.rfc != null)
+    candidatoFormData.append("RFC_Propietario_2", propietario_2.value.rfc);
+  if (propietario_2.value.curp != null)
+    candidatoFormData.append("CURP_Propietario_2", propietario_2.value.curp);
+  if (propietario_2.value.fecha_Nacimiento != null)
     candidatoFormData.append(
       "Fecha_Nacimiento_Propietario_2",
-      candidato.value.fecha_Nacimiento_Propietario_2
+      propietario_2.value.fecha_Nacimiento
     );
-  if (candidato.value.ocupacion_Propietario_2 != null)
+  if (propietario_2.value.ocupacion != null)
     candidatoFormData.append(
       "Ocupacion_Propietario_2",
-      candidato.value.ocupacion_Propietario_2
+      propietario_2.value.ocupacion
     );
-  if (candidato.value.telefono_Propietario_2 != null)
+  if (propietario_2.value.telefono != null)
     candidatoFormData.append(
       "Telefono_Propietario_2",
-      candidato.value.telefono_Propietario_2
+      propietario_2.value.telefono
     );
-  if (candidato.value.correo_Propietario_2 != null)
+  if (propietario_2.value.correo != null)
     candidatoFormData.append(
       "Correo_Propietario_2",
-      candidato.value.correo_Propietario_2
+      propietario_2.value.correo
     );
-  if (candidato.value.pertenece_Grupo_Vulnerable_Propietario_2 != null)
+  if (propietario_2.value.pertenece_Grupo_Vulnerable == true) {
     candidatoFormData.append(
       "Pertenece_Grupo_Vulnerable_Propietario_2",
-      candidato.value.pertenece_Grupo_Vulnerable_Propietario_2
+      propietario_2.value.pertenece_Grupo_Vulnerable
     );
-  if (candidato.value.grupo_Vulnerable_Propietario_2 != null)
-    candidatoFormData.append(
-      "Grupo_Vulnerable_Propietario_2",
-      candidato.value.grupo_Vulnerable_Propietario_2
+    const grupos = `${
+      propietario_2.value.grupo_Vulnerable_1 != null
+        ? propietario_2.value.grupo_Vulnerable_1
+        : propietario_2.value.grupo_Vulnerable_1
+    }`.concat(
+      `|${
+        propietario_2.value.grupo_Vulnerable_2 != null
+          ? propietario_2.value.grupo_Vulnerable_2
+          : ""
+      }|${
+        propietario_2.value.grupo_Vulnerable_3 != null
+          ? propietario_2.value.grupo_Vulnerable_3
+          : ""
+      }|${
+        propietario_2.value.grupo_Vulnerable_4 != null
+          ? propietario_2.value.grupo_Vulnerable_4
+          : ""
+      }`
     );
+    candidatoFormData.append("Grupo_Vulnerable_Propietario_2", grupos);
+  } else {
+    candidatoFormData.append("Pertenece_Grupo_Vulnerable_Propietario_2", false);
+    candidatoFormData.append("Grupo_Vulnerable_Propietario_2", "");
+  }
 
   //------------SUPLENTE------------
-  if (candidato.value.nombres_Suplente != null)
-    candidatoFormData.append(
-      "Nombres_Suplente",
-      candidato.value.nombres_Suplente
-    );
-  if (candidato.value.apellido_Paterno_Suplente != null)
+  if (suplente_1.value.nombres != null)
+    candidatoFormData.append("Nombres_Suplente", suplente_1.value.nombres);
+  if (suplente_1.value.apellido_Paterno != null)
     candidatoFormData.append(
       "Apellido_Paterno_Suplente",
-      candidato.value.apellido_Paterno_Suplente
+      suplente_1.value.apellido_Paterno
     );
-  if (candidato.value.apellido_Materno_Suplente != null)
+  if (suplente_1.value.apellido_Materno != null)
     candidatoFormData.append(
       "Apellido_Materno_Suplente",
-      candidato.value.apellido_Materno_Suplente
+      suplente_1.value.apellido_Materno
     );
-  if (candidato.value.mote_Suplente != null)
-    candidatoFormData.append("Mote_Suplente", candidato.value.mote_Suplente);
-  if (candidato.value.sexo_Suplente != null)
-    candidatoFormData.append("Sexo_Suplente", candidato.value.sexo_Suplente);
-  if (candidato.value.url_Foto_Suplente != null)
-    candidatoFormData.append(
-      "Foto_Suplente",
-      candidato.value.url_Foto_Suplente
-    );
-  if (candidato.value.clave_Elector_Suplente != null)
+  if (suplente_1.value.mote != null)
+    candidatoFormData.append("Mote_Suplente", suplente_1.value.mote);
+  if (suplente_1.value.sexo != null)
+    candidatoFormData.append("Sexo_Suplente", suplente_1.value.sexo);
+  if (suplente_1.value.url_Foto != null)
+    candidatoFormData.append("Foto_Suplente", suplente_1.value.url_Foto);
+  if (suplente_1.value.clave_Elector != null)
     candidatoFormData.append(
       "Clave_Elector_Suplente",
-      candidato.value.clave_Elector_Suplente
+      suplente_1.value.clave_Elector
     );
-  if (candidato.value.rfc_Suplente != null)
-    candidatoFormData.append("RFC_Suplente", candidato.value.rfc_Suplente);
-  if (candidato.value.curp_Suplente != null)
-    candidatoFormData.append("CURP_Suplente", candidato.value.curp_Suplente);
-  if (candidato.value.fecha_Nacimiento_Suplente != null)
+  if (suplente_1.value.rfc != null)
+    candidatoFormData.append("RFC_Suplente", suplente_1.value.rfc);
+  if (suplente_1.value.curp != null)
+    candidatoFormData.append("CURP_Suplente", suplente_1.value.curp);
+  if (suplente_1.value.fecha_Nacimiento != null)
     candidatoFormData.append(
       "Fecha_Nacimiento_Suplente",
-      candidato.value.fecha_Nacimiento_Suplente
+      suplente_1.value.fecha_Nacimiento
     );
-  if (candidato.value.ocupacion_Suplente != null)
-    candidatoFormData.append(
-      "Ocupacion_Suplente",
-      candidato.value.ocupacion_Suplente
-    );
-  if (candidato.value.telefono_Suplente != null)
-    candidatoFormData.append(
-      "Telefono_Suplente",
-      candidato.value.telefono_Suplente
-    );
-  if (candidato.value.correo_Suplente != null)
-    candidatoFormData.append(
-      "Correo_Suplente",
-      candidato.value.correo_Suplente
-    );
-  if (candidato.value.pertenece_Grupo_Vulnerable_Suplente != null)
+  if (suplente_1.value.ocupacion != null)
+    candidatoFormData.append("Ocupacion_Suplente", suplente_1.value.ocupacion);
+  if (suplente_1.value.telefono != null)
+    candidatoFormData.append("Telefono_Suplente", suplente_1.value.telefono);
+  if (suplente_1.value.correo != null)
+    candidatoFormData.append("Correo_Suplente", suplente_1.value.correo);
+  if (suplente_1.value.pertenece_Grupo_Vulnerable == true) {
     candidatoFormData.append(
       "Pertenece_Grupo_Vulnerable_Suplente",
-      candidato.value.pertenece_Grupo_Vulnerable_Suplente
+      suplente_1.value.pertenece_Grupo_Vulnerable
     );
-  if (candidato.value.grupo_Vulnerable_Suplente != null)
-    candidatoFormData.append(
-      "Grupo_Vulnerable_Suplente",
-      candidato.value.grupo_Vulnerable_Suplente
+    const grupos = `${
+      suplente_1.value.grupo_Vulnerable_1 != null
+        ? suplente_1.value.grupo_Vulnerable_1
+        : ""
+    }`.concat(
+      `|${
+        suplente_1.value.grupo_Vulnerable_2 != null
+          ? suplente_1.value.grupo_Vulnerable_2
+          : ""
+      }|${
+        suplente_1.value.grupo_Vulnerable_3 != null
+          ? suplente_1.value.grupo_Vulnerable_3
+          : ""
+      }|${
+        suplente_1.value.grupo_Vulnerable_4 != null
+          ? suplente_1.value.grupo_Vulnerable_4
+          : ""
+      }`
     );
+    candidatoFormData.append("Grupo_Vulnerable_Suplente", grupos);
+  } else {
+    candidatoFormData.append("Pertenece_Grupo_Vulnerable_Suplente", false);
+    candidatoFormData.append("Grupo_Vulnerable_Suplente", "");
+  }
 
   //------------SUPLENTE 2------------
-  if (candidato.value.nombres_Suplente_2 != null)
-    candidatoFormData.append(
-      "Nombres_Suplente_2",
-      candidato.value.nombres_Suplente_2
-    );
-  if (candidato.value.apellido_Paterno_Suplente_2 != null)
+  if (suplente_2.value.nombres != null)
+    candidatoFormData.append("Nombres_Suplente_2", suplente_2.value.nombres);
+  if (suplente_2.value.apellido_Paterno != null)
     candidatoFormData.append(
       "Apellido_Paterno_Suplente_2",
-      candidato.value.apellido_Paterno_Suplente_2
+      suplente_2.value.apellido_Paterno
     );
-  if (candidato.value.apellido_Materno_Suplente_2 != null)
+  if (suplente_2.value.apellido_Materno != null)
     candidatoFormData.append(
       "Apellido_Materno_Suplente_2",
-      candidato.value.apellido_Materno_Suplente_2
+      suplente_2.value.apellido_Materno
     );
-  if (candidato.value.mote_Suplente_2 != null)
-    candidatoFormData.append(
-      "Mote_Suplente_2",
-      candidato.value.mote_Suplente_2
-    );
-  if (candidato.value.sexo_Suplente_2 != null)
-    candidatoFormData.append(
-      "Sexo_Suplente_2",
-      candidato.value.sexo_Suplente_2
-    );
-  if (candidato.value.url_Foto_Suplente_2 != null)
-    candidatoFormData.append(
-      "Foto_Suplente_2",
-      candidato.value.url_Foto_Suplente_2
-    );
-  if (candidato.value.clave_Elector_Suplente_2 != null)
+  if (suplente_2.value.mote != null)
+    candidatoFormData.append("Mote_Suplente_2", suplente_2.value.mote);
+  if (suplente_2.value.sexo != null)
+    candidatoFormData.append("Sexo_Suplente_2", suplente_2.value.sexo);
+  if (suplente_2.value.url_Foto != null)
+    candidatoFormData.append("Foto_Suplente_2", suplente_2.value.url_Foto);
+  if (suplente_2.value.clave_Elector != null)
     candidatoFormData.append(
       "Clave_Elector_Suplente_2",
-      candidato.value.clave_Elector_Suplente_2
+      suplente_2.value.clave_Elector
     );
-  if (candidato.value.rfc_Suplente_2 != null)
-    candidatoFormData.append("RFC_Suplente_2", candidato.value.rfc_Suplente_2);
-  if (candidato.value.curp_Suplente_2 != null)
-    candidatoFormData.append(
-      "CURP_Suplente_2",
-      candidato.value.curp_Suplente_2
-    );
-  if (candidato.value.fecha_Nacimiento_Suplente_2 != null)
+  if (suplente_2.value.rfc != null)
+    candidatoFormData.append("RFC_Suplente_2", suplente_2.value.rfc);
+  if (suplente_2.value.curp != null)
+    candidatoFormData.append("CURP_Suplente_2", suplente_2.value.curp);
+  if (suplente_2.value.fecha_Nacimiento != null)
     candidatoFormData.append(
       "Fecha_Nacimiento_Suplente_2",
-      candidato.value.fecha_Nacimiento_Suplente_2
+      suplente_2.value.fecha_Nacimiento
     );
-  if (candidato.value.ocupacion_Suplente_2 != null)
+  if (suplente_2.value.ocupacion != null)
     candidatoFormData.append(
       "Ocupacion_Suplente_2",
-      candidato.value.ocupacion_Suplente_2
+      suplente_2.value.ocupacion
     );
-  if (candidato.value.telefono_Suplente_2 != null)
+  if (suplente_2.value.telefono != null)
+    candidatoFormData.append("Telefono_Suplente_2", suplente_2.value.telefono);
+  if (suplente_2.value.correo != null)
+    candidatoFormData.append("Correo_Suplente_2", suplente_2.value.correo);
+  if (suplente_2.value.pertenece_Grupo_Vulnerable == true) {
     candidatoFormData.append(
-      "Telefono_Suplente_2",
-      candidato.value.telefono_Suplente_2
+      "Pertenece_Grupo_Vulnerable_Suplente",
+      suplente_2.value.pertenece_Grupo_Vulnerable
     );
-  if (candidato.value.correo_Suplente_2 != null)
-    candidatoFormData.append(
-      "Correo_Suplente_2",
-      candidato.value.correo_Suplente_2
+    const grupos = `${
+      suplente_2.value.grupo_Vulnerable_1 != null
+        ? suplente_2.value.grupo_Vulnerable_1
+        : suplente_2.value.grupo_Vulnerable_1
+    }`.concat(
+      `|${
+        suplente_2.value.grupo_Vulnerable_2 != null
+          ? suplente_2.value.grupo_Vulnerable_2
+          : ""
+      }|${
+        suplente_2.value.grupo_Vulnerable_3 != null
+          ? suplente_2.value.grupo_Vulnerable_3
+          : ""
+      }|${
+        suplente_2.value.grupo_Vulnerable_4 != null
+          ? suplente_2.value.grupo_Vulnerable_4
+          : ""
+      }`
     );
-  if (candidato.value.pertenece_Grupo_Vulnerable_Suplente_2 != null)
-    candidatoFormData.append(
-      "Pertenece_Grupo_Vulnerable_Suplente_2",
-      candidato.value.pertenece_Grupo_Vulnerable_Suplente_2
-    );
-  if (candidato.value.grupo_Vulnerable_Suplente_2 != null)
-    candidatoFormData.append(
-      "Grupo_Vulnerable_Suplente_2",
-      candidato.value.grupo_Vulnerable_Suplente_2
-    );
+    candidatoFormData.append("Grupo_Vulnerable_Suplente_2", grupos);
+  } else {
+    candidatoFormData.append("Pertenece_Grupo_Vulnerable_Suplente_2", false);
+    candidatoFormData.append("Grupo_Vulnerable_Suplente_2", "");
+  }
+
   if (candidato.value.is_Coalicion == true) {
     if (partido_Id_prop.value != null)
-      candidatoFormData.append("Partido_Id", partido_Id_prop.value);
+      candidatoFormData.append("Partido_Id", partido_Id_prop.value.value);
     if (partido_Id_sup.value != null)
-      candidatoFormData.append("Partido_Suplente_Id", partido_Id_sup.value);
+      candidatoFormData.append(
+        "Partido_Suplente_Id",
+        partido_Id_sup.value.value
+      );
     if (partido_Id_prop2.value != null)
       candidatoFormData.append(
         "Partido_Propietario_2_Id",
-        partido_Id_prop2.value
+        partido_Id_prop2.value.value
       );
     if (partido_Id_sup2.value != null)
-      candidatoFormData.append("Partido_Suplente_2_Id", partido_Id_sup2.value);
+      candidatoFormData.append(
+        "Partido_Suplente_2_Id",
+        partido_Id_sup2.value.value
+      );
   } else {
     if (partido_Id.value != null) {
       candidatoFormData.append("Partido_Id", partido_Id.value.value);

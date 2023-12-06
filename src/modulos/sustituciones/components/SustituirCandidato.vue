@@ -3,10 +3,8 @@
     <q-card-section class="row">
       <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 q-pr-xs">
         <q-file
-          accept=".jpg, .jpeg, .png"
-          max-file-size="700"
           bottom-slots
-          v-model="candidato.foto_Propietario_2"
+          v-model="sustitucion.Foto_Nuevo"
           label="Fotografía"
           counter
         >
@@ -16,7 +14,7 @@
           <template v-slot:append>
             <q-icon
               name="close"
-              @click.stop.prevent="model = null"
+              @click.stop.prevent="sustitucion.Foto_Nuevo = null"
               class="cursor-pointer"
             />
           </template>
@@ -26,7 +24,7 @@
       </div>
       <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12 q-pr-xs">
         <q-input
-          v-model="candidato.nombres_Suplente_2"
+          v-model="sustitucion.Nombres_Nuevo"
           label="Nombre(s)"
           hint="Ingrese su nombre"
           autogrow
@@ -37,18 +35,16 @@
       </div>
       <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12 q-pr-xs">
         <q-input
-          v-model="candidato.apellido_Paterno_Suplente_2"
+          v-model="sustitucion.Apellido_Paterno_Nuevo"
           label="Apellido paterno"
           hint="Ingrese su apellido paterno"
           autogrow
-          lazy-rules
-          :rules="[(val) => !!val || 'El apellido paterno es requerido']"
         >
         </q-input>
       </div>
       <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12 q-pr-xs">
         <q-input
-          v-model="candidato.apellido_Materno_Suplente_2"
+          v-model="sustitucion.Apellido_Materno_Nuevo"
           label="Apellido Materno"
           hint="Ingrese su apellido materno"
           autogrow
@@ -57,16 +53,16 @@
       </div>
       <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12 q-pr-xs">
         <q-input
-          v-model="candidato.mote_Suplente_2"
+          v-model="sustitucion.Mote_Nuevo"
           label="Mote"
           hint="Ingrese su sobrenombre"
           autogrow
         >
         </q-input>
       </div>
-      <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 q-pr-xs">
+      <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12 q-pr-xs">
         <q-input
-          v-model.trim="candidato.clave_Elector_Suplente_2"
+          v-model.trim="sustitucion.Clave_Elector_Nuevo"
           label="Clave de elector"
           hint="Ingrese su clave de elector"
           counter
@@ -81,9 +77,9 @@
         >
         </q-input>
       </div>
-      <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 q-pr-xs">
+      <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12 q-pr-xs">
         <q-input
-          v-model.trim="candidato.curp_Suplente_2"
+          v-model.trim="sustitucion.CURP_Nuevo"
           label="CURP"
           hint="Ingrese su CURP"
           autogrow
@@ -97,9 +93,9 @@
         >
         </q-input>
       </div>
-      <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 q-pr-xs">
+      <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12 q-pr-xs">
         <q-input
-          v-model.trim="candidato.rfc_Suplente_2"
+          v-model.trim="sustitucion.RFC_Nuevo"
           label="RFC"
           hint="Ingrese su RFC"
           counter
@@ -115,9 +111,7 @@
       </div>
       <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12 q-pr-xs">
         <q-input
-          v-model="date"
-          mask="date"
-          :rules="['date']"
+          v-model="sustitucion.Fecha_Nacimiento_Nuevo"
           label="Fecha de nacimiento"
         >
           <template v-slot:append>
@@ -127,7 +121,12 @@
                 transition-show="scale"
                 transition-hide="scale"
               >
-                <q-date v-model="date" color="pink-4" :options="optionsDate">
+                <q-date
+                  v-model="sustitucion.Fecha_Nacimiento_Nuevo"
+                  color="pink-4"
+                  :options="optionsDate"
+                  mask="DD-MM-YYYY"
+                >
                   <div class="row items-center justify-end">
                     <q-btn v-close-popup label="Close" color="pink" flat />
                   </div>
@@ -149,7 +148,7 @@
       </div>
       <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12 q-pr-xs">
         <q-select
-          v-model="candidato.sexo_Suplente_2"
+          v-model="sustitucion.Sexo_Nuevo"
           :options="optionsGenero"
           label="Género"
           lazy-rules
@@ -158,7 +157,7 @@
       </div>
       <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
         <q-input
-          v-model="candidato.ocupacion_Suplente_2"
+          v-model="sustitucion.Ocupacion_Nuevo"
           label="Ocupación"
           hint="Ingrese su ocupación"
         >
@@ -166,18 +165,13 @@
       </div>
       <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 q-pr-xs">
         <q-input
-          v-model.trim="candidato.correo_Suplente_2"
+          v-model.trim="sustitucion.Correo_Nuevo"
           type="email"
           label="Correo electrónico"
           hint="Correo electrónico para recibir avisos y comuniados "
           autogrow
           lazy-rules
-          :rules="[
-            (val) => !!val || 'El correo electrónico es requerido',
-            (val) =>
-              /\w+([.-_+]?\w+)*@\w+([.-]?\w+)*(\.\w{2,10})+$/.test(val) ||
-              'Formato de correo electrónico no válido',
-          ]"
+          :rules="[(val) => !!val || 'El correo electronico es requerida']"
         >
           <template v-slot:prepend>
             <q-icon name="email" color="pink" />
@@ -194,7 +188,7 @@
         <q-select
           label="Teléfono"
           hint="Da enter para agregar teléfono"
-          v-model="telefono"
+          v-model="telefonos"
           use-input
           use-chips
           hide-dropdown-icon
@@ -208,16 +202,17 @@
           </template>
         </q-select>
       </div>
-      <div v-if="isExtension" class="col-lg-1 col-md-1 col-sm-1 col-xs-12">
+      <!-- <div v-if="isExtension" class="col-lg-1 col-md-1 col-sm-1 col-xs-12">
         <q-input
-          v-model.trim="correo"
-          type="email"
+          v-model.number="candidatoSustituir.extension_Prop"
+          type="number"
           label="Extensión"
           hint="Extensión"
           autogrow
         >
         </q-input>
-      </div>
+      </div> -->
+
       <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
         <br />
         <q-checkbox
@@ -226,72 +221,99 @@
           checked-icon="task_alt"
           unchecked-icon="highlight_off"
           size="lg"
-          v-model="candidato.pertenece_Grupo_Vulnerable_Suplente_2"
+          v-model="sustitucion.Pertenece_Grupo_Vulnerable_Nuevo"
           color="pink"
         />
       </div>
       <div
-        class="row"
-        v-if="candidato.pertenece_Grupo_Vulnerable_Suplente_2 == true"
+        v-if="sustitucion.Pertenece_Grupo_Vulnerable_Nuevo == true"
+        class="col-lg-6 col-md-6 col-sm-12 col-xs-12 q-pr-xs"
       >
-        <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12 q-pr-xs">
-          <q-input label="Personas de pueblos y comunidades indígenas">
-          </q-input>
-          <q-input label="Diversidad sexual"> </q-input>
-        </div>
-        <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12 q-pr-xs">
-          <q-input label="Personas con discapacidad"> </q-input>
-          <q-input label="Otro"> </q-input>
-        </div>
+        <q-input
+          v-model="sustitucion.grupo_Vulnerable_1"
+          label="Personas de pueblos y comunidades indígenas"
+        >
+        </q-input>
+        <q-input
+          v-model="sustitucion.grupo_Vulnerable_2"
+          label="Diversidad sexual"
+        >
+        </q-input>
+      </div>
+      <div
+        v-if="sustitucion.Pertenece_Grupo_Vulnerable_Nuevo == true"
+        class="col-lg-6 col-md-6 col-sm-12 col-xs-12 q-pr-xs"
+      >
+        <q-input
+          v-model="sustitucion.grupo_Vulnerable_3"
+          label="Personas con discapacidad"
+        >
+        </q-input>
+        <q-input v-model="sustitucion.grupo_Vulnerable_4" label="Otro">
+        </q-input>
       </div>
     </q-card-section>
   </q-card>
 </template>
 
 <script setup>
-import { ref, defineProps, watch } from "vue";
-import { useCandidatosStore } from "src/stores/candidatos-store";
+import { useQuasar } from "quasar";
 import { storeToRefs } from "pinia";
+import { useCandidatosStore } from "src/stores/candidatos-store";
+import { ref, defineProps, watch } from "vue";
+import { useSustituirStore } from "src/stores/sustituir-store";
 
 //--------------------------------------------------------------------
 
-const candidatosStore = useCandidatosStore();
-const { candidato } = storeToRefs(candidatosStore);
+const $q = useQuasar();
+const candidatoStore = useCandidatosStore();
+const sustituirStore = useSustituirStore();
+const { candidato } = storeToRefs(candidatoStore);
+const { sustitucion } = storeToRefs(sustituirStore);
 const optionsGenero = ref(["Hombre", "Mujer", "No binario"]);
-const telefono = ref([]);
-const correo = ref(null);
+const telefonos = ref([]);
 const props = defineProps({
-  coalicion: { type: Boolean, required: true },
+  tab: { type: String, required: true },
 });
-const date = ref(null);
 const edad = ref("");
 const isExtension = ref(false);
+const num_Extension = ref(null);
 
 //--------------------------------------------------------------------
 
-watch(date, (val) => {
-  var fechaNace = new Date(val.fecha_Nacimiento_Suplente);
-  var fechaActual = new Date();
+watch(candidato.value, (val) => {
+  if (val != null) {
+    var fechaNace = new Date(val.fecha_Nacimiento_Propietario);
+    var fechaActual = new Date();
 
-  var mes = fechaActual.getMonth();
-  var dia = fechaActual.getDate();
-  var año = fechaActual.getFullYear();
+    var mes = fechaActual.getMonth();
+    var dia = fechaActual.getDate();
+    var año = fechaActual.getFullYear();
 
-  fechaActual.setDate(dia);
-  fechaActual.setMonth(mes);
-  fechaActual.setFullYear(año);
+    fechaActual.setDate(dia);
+    fechaActual.setMonth(mes);
+    fechaActual.setFullYear(año);
 
-  edad.value = Math.floor(
-    (fechaActual - fechaNace) / (1000 * 60 * 60 * 24) / 365
-  );
-  return edad;
+    edad.value = Math.floor(
+      (fechaActual - fechaNace) / (1000 * 60 * 60 * 24) / 365
+    );
+
+    return edad;
+  }
 });
 
-watch(telefono, (val) => {
+watch(telefonos, (val) => {
   if (val[2] != null) {
     isExtension.value = true;
   } else {
     isExtension.value = false;
+  }
+  if (val != null) {
+    sustitucion.value.Telefono_Nuevo = `${val[0] != undefined ? val[0] : ""},${
+      val[1] != undefined ? val[1] : ""
+    },${val[2] != undefined ? val[2] : ""}, ${
+      num_Extension.value != null ? num_Extension.value : ""
+    }`;
   }
 });
 

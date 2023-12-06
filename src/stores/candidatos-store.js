@@ -5,12 +5,12 @@ export const useCandidatosStore = defineStore("useCandidatosStore", {
   state: () => ({
     modal: false,
     isEditar: false,
-
     modalSustituir: false,
     list_Candidatos: [],
     candidato: {
       id: null,
       tipo_Eleccion_Id: null,
+      tipo_Eleccion: null,
       municipio_Id: null,
       distrito_Id: null,
       demarcacion_Id: null,
@@ -20,83 +20,102 @@ export const useCandidatosStore = defineStore("useCandidatosStore", {
       orden: null,
       activo: null,
       fecha_Registro: null,
-      //---------------------------------
-      nombre_Completo_Propietario: null,
-      nombres_Propietario: null,
-      apellido_Paterno_Propietario: null,
-      apellido_Materno_Propietario: null,
-      mote_Propietario: null,
-      sexo_Propietario: null,
-      url_Foto_Propietario: null,
-      clave_Elector_Propietario: null,
-      rfc_Propietario: null,
-      curp_Propietario: null,
-      fecha_Nacimiento_Propietario: null,
-      ocupacion_Propietario: null,
-      telefono_Propietario: null,
-      correo_Propietario: null,
-      pertenece_Grupo_Vulnerable_Propietario: false,
-      grupo_Vulnerable_Propietario: null,
+    },
+    propietario_1: {
+      nombre_Completo: null,
+      nombres: null,
+      apellido_Paterno: null,
+      apellido_Materno: null,
+      mote: null,
+      sexo: null,
+      url_Foto: null,
+      clave_Elector: null,
+      rfc: null,
+      curp: null,
+      fecha_Nacimiento: null,
+      ocupacion: null,
+      telefono: null,
+      correo: null,
+      pertenece_Grupo_Vulnerable: false,
+      grupo_Vulnerable: null,
       partido_Id: null,
-      grupoProp_1: null,
-      grupoProp_2: null,
-      grupoProp_3: null,
-      grupoProp_4: null,
-      extension_Prop: null,
-      //---------------------------------
-      nombre_Completo_Propietario_2: null,
-      nombres_Propietario_2: null,
-      apellido_Paterno_Propietario_2: null,
-      apellido_Materno_Propietario_2: null,
-      mote_Propietario_2: null,
-      sexo_Propietario_2: null,
-      url_Foto_Propietario_2: null,
-      clave_Elector_Propietario_2: null,
-      rfc_Propietario_2: null,
-      curp_Propietario_2: null,
-      fecha_Nacimiento_Propietario_2: null,
-      ocupacion_Propietario_2: null,
-      telefono_Propietario_2: null,
-      correo_Propietario_2: null,
-      pertenece_Grupo_Vulnerable_Propietario_2: false,
-      grupo_Vulnerable_Propietario_2: null,
-      partido_Propietario_2_Id: null,
-      //---------------------------------
-      nombre_Completo_Suplente: null,
-      nombres_Suplente: null,
-      apellido_Paterno_Suplente: null,
-      apellido_Materno_Suplente: null,
-      mote_Suplente: null,
-      sexo_Suplente: null,
-      url_Foto_Suplente: null,
-      clave_Elector_Suplente: null,
-      rfc_Suplente: null,
-      curp_Suplente: null,
-      fecha_Nacimiento_Suplente: null,
-      ocupacion_Suplente: null,
-      telefono_Suplente: null,
-      correo_Suplente: null,
-      pertenece_Grupo_Vulnerable_Suplente: false,
-      grupo_Vulnerable_Suplente: null,
-      partido_Suplente_Id: null,
-      //---------------------------------
-      nombre_Completo_Suplente_2: null,
-      nombres_Suplente_2: null,
-      apellido_Paterno_Suplente_2: null,
-      apellido_Materno_Suplente_2: null,
-      mote_Suplente_2: null,
-      sexo_Suplente_2: null,
-      url_Foto_Suplente_2: null,
-      clave_Elector_Suplente_2: null,
-      rfc_Suplente_2: null,
-      curp_Suplente_2: null,
-      fecha_Nacimiento_Suplente_2: null,
-      ocupacion_Suplente_2: null,
-      telefono_Suplente_2: null,
-      correo_Suplente_2: null,
-      pertenece_Grupo_Vulnerable_Suplente_2: false,
-      grupo_Vulnerable_Suplente_2: null,
-      partido_Suplente_2_Id: null,
+      url_Logo_Partido: null,
+      grupo_Vulnerable_1: null,
+      grupo_Vulnerable_2: null,
+      grupo_Vulnerable_3: null,
+      grupo_Vulnerable_4: null,
+    },
+    propietario_2: {
+      nombre_Completo: null,
+      nombres: null,
+      apellido_Paterno: null,
+      apellido_Materno: null,
+      mote: null,
+      sexo: null,
+      url_Foto: null,
+      clave_Elector: null,
+      rfc: null,
+      curp: null,
+      fecha_Nacimiento: null,
+      ocupacion: null,
+      telefono: null,
+      correo: null,
+      pertenece_Grupo_Vulnerable: false,
+      grupo_Vulnerable: null,
+      partido_Id: null,
+      url_Logo_Partido: null,
+      grupo_Vulnerable_1: null,
+      grupo_Vulnerable_2: null,
+      grupo_Vulnerable_3: null,
+      grupo_Vulnerable_4: null,
+    },
+    suplente_1: {
+      nombre_Completo: null,
+      nombres: null,
+      apellido_Paterno: null,
+      apellido_Materno: null,
+      mote: null,
+      sexo: null,
+      url_Foto: null,
+      clave_Elector: null,
+      rfc: null,
+      curp: null,
+      fecha_Nacimiento: null,
+      ocupacion: null,
+      telefono: null,
+      correo: null,
+      pertenece_Grupo_Vulnerable: false,
+      grupo_Vulnerable: null,
+      partido_Id: null,
+      url_Logo_Partido: null,
+      grupo_Vulnerable_1: null,
+      grupo_Vulnerable_2: null,
+      grupo_Vulnerable_3: null,
+      grupo_Vulnerable_4: null,
+    },
+    suplente_2: {
+      nombre_Completo: null,
+      nombres: null,
+      apellido_Paterno: null,
+      apellido_Materno: null,
+      mote: null,
+      sexo: null,
+      url_Foto: null,
+      clave_Elector: null,
+      rfc: null,
+      curp: null,
+      fecha_Nacimiento: null,
+      ocupacion: null,
+      telefono: null,
+      correo: null,
+      pertenece_Grupo_Vulnerable: false,
+      grupo_Vulnerable: null,
+      partido_Id: null,
+      url_Logo_Partido: null,
+      grupo_Vulnerable_1: null,
+      grupo_Vulnerable_2: null,
+      grupo_Vulnerable_3: null,
+      grupo_Vulnerable_4: null,
     },
   }),
   actions: {
@@ -111,7 +130,7 @@ export const useCandidatosStore = defineStore("useCandidatosStore", {
     },
     //----------------------------------------------------------------------
     //INTI CANDIDATO
-    initiCandidato() {
+    initCandidato() {
       this.candidato.id = null;
       this.candidato.tipo_Eleccion_Id = null;
       this.candidato.municipio_Id = null;
@@ -123,77 +142,101 @@ export const useCandidatosStore = defineStore("useCandidatosStore", {
       this.candidato.orden = null;
       this.candidato.activo = null;
       //---------------------------------
-      this.candidato.nombre_Completo_Propietario = null;
-      this.candidato.nombres_Propietario = null;
-      this.candidato.apellido_Paterno_Propietario = null;
-      this.candidato.apellido_Materno_Propietario = null;
-      this.candidato.mote_Propietario = null;
-      this.candidato.sexo_Propietario = null;
-      this.candidato.url_Foto_Propietario = null;
-      this.candidato.clave_Elector_Propietario = null;
-      this.candidato.rfc_Propietario = null;
-      this.candidato.curp_Propietario = null;
-      this.candidato.fecha_Nacimiento_Propietario = null;
-      this.candidato.ocupacion_Propietario = null;
-      this.candidato.telefono_Propietario = null;
-      this.candidato.correo_Propietario = null;
-      this.candidato.pertenece_Grupo_Vulnerable_Propietario = null;
-      this.candidato.grupo_Vulnerable_Propietario = null;
-      this.candidato.partido_Id = null;
+      //PROPIETARIO 1
+      this.propietario_1.nombre_Completo = null;
+      this.propietario_1.nombres = null;
+      this.propietario_1.apellido_Paterno = null;
+      this.propietario_1.apellido_Materno = null;
+      this.propietario_1.mote = null;
+      this.propietario_1.sexo = null;
+      this.propietario_1.url_Foto = null;
+      this.propietario_1.clave_Elector = null;
+      this.propietario_1.rfc = null;
+      this.propietario_1.curp = null;
+      this.propietario_1.fecha_Nacimiento = null;
+      this.propietario_1.ocupacion = null;
+      this.propietario_1.telefono = null;
+      this.propietario_1.correo = null;
+      this.propietario_1.pertenece_Grupo_Vulnerable = null;
+      this.propietario_1.grupo_Vulnerable = null;
+      this.propietario_1.partido_Id = null;
+      this.propietario_1.url_Logo_Partido = null;
+      this.propietario_1.grupo_Vulnerable_1 = null;
+      this.propietario_1.grupo_Vulnerable_2 = null;
+      this.propietario_1.grupo_Vulnerable_3 = null;
+      this.propietario_1.grupo_Vulnerable_4 = null;
       //---------------------------------
-      this.candidato.nombre_Completo_Propietario_2 = null;
-      this.candidato.nombres_Propietario_2 = null;
-      this.candidato.apellido_Paterno_Propietario_2 = null;
-      this.candidato.apellido_Materno_Propietario_2 = null;
-      this.candidato.mote_Propietario_2 = null;
-      this.candidato.sexo_Propietario_2 = null;
-      this.candidato.url_Foto_Propietario_2 = null;
-      this.candidato.clave_Elector_Propietario_2 = null;
-      this.candidato.rfc_Propietario_2 = null;
-      this.candidato.curp_Propietario_2 = null;
-      this.candidato.fecha_Nacimiento_Propietario_2 = null;
-      this.candidato.ocupacion_Propietario_2 = null;
-      this.candidato.telefono_Propietario_2 = null;
-      this.candidato.correo_Propietario_2 = null;
-      this.candidato.pertenece_Grupo_Vulnerable_Propietario_2 = null;
-      this.candidato.grupo_Vulnerable_Propietario_2 = null;
-      this.candidato.partido_Propietario_2_Id = null;
+      //PROPIETARIO 2
+      this.propietario_2.nombre_Completo = null;
+      this.propietario_2.nombres = null;
+      this.propietario_2.apellido_Paterno = null;
+      this.propietario_2.apellido_Materno = null;
+      this.propietario_2.mote = null;
+      this.propietario_2.sexo = null;
+      this.propietario_2.url_Foto = null;
+      this.propietario_2.clave_Elector = null;
+      this.propietario_2.rfc = null;
+      this.propietario_2.curp = null;
+      this.propietario_2.fecha_Nacimiento = null;
+      this.propietario_2.ocupacion = null;
+      this.propietario_2.telefono = null;
+      this.propietario_2.correo = null;
+      this.propietario_2.pertenece_Grupo_Vulnerable = null;
+      this.propietario_2.grupo_Vulnerable = null;
+      this.propietario_2.partido_Id = null;
+      this.propietario_2.url_Logo_Partido = null;
+      this.propietario_2.grupo_Vulnerable_1 = null;
+      this.propietario_2.grupo_Vulnerable_2 = null;
+      this.propietario_2.grupo_Vulnerable_3 = null;
+      this.propietario_2.grupo_Vulnerable_4 = null;
       //---------------------------------
-      this.candidato.nombre_Completo_Suplente = null;
-      this.candidato.nombres_Suplente = null;
-      this.candidato.apellido_Paterno_Suplente = null;
-      this.candidato.apellido_Materno_Suplente = null;
-      this.candidato.mote_Suplente = null;
-      this.candidato.sexo_Suplente = null;
-      this.candidato.url_Foto_Suplente = null;
-      this.candidato.clave_Elector_Suplente = null;
-      this.candidato.rfc_Suplente = null;
-      this.candidato.curp_Suplente = null;
-      this.candidato.fecha_Nacimiento_Suplente = null;
-      this.candidato.ocupacion_Suplente = null;
-      this.candidato.telefono_Suplente = null;
-      this.candidato.correo_Suplente = null;
-      this.candidato.pertenece_Grupo_Vulnerable_Suplente = null;
-      this.candidato.grupo_Vulnerable_Suplente = null;
-      this.candidato.partido_Suplente_Id = null;
+      //SUPLENTE 1
+      this.suplente_1.nombre_Completo = null;
+      this.suplente_1.nombres = null;
+      this.suplente_1.apellido_Paterno = null;
+      this.suplente_1.apellido_Materno = null;
+      this.suplente_1.mote = null;
+      this.suplente_1.sexo = null;
+      this.suplente_1.url_Foto = null;
+      this.suplente_1.clave_Elector = null;
+      this.suplente_1.rfc = null;
+      this.suplente_1.curp = null;
+      this.suplente_1.fecha_Nacimiento = null;
+      this.suplente_1.ocupacion = null;
+      this.suplente_1.telefono = null;
+      this.suplente_1.correo = null;
+      this.suplente_1.pertenece_Grupo_Vulnerable = null;
+      this.suplente_1.grupo_Vulnerable = null;
+      this.suplente_1.partido_Id = null;
+      this.suplente_1.url_Logo_Partido = null;
+      this.suplente_1.grupo_Vulnerable_1 = null;
+      this.suplente_1.grupo_Vulnerable_2 = null;
+      this.suplente_1.grupo_Vulnerable_3 = null;
+      this.suplente_1.grupo_Vulnerable_4 = null;
       //---------------------------------
-      this.candidato.nombre_Completo_Suplente_2 = null;
-      this.candidato.nombres_Suplente_2 = null;
-      this.candidato.apellido_Paterno_Suplente_2 = null;
-      this.candidato.apellido_Materno_Suplente_2 = null;
-      this.candidato.mote_Suplente_2 = null;
-      this.candidato.sexo_Suplente_2 = null;
-      this.candidato.url_Foto_Suplente_2 = null;
-      this.candidato.clave_Elector_Suplente_2 = null;
-      this.candidato.rfc_Suplente_2 = null;
-      this.candidato.curp_Suplente_2 = null;
-      this.candidato.fecha_Nacimiento_Suplente_2 = null;
-      this.candidato.ocupacion_Suplente_2 = null;
-      this.candidato.telefono_Suplente_2 = null;
-      this.candidato.correo_Suplente_2 = null;
-      this.candidato.pertenece_Grupo_Vulnerable_Suplente_2 = null;
-      this.candidato.grupo_Vulnerable_Suplente_2 = null;
-      this.candidato.partido_Suplente_2_Id = null;
+      //SUPLENTE 2
+      this.suplente_2.nombre_Completo = null;
+      this.suplente_2.nombres = null;
+      this.suplente_2.apellido_Paterno = null;
+      this.suplente_2.apellido_Materno = null;
+      this.suplente_2.mote = null;
+      this.suplente_2.sexo = null;
+      this.suplente_2.url_Foto = null;
+      this.suplente_2.clave_Elector = null;
+      this.suplente_2.rfc = null;
+      this.suplente_2.curp = null;
+      this.suplente_2.fecha_Nacimiento = null;
+      this.suplente_2.ocupacion = null;
+      this.suplente_2.telefono = null;
+      this.suplente_2.correo = null;
+      this.suplente_2.pertenece_Grupo_Vulnerable = null;
+      this.suplente_2.grupo_Vulnerable = null;
+      this.suplente_2.partido_Id = null;
+      this.suplente_2.url_Logo_Partido = null;
+      this.suplente_2.grupo_Vulnerable_1 = null;
+      this.suplente_2.grupo_Vulnerable_2 = null;
+      this.suplente_2.grupo_Vulnerable_3 = null;
+      this.suplente_2.grupo_Vulnerable_4 = null;
     },
     //----------------------------------------------------------------------
     //CANDIDATO
@@ -280,7 +323,8 @@ export const useCandidatosStore = defineStore("useCandidatosStore", {
             orden: candidato.orden,
             activo: candidato.activo,
             fecha_registro: candidato.fecha_Registro,
-            //---------------------------------
+            //----------------------------------------------------
+            //PROPIETARIO 1
             nombre_Completo_Propietario: `${candidato.nombres_Propietario} ${candidato.apellido_Paterno_Propietario} ${candidato.apellido_Materno_Propietario}`,
             nombres_Propietario: candidato.nombres_Propietario,
             apellido_Paterno_Propietario:
@@ -304,7 +348,10 @@ export const useCandidatosStore = defineStore("useCandidatosStore", {
               candidato.grupo_Vulnerable_Propietario,
             partido_Id: candidato.partido_Id,
             partido: candidato.partido,
-            //---------------------------------
+            url_Logo_Partido_Propietario:
+              candidato.url_Logo_Partido_Propietario,
+            //----------------------------------------------------
+            //PROPIETARIO 2
             nombre_Completo_Propietario_2: `${candidato.nombres_Propietario_2} ${candidato.apellido_Paterno_Propietario_2} ${candidato.apellido_Materno_Propietario_2}`,
             nombres_Propietario_2: candidato.nombres_Propietario_2,
             apellido_Paterno_Propietario_2:
@@ -327,7 +374,10 @@ export const useCandidatosStore = defineStore("useCandidatosStore", {
             grupo_Vulnerable_Propietario_2:
               candidato.grupo_Vulnerable_Propietario_2,
             partido_Propietario_2_Id: candidato.partido_Propietario_2_Id,
-            //---------------------------------
+            url_Logo_Partido_Propietario_2:
+              candidato.url_Logo_Partido_Propietario_2,
+            //----------------------------------------------------
+            //SUPLENTE 1
             nombre_Completo_Suplente: `${candidato.nombres_Suplente} ${candidato.apellido_Paterno_Suplente} ${candidato.apellido_Materno_Suplente}`,
             nombres_Suplente: candidato.nombres_Suplente,
             apellido_Paterno_Suplente: candidato.apellido_Paterno_Suplente,
@@ -346,7 +396,10 @@ export const useCandidatosStore = defineStore("useCandidatosStore", {
               candidato.pertenece_Grupo_Vulerable_Suplente,
             grupo_Vulnerable_Suplente: candidato.grupo_Vulnerable_Suplente,
             partido_Suplente_Id: candidato.partido_Suplente_Id,
-            //---------------------------------
+            url_Logo_Partido_Partido_Suplente:
+              candidato.url_Logo_Partido_Partido_Suplente,
+            //----------------------------------------------------
+            //SUPLENTE 2
             nombre_Completo_Suplente_2: `${candidato.nombres_Suplente_2} ${candidato.apellido_Paterno_Suplente_2} ${candidato.apellido_Materno_Suplente_2}`,
             nombres_Suplente_2: candidato.nombres_Suplente_2,
             apellido_Paterno_Suplente_2: candidato.apellido_Paterno_Suplente_2,
@@ -365,6 +418,8 @@ export const useCandidatosStore = defineStore("useCandidatosStore", {
               candidato.pertenece_Grupo_Vulerable_Suplente_2,
             grupo_Vulnerable_Suplente_2: candidato.grupo_Vulnerable_Suplente_2,
             partido_Suplente_Id_2: candidato.partido_Suplente_Id_2,
+            url_Logo_Partido_Partido_Suplente_2:
+              candidato.url_Logo_Partido_Partido_Suplente_2,
           };
         });
 
@@ -384,124 +439,134 @@ export const useCandidatosStore = defineStore("useCandidatosStore", {
         resp = await api.get(`/Candidatos/${id}`);
         if (resp.status == 200) {
           const { success, data } = resp.data;
-          console.log("data", data);
           if (success == true) {
-            this.candidato.activo = data.activo;
-            this.candidato.id = data.id;
-            this.candidato.tipo_Eleccion_Id = data.tipo_Eleccion_Id;
-            this.candidato.municipio_Id = data.municipio_Id;
-            this.candidato.distrito_Id = data.distrito_Id;
-            this.candidato.distrito = data.distrito;
-            this.candidato.demarcacion_Id = data.demarcacion_Id;
-            this.candidato.coalicion_Id = data.coalicion_Id;
-            this.candidato.is_Coalicion = data.is_Coalicion;
-            this.candidato.tipo_Candidato = data.tipo_Candidato;
-            this.candidato.orden = data.orden;
-            this.candidato.nombre_Completo_Propietario = `${data.nombres_Propietario} ${data.apellido_Paterno_Propietario} ${data.apellido_Materno_Propietario}`;
-            this.candidato.nombres_Propietario = data.nombres_Propietario;
-            this.candidato.apellido_Paterno_Propietario =
-              data.apellido_Paterno_Propietario;
-            this.candidato.apellido_Materno_Propietario =
-              data.apellido_Materno_Propietario;
-            this.candidato.mote_Propietario = data.mote_Propietario;
-            this.candidato.sexo_Propietario = data.sexo_Propietario;
-            this.candidato.url_Foto_Propietario = data.url_Foto_Propietario;
-            this.candidato.clave_Elector_Propietario =
-              data.clave_Elector_Propietario;
-            this.candidato.rfc_Propietario = data.rfC_Propietario;
-            this.candidato.curp_Propietario = data.curP_Propietario;
-            this.candidato.fecha_Nacimiento_Propietario =
-              data.fecha_Nacimiento_Propietario;
-            this.candidato.ocupacion_Propietario = data.ocupacion_Propietario;
-            this.candidato.correo_Propietario = data.correo_Propietario;
-            this.candidato.pertenece_Grupo_Vulnerable_Propietario =
-              data.pertenece_Grupo_Vulnerable_Propietario;
-            this.candidato.grupo_Vulnerable_Propietario =
-              data.grupo_Vulnerable_Propietario;
-            this.candidato.partido_Id = data.partido_Id;
-            this.candidato.partido = data.partido;
-            this.candidato.nombre_Completo_Propietario_2 = `${data.nombres_Propietario_2} ${data.apellido_Paterno_Propietario_2} ${data.apellido_Materno_Propietario_2}`;
-            this.candidato.nombres_Propietario_2 = data.nombres_Propietario_2;
-            this.candidato.apellido_Paterno_Propietario_2 =
+            this.candidato.activo = data[0].activo;
+            this.candidato.id = data[0].id;
+            this.candidato.tipo_Eleccion_Id = data[0].tipo_Eleccion_Id;
+            this.candidato.municipio_Id = data[0].municipio_Id;
+            this.candidato.distrito_Id = data[0].distrito_Id;
+            this.candidato.distrito = data[0].distrito;
+            this.candidato.demarcacion_Id = data[0].demarcacion_Id;
+            this.candidato.coalicion_Id = data[0].coalicion_Id;
+            this.candidato.is_Coalicion = data[0].is_Coalicion;
+            this.candidato.tipo_Candidato = data[0].tipo_Candidato;
+            this.candidato.orden = data[0].orden;
+            this.candidato.partido_Id = data[0].partido_Id;
+            //-----------------------------------------------------
+            //PROPIETARIO 1
+            this.propietario_1.nombre_Completo = `${data[0].nombres_Propietario} ${data[0].apellido_Paterno_Propietario} ${data[0].apellido_Materno_Propietario}`;
+            this.propietario_1.nombres = data[0].nombres_Propietario;
+            this.propietario_1.apellido_Paterno =
+              data[0].apellido_Paterno_Propietario;
+            this.propietario_1.apellido_Materno =
+              data[0].apellido_Materno_Propietario;
+            this.propietario_1.mote = data[0].mote_Propietario;
+            this.propietario_1.sexo = data[0].sexo_Propietario;
+            this.propietario_1.url_Foto = data[0].url_Foto_Propietario;
+            this.propietario_1.clave_Elector =
+              data[0].clave_Elector_Propietario;
+            this.propietario_1.rfc = data[0].rfC_Propietario;
+            this.propietario_1.curp = data[0].curP_Propietario;
+            this.propietario_1.fecha_Nacimiento =
+              data[0].fecha_Nacimiento_Propietario;
+            this.propietario_1.ocupacion = data[0].ocupacion_Propietario;
+            this.propietario_1.correo = data[0].correo_Propietario;
+            this.propietario_1.pertenece_Grupo_Vulnerable =
+              data[0].pertenece_Grupo_Vulnerable_Propietario;
+            this.propietario_1.grupo_Vulnerable =
+              data[0].grupo_Vulnerable_Propietario;
+            this.propietario_1.partido_Id = data[0].partido_Id;
+            this.propietario_1.partido = data[0].partido;
+            //-----------------------------------------------------
+            //PROPIETARIO 2
+            this.propietario_2.nombre_Completo = `${data[0].nombres_Propietario_2} ${data[0].apellido_Paterno_Propietario_2} ${data[0].apellido_Materno_Propietario_2}`;
+            this.propietario_2.nombres = data[0].nombres_Propietario_2;
+            this.propietario_2.apellido_Paterno =
               data.apellido_Paterno_Propietario_2;
-            this.candidato.apellido_Materno_Propietario_2 =
+            this.propietario_2.apellido_Materno =
               data.apellido_Materno_Propietario_2;
-            this.candidato.mote_Propietario_2 = data.mote_Propietario_2;
-            this.candidato.sexo_Propietario_2 = data.sexo_Propietario_2;
-            this.candidato.clave_Elector_Propietario_2 =
-              data.clave_Elector_Propietario_2;
-            this.candidato.url_Foto_Propietario_2 = data.url_Foto_Propietario_2;
-            this.candidato.rfc_Propietario_2 = data.rfc_Propietario_2;
-            this.candidato.curp_Propietario_2 = data.curp_Propietario_2;
-            this.candidato.fecha_Nacimiento_Propietario_2 =
-              data.fecha_Nacimiento_Propietario_2;
-            this.candidato.ocupacion_Propietario_2 =
-              data.ocupacion_Propietario_2;
-            this.candidato.telefono_Propietario_2 = data.telefono_Propietario_2;
-            this.candidato.correo_Propietario_2 = data.correo_Propietario_2;
-            this.candidato.pertenece_Grupo_Vulnerable_Propietario_2 =
-              data.pertenece_Grupo_Vulerable_Propietario_2;
-            this.candidato.grupo_Vulnerable_Propietario_2 =
-              data.grupo_Vulnerable_Propietario_2;
-            this.candidato.partido_Propietario_2_Id =
-              data.partido_Propietario_2_Id;
-            this.candidato.nombre_Completo_Suplente = `${data.nombres_Suplente} ${data.apellido_Paterno_Suplente} ${data.apellido_Materno_Suplente}`;
-            this.candidato.nombres_Suplente = data.nombres_Suplente;
-            this.candidato.apellido_Paterno_Suplente =
-              data.apellido_Paterno_Suplente;
-            this.candidato.apellido_Materno_Suplente =
-              data.apellido_Materno_Suplente;
-            this.candidato.mote_Suplente = data.mote_Suplente;
-            this.candidato.sexo_Suplente = data.sexo_Suplente;
-            this.candidato.clave_Elector_Suplente = data.clave_Elector_Suplente;
-            this.candidato.url_Foto_Suplente = data.url_Foto_Suplente;
-            this.candidato.rfc_Suplente = data.rfC_Suplente;
-            this.candidato.curp_Suplente = data.curP_Suplente;
-            this.candidato.fecha_Nacimiento_Suplente =
-              data.fecha_Nacimiento_Suplente;
-            this.candidato.ocupacion_Suplente = data.ocupacion_Suplente;
-            this.candidato.telefono_Suplente = data.telefono_Suplente;
-            this.candidato.correo_Suplente = data.correo_Suplente;
-            this.candidato.pertenece_Grupo_Vulnerable_Suplente =
-              data.pertenece_Grupo_Vulnerable_Suplente;
-            this.candidato.grupo_Vulnerable_Suplente =
-              data.grupo_Vulnerable_Suplente;
-            this.candidato.partido_Suplente_Id = data.partido_Suplente_Id;
-            this.candidato.nombre_Completo_Suplente_2 = `${data.nombres_Suplente_2} ${data.apellido_Paterno_Suplente_2} ${data.apellido_Materno_Suplente_2}`;
-            this.candidato.nombres_Suplente_2 = data.nombres_Suplente_2;
-            this.candidato.apellido_Paterno_Suplente_2 =
-              data.apellido_Paterno_Suplente_2;
-            this.candidato.apellido_Materno_Suplente_2 =
-              data.apellido_Materno_Suplente_2;
-            this.candidato.mote_Suplente_2 = data.mote_Suplente_2;
-            this.candidato.sexo_Suplente_2 = data.sexo_Suplente_2;
-            this.candidato.foto_Suplente_2 = data.foto_Suplente_2;
-            this.candidato.clave_Elector_Suplente_2 =
-              data.clave_Elector_Suplente_2;
-            this.candidato.rfc_Suplente_2 = data.rfc_Suplente_2;
-            this.candidato.curp_Suplente_2 = data.curp_Suplente_2;
-            this.candidato.fecha_Nacimiento_Suplente_2 =
-              data.fecha_Nacimiento_Suplente_2;
-            this.candidato.ocupacion_Suplente_2 = data.ocupacion_Suplente_2;
-            this.candidato.telefono_Suplente_2 = data.telefono_Suplente_2;
-            this.candidato.correo_Suplente_2 = data.correo_Suplente_2;
-            this.candidato.pertenece_Grupo_Vulnerable_Suplente_2 =
-              data.pertenece_Grupo_Vulnerable_Suplente_2;
-            this.candidato.grupo_Vulnerable_Suplente_2 =
-              data.grupo_Vulnerable_Suplente_2;
-            this.candidato.partido_Suplente_2_Id = data.partido_Suplente_2_Id;
-            this.candidato.correo_Suplente_2 = data.correo_Suplente_2;
+            this.propietario_2.mote = data[0].mote_Propietario_2;
+            this.propietario_2.sexo = data[0].sexo_Propietario_2;
+            this.propietario_2.clave_Elector = data.clave_Elector_Propietario_2;
+            this.propietario_2.url_Foto = data[0].url_Foto_Propietario_2;
+            this.propietario_2.rfc = data[0].rfc_Propietario_2;
+            this.propietario_2.curp = data[0].curp_Propietario_2;
+            this.propietario_2.fecha_Nacimiento =
+              data[0].fecha_Nacimiento_Propietario_2;
+            this.propietario_2.ocupacion = data.ocupacion_Propietario_2;
+            this.propietario_2.telefono = data[0].telefono_Propietario_2;
+            this.propietario_2.correo = data[0].correo_Propietario_2;
+            this.propietario_2.pertenece_Grupo_Vulnerable =
+              data[0].pertenece_Grupo_Vulerable_Propietario_2;
+            this.propietario_2.grupo_Vulnerable =
+              data[0].grupo_Vulnerable_Propietario_2;
+            this.propietario_2.partido_Id = data[0].partido_Propietario_2_Id;
+            //-----------------------------------------------------
+            //SUPLENTE 1
+            this.suplente_1.nombre_Completo = `${data[0].nombres_Suplente} ${data[0].apellido_Paterno_Suplente} ${data[0].apellido_Materno_Suplente}`;
+            this.suplente_1.nombres = data[0].nombres_Suplente;
+            this.suplente_1.apellido_Paterno =
+              data[0].apellido_Paterno_Suplente;
+            this.suplente_1.apellido_Materno =
+              data[0].apellido_Materno_Suplente;
+            this.suplente_1.mote = data[0].mote_Suplente;
+            this.suplente_1.sexo = data[0].sexo_Suplente;
+            this.suplente_1.clave_Elector = data[0].clave_Elector_Suplente;
+            this.suplente_1.url_Foto = data[0].url_Foto_Suplente;
+            this.suplente_1.rfc = data[0].rfC_Suplente;
+            this.suplente_1.curp = data[0].curP_Suplente;
+            this.suplente_1.fecha_Nacimiento =
+              data[0].fecha_Nacimiento_Suplente;
+            this.suplente_1.ocupacion = data[0].ocupacion_Suplente;
+            this.suplente_1.telefono = data[0].telefono_Suplente;
+            this.suplente_1.correo = data[0].correo_Suplente;
+            this.suplente_1.pertenece_Grupo_Vulnerable =
+              data[0].pertenece_Grupo_Vulnerable_Suplente;
+            this.suplente_1.grupo_Vulnerable =
+              data[0].grupo_Vulnerable_Suplente;
+            this.suplente_1.partido_Id = data[0].partido_Suplente_Id;
+            this.suplente_1.url_Logo_Partido =
+              data[0].url_Logo_Partido_Partido_Suplente;
+            //-----------------------------------------------------
+            //SUPLENTE 2
+            this.suplente_2.nombre_Completo = `${data[0].nombres_Suplente_2} ${data[0].apellido_Paterno_Suplente_2} ${data[0].apellido_Materno_Suplente_2}`;
+            this.suplente_2.nombres = data[0].nombres_Suplente_2;
+            this.suplente_2.apellido_Paterno =
+              data[0].apellido_Paterno_Suplente_2;
+            this.suplente_2.apellido_Materno =
+              data[0].apellido_Materno_Suplente_2;
+            this.suplente_2.mote = data[0].mote_Suplente_2;
+            this.suplente_2.sexo = data[0].sexo_Suplente_2;
+            this.suplente_2.url_Foto = data[0].url_Foto_Suplente_2;
+            this.suplente_2.clave_Elector = data[0].clave_Elector_Suplente_2;
+            this.suplente_2.rfc = data[0].rfc_Suplente_2;
+            this.suplente_2.curp = data[0].curp_Suplente_2;
+            this.suplente_2.fecha_Nacimiento =
+              data[0].fecha_Nacimiento_Suplente_2;
+            this.suplente_2.ocupacion = data[0].ocupacion_Suplente_2;
+            this.suplente_2.telefono = data[0].telefono_Suplente_2;
+            this.suplente_2.correo = data[0].correo_Suplente_2;
+            this.suplente_2.pertenece_Grupo_Vulnerable =
+              data[0].pertenece_Grupo_Vulnerable_Suplente_2;
+            this.suplente_2.grupo_Vulnerable = data[0].grupo_Vulnerable;
+            this.suplente_2.partido_Id = data[0].partido_Suplente_2_Id;
+            this.suplente_2.correo = data[0].correo_Suplente_2;
 
-            if (data.pertenece_Grupo_Vulnerable_Propietario == true) {
-              let elementos = data.grupo_Vulnerable_Propietario.split("|");
-              if (elementos[0] != undefined)
-                this.candidato.grupoProp_1 = elementos[0];
-              if (elementos[1] != undefined)
-                this.candidato.grupoProp_2 = elementos[1];
-              if (elementos[2] != undefined)
-                this.candidato.grupoProp_3 = elementos[2];
-              if (elementos[3] != undefined)
-                this.candidato.grupoProp_4 = elementos[3];
+            if (data[0].pertenece_Grupo_Vulnerable_Propietario == true) {
+              let elementos = data[0].grupo_Vulnerable_Propietario.split("|");
+
+              if (elementos[0] != undefined) {
+                this.propietario_1.grupo_Vulnerable_1 = elementos[0];
+              }
+              if (elementos[1] != undefined) {
+                this.propietario_1.grupo_Vulnerable_2 = elementos[1];
+              }
+              if (elementos[2] != undefined) {
+                this.propietario_1.grupo_Vulnerable_3 = elementos[2];
+              }
+              if (elementos[3] != undefined) {
+                this.propietario_1.grupo_Vulnerable_4 = elementos[3];
+              }
             }
           }
         }
