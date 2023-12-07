@@ -24,7 +24,6 @@
         </div>
       </div>
     </div>
-    <div class="q-pt-md"></div>
     <TablaPrincipalTipoEleccion />
   </q-page>
 </template>

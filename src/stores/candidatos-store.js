@@ -157,7 +157,7 @@ export const useCandidatosStore = defineStore("useCandidatosStore", {
       this.propietario_1.ocupacion = null;
       this.propietario_1.telefono = null;
       this.propietario_1.correo = null;
-      this.propietario_1.pertenece_Grupo_Vulnerable = null;
+      this.propietario_1.pertenece_Grupo_Vulnerable = false;
       this.propietario_1.grupo_Vulnerable = null;
       this.propietario_1.partido_Id = null;
       this.propietario_1.url_Logo_Partido = null;
@@ -181,7 +181,7 @@ export const useCandidatosStore = defineStore("useCandidatosStore", {
       this.propietario_2.ocupacion = null;
       this.propietario_2.telefono = null;
       this.propietario_2.correo = null;
-      this.propietario_2.pertenece_Grupo_Vulnerable = null;
+      this.propietario_2.pertenece_Grupo_Vulnerable = false;
       this.propietario_2.grupo_Vulnerable = null;
       this.propietario_2.partido_Id = null;
       this.propietario_2.url_Logo_Partido = null;
@@ -205,7 +205,7 @@ export const useCandidatosStore = defineStore("useCandidatosStore", {
       this.suplente_1.ocupacion = null;
       this.suplente_1.telefono = null;
       this.suplente_1.correo = null;
-      this.suplente_1.pertenece_Grupo_Vulnerable = null;
+      this.suplente_1.pertenece_Grupo_Vulnerable = false;
       this.suplente_1.grupo_Vulnerable = null;
       this.suplente_1.partido_Id = null;
       this.suplente_1.url_Logo_Partido = null;
@@ -229,7 +229,7 @@ export const useCandidatosStore = defineStore("useCandidatosStore", {
       this.suplente_2.ocupacion = null;
       this.suplente_2.telefono = null;
       this.suplente_2.correo = null;
-      this.suplente_2.pertenece_Grupo_Vulnerable = null;
+      this.suplente_2.pertenece_Grupo_Vulnerable = false;
       this.suplente_2.grupo_Vulnerable = null;
       this.suplente_2.partido_Id = null;
       this.suplente_2.url_Logo_Partido = null;
@@ -325,7 +325,13 @@ export const useCandidatosStore = defineStore("useCandidatosStore", {
             fecha_registro: candidato.fecha_Registro,
             //----------------------------------------------------
             //PROPIETARIO 1
-            nombre_Completo_Propietario: `${candidato.nombres_Propietario} ${candidato.apellido_Paterno_Propietario} ${candidato.apellido_Materno_Propietario}`,
+            nombre_Completo_Propietario: `${candidato.nombres_Propietario} ${
+              candidato.apellido_Paterno_Propietario
+            } ${
+              candidato.apellido_Materno_Propietario != null
+                ? candidato.apellido_Materno_Propietario
+                : ""
+            }`,
             nombres_Propietario: candidato.nombres_Propietario,
             apellido_Paterno_Propietario:
               candidato.apellido_Paterno_Propietario,
@@ -439,121 +445,115 @@ export const useCandidatosStore = defineStore("useCandidatosStore", {
         resp = await api.get(`/Candidatos/${id}`);
         if (resp.status == 200) {
           const { success, data } = resp.data;
+          console.log(data);
           if (success == true) {
-            this.candidato.activo = data[0].activo;
-            this.candidato.id = data[0].id;
-            this.candidato.tipo_Eleccion_Id = data[0].tipo_Eleccion_Id;
-            this.candidato.municipio_Id = data[0].municipio_Id;
-            this.candidato.distrito_Id = data[0].distrito_Id;
-            this.candidato.distrito = data[0].distrito;
-            this.candidato.demarcacion_Id = data[0].demarcacion_Id;
-            this.candidato.coalicion_Id = data[0].coalicion_Id;
-            this.candidato.is_Coalicion = data[0].is_Coalicion;
-            this.candidato.tipo_Candidato = data[0].tipo_Candidato;
-            this.candidato.orden = data[0].orden;
-            this.candidato.partido_Id = data[0].partido_Id;
+            this.candidato.activo = data.activo;
+            this.candidato.id = data.id;
+            this.candidato.tipo_Eleccion_Id = data.tipo_Eleccion_Id;
+            this.candidato.municipio_Id = data.municipio_Id;
+            this.candidato.distrito_Id = data.distrito_Id;
+            this.candidato.distrito = data.distrito;
+            this.candidato.demarcacion_Id = data.demarcacion_Id;
+            this.candidato.coalicion_Id = data.coalicion_Id;
+            this.candidato.is_Coalicion = data.is_Coalicion;
+            this.candidato.tipo_Candidato = data.tipo_Candidato;
+            this.candidato.orden = data.orden;
+            this.candidato.partido_Id = data.partido_Id;
             //-----------------------------------------------------
             //PROPIETARIO 1
-            this.propietario_1.nombre_Completo = `${data[0].nombres_Propietario} ${data[0].apellido_Paterno_Propietario} ${data[0].apellido_Materno_Propietario}`;
-            this.propietario_1.nombres = data[0].nombres_Propietario;
+            this.propietario_1.nombre_Completo = `${data.nombres_Propietario} ${data.apellido_Paterno_Propietario} ${data.apellido_Materno_Propietario}`;
+            this.propietario_1.nombres = data.nombres_Propietario;
             this.propietario_1.apellido_Paterno =
-              data[0].apellido_Paterno_Propietario;
+              data.apellido_Paterno_Propietario;
             this.propietario_1.apellido_Materno =
-              data[0].apellido_Materno_Propietario;
-            this.propietario_1.mote = data[0].mote_Propietario;
-            this.propietario_1.sexo = data[0].sexo_Propietario;
-            this.propietario_1.url_Foto = data[0].url_Foto_Propietario;
-            this.propietario_1.clave_Elector =
-              data[0].clave_Elector_Propietario;
-            this.propietario_1.rfc = data[0].rfC_Propietario;
-            this.propietario_1.curp = data[0].curP_Propietario;
+              data.apellido_Materno_Propietario;
+            this.propietario_1.mote = data.mote_Propietario;
+            this.propietario_1.sexo = data.sexo_Propietario;
+            this.propietario_1.url_Foto = data.url_Foto_Propietario;
+            this.propietario_1.clave_Elector = data.clave_Elector_Propietario;
+            this.propietario_1.rfc = data.rfC_Propietario;
+            this.propietario_1.curp = data.curP_Propietario;
             this.propietario_1.fecha_Nacimiento =
-              data[0].fecha_Nacimiento_Propietario;
-            this.propietario_1.ocupacion = data[0].ocupacion_Propietario;
-            this.propietario_1.correo = data[0].correo_Propietario;
+              data.fecha_Nacimiento_Propietario;
+            this.propietario_1.ocupacion = data.ocupacion_Propietario;
+            this.propietario_1.correo = data.correo_Propietario;
             this.propietario_1.pertenece_Grupo_Vulnerable =
-              data[0].pertenece_Grupo_Vulnerable_Propietario;
+              data.pertenece_Grupo_Vulnerable_Propietario;
             this.propietario_1.grupo_Vulnerable =
-              data[0].grupo_Vulnerable_Propietario;
-            this.propietario_1.partido_Id = data[0].partido_Id;
-            this.propietario_1.partido = data[0].partido;
+              data.grupo_Vulnerable_Propietario;
+            this.propietario_1.partido_Id = data.partido_Id;
+            this.propietario_1.partido = data.partido;
+            this.propietario_1.telefono = data.telefono_Propietario;
             //-----------------------------------------------------
             //PROPIETARIO 2
-            this.propietario_2.nombre_Completo = `${data[0].nombres_Propietario_2} ${data[0].apellido_Paterno_Propietario_2} ${data[0].apellido_Materno_Propietario_2}`;
-            this.propietario_2.nombres = data[0].nombres_Propietario_2;
+            this.propietario_2.nombre_Completo = `${data.nombres_Propietario_2} ${data.apellido_Paterno_Propietario_2} ${data.apellido_Materno_Propietario_2}`;
+            this.propietario_2.nombres = data.nombres_Propietario_2;
             this.propietario_2.apellido_Paterno =
               data.apellido_Paterno_Propietario_2;
             this.propietario_2.apellido_Materno =
               data.apellido_Materno_Propietario_2;
-            this.propietario_2.mote = data[0].mote_Propietario_2;
-            this.propietario_2.sexo = data[0].sexo_Propietario_2;
+            this.propietario_2.mote = data.mote_Propietario_2;
+            this.propietario_2.sexo = data.sexo_Propietario_2;
             this.propietario_2.clave_Elector = data.clave_Elector_Propietario_2;
-            this.propietario_2.url_Foto = data[0].url_Foto_Propietario_2;
-            this.propietario_2.rfc = data[0].rfc_Propietario_2;
-            this.propietario_2.curp = data[0].curp_Propietario_2;
+            this.propietario_2.url_Foto = data.url_Foto_Propietario_2;
+            this.propietario_2.rfc = data.rfc_Propietario_2;
+            this.propietario_2.curp = data.curp_Propietario_2;
             this.propietario_2.fecha_Nacimiento =
-              data[0].fecha_Nacimiento_Propietario_2;
+              data.fecha_Nacimiento_Propietario_2;
             this.propietario_2.ocupacion = data.ocupacion_Propietario_2;
-            this.propietario_2.telefono = data[0].telefono_Propietario_2;
-            this.propietario_2.correo = data[0].correo_Propietario_2;
+            this.propietario_2.telefono = data.telefono_Propietario_2;
+            this.propietario_2.correo = data.correo_Propietario_2;
             this.propietario_2.pertenece_Grupo_Vulnerable =
-              data[0].pertenece_Grupo_Vulerable_Propietario_2;
+              data.pertenece_Grupo_Vulerable_Propietario_2;
             this.propietario_2.grupo_Vulnerable =
-              data[0].grupo_Vulnerable_Propietario_2;
-            this.propietario_2.partido_Id = data[0].partido_Propietario_2_Id;
+              data.grupo_Vulnerable_Propietario_2;
+            this.propietario_2.partido_Id = data.partido_Propietario_2_Id;
             //-----------------------------------------------------
             //SUPLENTE 1
-            this.suplente_1.nombre_Completo = `${data[0].nombres_Suplente} ${data[0].apellido_Paterno_Suplente} ${data[0].apellido_Materno_Suplente}`;
-            this.suplente_1.nombres = data[0].nombres_Suplente;
-            this.suplente_1.apellido_Paterno =
-              data[0].apellido_Paterno_Suplente;
-            this.suplente_1.apellido_Materno =
-              data[0].apellido_Materno_Suplente;
-            this.suplente_1.mote = data[0].mote_Suplente;
-            this.suplente_1.sexo = data[0].sexo_Suplente;
-            this.suplente_1.clave_Elector = data[0].clave_Elector_Suplente;
-            this.suplente_1.url_Foto = data[0].url_Foto_Suplente;
-            this.suplente_1.rfc = data[0].rfC_Suplente;
-            this.suplente_1.curp = data[0].curP_Suplente;
-            this.suplente_1.fecha_Nacimiento =
-              data[0].fecha_Nacimiento_Suplente;
-            this.suplente_1.ocupacion = data[0].ocupacion_Suplente;
-            this.suplente_1.telefono = data[0].telefono_Suplente;
-            this.suplente_1.correo = data[0].correo_Suplente;
+            this.suplente_1.nombre_Completo = `${data.nombres_Suplente} ${data.apellido_Paterno_Suplente} ${data.apellido_Materno_Suplente}`;
+            this.suplente_1.nombres = data.nombres_Suplente;
+            this.suplente_1.apellido_Paterno = data.apellido_Paterno_Suplente;
+            this.suplente_1.apellido_Materno = data.apellido_Materno_Suplente;
+            this.suplente_1.mote = data.mote_Suplente;
+            this.suplente_1.sexo = data.sexo_Suplente;
+            this.suplente_1.clave_Elector = data.clave_Elector_Suplente;
+            this.suplente_1.url_Foto = data.url_Foto_Suplente;
+            this.suplente_1.rfc = data.rfC_Suplente;
+            this.suplente_1.curp = data.curP_Suplente;
+            this.suplente_1.fecha_Nacimiento = data.fecha_Nacimiento_Suplente;
+            this.suplente_1.ocupacion = data.ocupacion_Suplente;
+            this.suplente_1.telefono = data.telefono_Suplente;
+            this.suplente_1.correo = data.correo_Suplente;
             this.suplente_1.pertenece_Grupo_Vulnerable =
-              data[0].pertenece_Grupo_Vulnerable_Suplente;
-            this.suplente_1.grupo_Vulnerable =
-              data[0].grupo_Vulnerable_Suplente;
-            this.suplente_1.partido_Id = data[0].partido_Suplente_Id;
+              data.pertenece_Grupo_Vulnerable_Suplente;
+            this.suplente_1.grupo_Vulnerable = data.grupo_Vulnerable_Suplente;
+            this.suplente_1.partido_Id = data.partido_Suplente_Id;
             this.suplente_1.url_Logo_Partido =
-              data[0].url_Logo_Partido_Partido_Suplente;
+              data.url_Logo_Partido_Partido_Suplente;
             //-----------------------------------------------------
             //SUPLENTE 2
-            this.suplente_2.nombre_Completo = `${data[0].nombres_Suplente_2} ${data[0].apellido_Paterno_Suplente_2} ${data[0].apellido_Materno_Suplente_2}`;
-            this.suplente_2.nombres = data[0].nombres_Suplente_2;
-            this.suplente_2.apellido_Paterno =
-              data[0].apellido_Paterno_Suplente_2;
-            this.suplente_2.apellido_Materno =
-              data[0].apellido_Materno_Suplente_2;
-            this.suplente_2.mote = data[0].mote_Suplente_2;
-            this.suplente_2.sexo = data[0].sexo_Suplente_2;
-            this.suplente_2.url_Foto = data[0].url_Foto_Suplente_2;
-            this.suplente_2.clave_Elector = data[0].clave_Elector_Suplente_2;
-            this.suplente_2.rfc = data[0].rfc_Suplente_2;
-            this.suplente_2.curp = data[0].curp_Suplente_2;
-            this.suplente_2.fecha_Nacimiento =
-              data[0].fecha_Nacimiento_Suplente_2;
-            this.suplente_2.ocupacion = data[0].ocupacion_Suplente_2;
-            this.suplente_2.telefono = data[0].telefono_Suplente_2;
-            this.suplente_2.correo = data[0].correo_Suplente_2;
+            this.suplente_2.nombre_Completo = `${data.nombres_Suplente_2} ${data.apellido_Paterno_Suplente_2} ${data.apellido_Materno_Suplente_2}`;
+            this.suplente_2.nombres = data.nombres_Suplente_2;
+            this.suplente_2.apellido_Paterno = data.apellido_Paterno_Suplente_2;
+            this.suplente_2.apellido_Materno = data.apellido_Materno_Suplente_2;
+            this.suplente_2.mote = data.mote_Suplente_2;
+            this.suplente_2.sexo = data.sexo_Suplente_2;
+            this.suplente_2.url_Foto = data.url_Foto_Suplente_2;
+            this.suplente_2.clave_Elector = data.clave_Elector_Suplente_2;
+            this.suplente_2.rfc = data.rfc_Suplente_2;
+            this.suplente_2.curp = data.curp_Suplente_2;
+            this.suplente_2.fecha_Nacimiento = data.fecha_Nacimiento_Suplente_2;
+            this.suplente_2.ocupacion = data.ocupacion_Suplente_2;
+            this.suplente_2.telefono = data.telefono_Suplente_2;
+            this.suplente_2.correo = data.correo_Suplente_2;
             this.suplente_2.pertenece_Grupo_Vulnerable =
-              data[0].pertenece_Grupo_Vulnerable_Suplente_2;
-            this.suplente_2.grupo_Vulnerable = data[0].grupo_Vulnerable;
-            this.suplente_2.partido_Id = data[0].partido_Suplente_2_Id;
-            this.suplente_2.correo = data[0].correo_Suplente_2;
+              data.pertenece_Grupo_Vulnerable_Suplente_2;
+            this.suplente_2.grupo_Vulnerable = data.grupo_Vulnerable;
+            this.suplente_2.partido_Id = data.partido_Suplente_2_Id;
+            this.suplente_2.correo = data.correo_Suplente_2;
 
-            if (data[0].pertenece_Grupo_Vulnerable_Propietario == true) {
-              let elementos = data[0].grupo_Vulnerable_Propietario.split("|");
+            if (data.pertenece_Grupo_Vulnerable_Propietario == true) {
+              let elementos = data.grupo_Vulnerable_Propietario.split("|");
 
               if (elementos[0] != undefined) {
                 this.propietario_1.grupo_Vulnerable_1 = elementos[0];

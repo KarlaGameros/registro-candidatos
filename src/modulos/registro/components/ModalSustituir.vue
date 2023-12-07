@@ -20,41 +20,15 @@
       </q-card-section>
       <q-card-section>
         <q-radio
+          v-for="option in options"
+          :key="option"
           v-model="sustituirPor"
-          val="formula"
-          label="Formula"
+          :val="option"
+          :label="option"
           color="teal"
         />
-        <!-- <q-radio
-          v-if="tab != 'PYS'"
-          v-model="sustituirPor"
-          val="Propietario 1"
-          label="Propietario"
-          color="teal"
-        />
-        <q-radio
-          v-if="tab != 'PYS'"
-          v-model="sustituirPor"
-          val="Suplente 1"
-          label="Suplente"
-          color="teal"
-        />
-        <q-radio
-          v-if="tab == 'PYS'"
-          v-model="sustituirPor"
-          val="Propietario 2"
-          label="Presicencia "
-          color="teal"
-        />
-        <q-radio
-          v-if="tab == 'PYS'"
-          v-model="sustituirPor"
-          val="Suplente 2"
-          label="Sindicaturas "
-          color="teal"
-        /> -->
       </q-card-section>
-      <q-card-section
+      <!-- <q-card-section
         v-if="sustituirPor == 'Propietario 2' || sustituirPor == 'Suplente 2'"
       >
         <q-radio
@@ -69,7 +43,7 @@
           label="Suplente 2"
           color="teal"
         />
-      </q-card-section>
+      </q-card-section> -->
       <!-- <q-card-section v-if="sustituirPor == 'formula' && !is_Candidato">
         <div class="row">
           <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 q-pa-xs">
@@ -111,7 +85,7 @@
           </div>
         </div>
       </q-card-section> -->
-      <q-card-section>
+      <q-card-section v-if="sustituirPor == 'formula'">
         <div class="row q-pb-sm" v-if="sustituirPor == 'propietario'">
           <div class="col-5">
             <q-card>
@@ -171,9 +145,9 @@
                       />
                     </div>
                   </div>
-                  <FormularioDatosGenerales :tabTipo="tabTab" />
+                  <SustituirCandidato :tabTipo="tabTab" />
                 </q-expansion-item>
-                <q-expansion-item
+                <!-- <q-expansion-item
                   v-model="expansion2"
                   @show="expansion = false"
                   @hide="expansion = true"
@@ -182,7 +156,7 @@
                   label="Documentación Requerida"
                 >
                   <FormularioDocumentacion />
-                </q-expansion-item>
+                </q-expansion-item> -->
               </q-list>
             </q-tab-panel>
           </q-tab-panels>
@@ -216,8 +190,8 @@ import { ref, defineProps, watch } from "vue";
 import { storeToRefs } from "pinia";
 import { useCandidatosStore } from "src/stores/candidatos-store";
 import { useQuasar } from "quasar";
-import SustituirCandidato from "../../sustituciones/components/SustituirCandidato.vue";
 import { useSustituirStore } from "src/stores/sustituir-store";
+import SustituirCandidato from "../../sustituciones/components/SustituirCandidato.vue";
 
 const $q = useQuasar();
 const candidatoStore = useCandidatosStore();
@@ -234,6 +208,7 @@ const tabs = ref([
   "Propietario sindico",
   "Propietario suplente",
 ]);
+const options = ref(["Formula", "Propietario", "Suplente"]);
 const expansion = ref(true);
 const expansion2 = ref(false);
 
@@ -358,10 +333,7 @@ const onSubmit = async () => {
 
   let resp = null;
   $q.loading.show();
-  console.log("mando id", candidato.value.id);
-  sustituirFormData.forEach((index, element) => {
-    console.log(index, element);
-  });
+
   resp = await sustituirStore.sustituirCandidato(
     candidato.value.id,
     sustituirFormData

@@ -49,7 +49,7 @@
               </q-input>
             </template>
             <!--TEMPLATE SCREEN XS-->
-            <!-- <template v-if="$q.screen.xs" v-slot:item="props">
+            <template v-if="$q.screen.xs" v-slot:item="props">
               <div
                 class="q-pa-xs col-xs-12 col-sm-6 col-md-4 col-lg-3 grid-style-transition"
               >
@@ -57,26 +57,26 @@
                   <q-item>
                     <q-item-section avatar>
                       <q-avatar size="60px" class="shadow-10">
-                        <img :src="props.row.fotografia" />
+                        <img :src="props.row.url_Foto_Propietario" />
                       </q-avatar>
                     </q-item-section>
 
                     <q-item-section>
                       <q-item-label class="text-grey-8 text-weight-bold">
-                        {{ props.row.nombre }}
+                        {{ props.row.nombre_Completo_Propietario }}
                       </q-item-label>
                       <q-item-label caption>
-                        Fecha de registro: {{ props.row.fecha_Registro }}
+                        Fecha de registro: {{ props.row.fecha_registro }}
                       </q-item-label>
                       <q-item-label class="text-grey-8">
-                        correo@example.com
+                        {{ props.row.correo_Propietario }}
                       </q-item-label>
                     </q-item-section>
 
                     <q-item-section side>
                       <q-item-label>
                         <q-avatar size="30px" class="shadow-10">
-                          <img :src="props.row.imgPartido" />
+                          <img :src="props.row.url_Logo_Partido_Propietario" />
                         </q-avatar>
                       </q-item-label>
                     </q-item-section>
@@ -85,13 +85,7 @@
                   <q-item>
                     <q-item-section>
                       <q-item-label class="text-grey-8 text-weight-bold">
-                        Género: {{ props.row.genero }}
-                      </q-item-label>
-                      <q-item-label
-                        caption
-                        v-if="props.row.tipo_Eleccion != null"
-                      >
-                        Tipo de elección: {{ props.row.tipo_Eleccion }}
+                        Género: {{ props.row.genero_Propietario }}
                       </q-item-label>
                       <q-item-label caption v-if="props.row.distrito != null">
                         Distrito: {{ props.row.distrito }}
@@ -129,7 +123,7 @@
                   </q-item>
                 </q-card>
               </div>
-            </template> -->
+            </template>
             <!--TEMPLATE SCREEN DESKTOP-->
             <template v-slot:body="props">
               <q-tr :props="props">
@@ -218,38 +212,35 @@
               <!--------------------------------------------------------------------------->
               <q-tr v-show="isRowExpanded(props.row)" :props="props">
                 <q-td colspan="100%">
-                  <div class="row" v-if="candidato.nombres_Suplente != null">
-                    <div class="col-2 text-caption text-bold"></div>
+                  <div class="row" v-if="suplente_1.nombres != null">
+                    <div class="col-1 text-caption text-bold"></div>
                     <div class="col-3 text-caption text-bold">Nombre</div>
-                    <div class="col-1 text-caption text-bold">Género</div>
+                    <div class="col-1 text-caption text-bold">Genero</div>
                     <div class="col-1 text-caption text-bold">Tipo</div>
                     <div class="col-1 text-caption text-bold">Partido</div>
                   </div>
                   <div v-else>No hay mas registros</div>
-                  <div
-                    v-if="candidato.nombres_Suplente != null"
-                    class="row q-pb-xs"
-                  >
-                    <div class="col-2">Suplente</div>
+                  <div v-if="suplente_1.nombres != null" class="row q-pb-xs">
+                    <div class="col-1">Suplente</div>
                     <div class="col-lg-3 col-md-3">
                       <q-item>
                         <q-item-section avatar>
                           <q-avatar>
-                            <img :src="candidato.url_Foto_Suplente" />
+                            <img :src="suplente_1.url_Logo_Partido" />
                           </q-avatar>
                         </q-item-section>
 
                         <q-item-section class="text-left">
                           <q-item-label>{{
-                            candidato.nombre_Completo_Suplente
+                            suplente_1.nombre_Completo
                           }}</q-item-label>
                           <q-item-label caption class="">{{
-                            candidato.correo_Suplente
+                            suplente_1.correo
                           }}</q-item-label>
                         </q-item-section>
                       </q-item>
                     </div>
-                    <div class="col-1">{{ candidato.sexo_Suplente }}</div>
+                    <div class="col-1">{{ suplente_1.sexo }}</div>
                     <div class="col-1">{{ candidato.tipo_Candidato }}</div>
                     <div class="col-1">
                       <q-avatar>
@@ -366,7 +357,7 @@ const $q = useQuasar();
 const candidatoStore = useCandidatosStore();
 const configuracionStore = useConfiguracionStore();
 const { tipo_Elecciones } = storeToRefs(configuracionStore);
-const { list_Candidatos, candidato } = storeToRefs(candidatoStore);
+const { list_Candidatos, candidato, suplente_1 } = storeToRefs(candidatoStore);
 const visisble_columns = ref("");
 const expandedRow = ref(null);
 const tab = ref("DIP");

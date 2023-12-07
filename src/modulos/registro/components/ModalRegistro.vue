@@ -27,7 +27,7 @@
         <q-form class="q-col-gutter-xs" @submit="onSubmit">
           <div class="row">
             <div
-              v-if="tab != 'PYS'"
+              v-if="props.tab != 'PYS'"
               class="col-lg-2 col-md-2 col-sm-2 col-xs-12 q-pr-xs"
             >
               <q-select
@@ -38,7 +38,7 @@
               />
             </div>
             <div
-              v-if="cargo_Id == 'MR' && tab == 'DIP'"
+              v-if="cargo_Id == 'MR' && props.tab == 'DIP'"
               class="col-lg-3 col-md-3 col-sm-3 col-xs-12"
             >
               <q-select
@@ -49,9 +49,11 @@
               />
             </div>
             <div
-              v-if="tab == 'PYS' || (tab == 'REG' && cargo_Id != null)"
+              v-if="
+                props.tab == 'PYS' || (props.tab == 'REG' && cargo_Id != null)
+              "
               :class="
-                tab == 'PYS'
+                props.tab == 'PYS'
                   ? 'col-lg-5 col-md-5 col-sm-5 col-xs-12 q-pr-xs'
                   : 'col-lg-3 col-md-3 col-sm-3 col-xs-12 q-pr-xs'
               "
@@ -65,7 +67,7 @@
             </div>
             <div
               div
-              v-if="cargo_Id == 'MR' && tab == 'REG'"
+              v-if="cargo_Id == 'MR' && props.tab == 'REG'"
               class="col-lg-3 col-md-3 col-sm-3 col-xs-12"
             >
               <q-select
@@ -77,7 +79,7 @@
             </div>
             <div
               :class="
-                tab == 'PYS'
+                props.tab == 'PYS'
                   ? 'col-lg-2 col-md-2 col-sm-2 col-xs-2 text-center'
                   : 'col-lg-1 col-md-1 col-sm-1 col-xs-1 q-pr-xs text-center'
               "
@@ -94,7 +96,7 @@
             <div
               v-if="candidato.is_Coalicion"
               :class="
-                tab == 'PYS'
+                props.tab == 'PYS'
                   ? 'col-lg-5 col-md-5 col-sm-5 col-xs-12 q-pr-xs'
                   : 'col-lg-3 col-md-3 col-sm-3 col-xs-12 q-pr-xs'
               "
@@ -109,7 +111,7 @@
             <div
               v-else
               :class="
-                tab == 'PYS'
+                props.tab == 'PYS'
                   ? 'col-lg-5 col-md-5 col-sm-5 col-xs-12 q-pr-xs'
                   : 'col-lg-3 col-md-3 col-sm-3 col-xs-12 q-pr-xs'
               "
@@ -126,7 +128,7 @@
               class="col-lg-2 col-md-2 col-sm-2 col-xs-2"
             >
               <q-input
-                v-model.number="candidato.value.orden"
+                v-model.number="candidato.orden"
                 type="number"
                 label="Orden de prelación"
                 hint="Orden de prelación"
@@ -197,7 +199,7 @@
                     </div>
                     <FormularioDatosGenerales :tabTipo="tabTab" />
                   </q-expansion-item>
-                  <q-expansion-item
+                  <!-- <q-expansion-item
                     v-model="expansion2"
                     @show="expansion = false"
                     @hide="expansion = true"
@@ -206,7 +208,7 @@
                     label="Documentación Requerida"
                   >
                     <FormularioDocumentacion />
-                  </q-expansion-item>
+                  </q-expansion-item> -->
                 </q-list>
               </q-tab-panel>
               <!--SUPLENTE-->
@@ -236,7 +238,7 @@
                     <FormularioDatosGenerales :tabTipo="tabTab" />
                   </q-expansion-item>
 
-                  <q-expansion-item
+                  <!-- <q-expansion-item
                     v-model="expansion2"
                     @show="expansion = false"
                     @hide="expansion = true"
@@ -245,7 +247,7 @@
                     label="Documentación Requerida"
                   >
                     <FormularioDocumentacion />
-                  </q-expansion-item>
+                  </q-expansion-item> -->
                 </q-list>
               </q-tab-panel>
               <!--SINDICO PROPIETARIO-->
@@ -275,7 +277,7 @@
                     <FormularioDatosGenerales :tabTipo="tabTab" />
                   </q-expansion-item>
 
-                  <q-expansion-item
+                  <!-- <q-expansion-item
                     v-model="expansion2"
                     @show="expansion = false"
                     @hide="expansion = true"
@@ -284,7 +286,7 @@
                     label="Documentación Requerida"
                   >
                     <FormularioDocumentacion />
-                  </q-expansion-item>
+                  </q-expansion-item> -->
                 </q-list>
               </q-tab-panel>
               <!--SINDICO SUPLENTE-->
@@ -314,7 +316,7 @@
                     <FormularioDatosGenerales :tabTipo="tabTab" />
                   </q-expansion-item>
 
-                  <q-expansion-item
+                  <!-- <q-expansion-item
                     v-model="expansion2"
                     @show="expansion = false"
                     @hide="expansion = true"
@@ -323,7 +325,7 @@
                     label="Documentación Requerida"
                   >
                     <FormularioDocumentacion />
-                  </q-expansion-item>
+                  </q-expansion-item> -->
                 </q-list>
               </q-tab-panel>
             </q-tab-panels>
