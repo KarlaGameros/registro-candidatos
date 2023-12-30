@@ -5,18 +5,18 @@
         <div class="q-pa-md q-gutter-sm">
           <q-breadcrumbs>
             <q-breadcrumbs-el icon="home" to="/" />
-            <q-breadcrumbs-el icon="list_alt" label="Registro" />
+            <q-breadcrumbs-el icon="list_alt" label="Aprobar" />
           </q-breadcrumbs>
         </div>
       </div>
     </div>
-    <ModalVerOficio />
-    <TablaHistorial />
+    <ModalComp />
+    <TablaComp />
   </q-page>
 </template>
 <script setup>
-import ModalVerOficio from "../components/ModalVerOficio.vue";
-import TablaHistorial from "../components/TablaHistorial.vue";
+import ModalComp from "../components/ModalComp.vue";
+import TablaComp from "../components/TablaComp.vue";
 
 //--------------------------------------------------------------------
 </script>

@@ -133,7 +133,9 @@ export const useConfiguracionStore = defineStore("useConfiguracionStore", {
       try {
         let resp = await api.get("/Partidos_Politicos");
         let { data } = resp.data;
-        let listPartidos = data.map((partido) => {
+        let listPartidosFiltro = [];
+        listPartidosFiltro = data.filter((x) => x.is_Coalicion == false);
+        let listPartidos = listPartidosFiltro.map((partido) => {
           return {
             value: partido.id,
             label: partido.siglas,
@@ -144,6 +146,9 @@ export const useConfiguracionStore = defineStore("useConfiguracionStore", {
             prioridad: partido.prioridad,
             pantone_Fondo: partido.pantone_Fondo,
             pantone_Letra: partido.pantone_Letra,
+            coalicion_Id: partido.coalicion_Id,
+            coalicion: partido.coalicion,
+            is_Coalicion: partido.is_Coalicion,
           };
         });
         this.list_Partidos_Politicos = listPartidos;

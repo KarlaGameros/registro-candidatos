@@ -4,9 +4,10 @@
       <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 q-pr-xs">
         <q-file
           bottom-slots
-          v-model="candidatoBase.url_Foto"
+          v-model="fotoBase.url_Foto"
           label="Fotografía"
           counter
+          accept=".jpg, image/*"
         >
           <template v-slot:prepend>
             <q-avatar v-if="isEditar">
@@ -17,7 +18,7 @@
           <template v-slot:append>
             <q-icon
               name="close"
-              @click.stop.prevent="candidatoBase.url_Foto = null"
+              @click.stop.prevent="fotoBase.url_Foto = null"
               class="cursor-pointer"
             />
           </template>
@@ -143,7 +144,7 @@
       <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12 q-pr-xs">
         <q-input
           readonly
-          v-model.number="edad"
+          v-model.number="candidatoBase.edad"
           type="number"
           label="Edad"
           hint="Ingrese su edad"
@@ -197,7 +198,7 @@
         <q-select
           label="Teléfono"
           hint="Da enter para agregar teléfono"
-          v-model="telefonos"
+          v-model="candidatoBase.telefono"
           use-input
           use-chips
           hide-dropdown-icon
@@ -274,15 +275,18 @@ import { ref, defineProps, watch, watchEffect } from "vue";
 
 const candidatoStore = useCandidatosStore();
 const {
-  candidato,
   propietario_1,
   propietario_2,
   suplente_1,
   suplente_2,
   isEditar,
+  foto_1,
+  foto_2,
+  foto_3,
+  foto_4,
 } = storeToRefs(candidatoStore);
 const optionsGenero = ref(["Hombre", "Mujer", "No binario"]);
-const telefonos = ref([]);
+const telefonos = ref();
 const props = defineProps({
   tabTipo: { type: String, required: true },
 });
@@ -290,19 +294,25 @@ const edad = ref("");
 const isExtension = ref(false);
 const num_Extension = ref(null);
 const candidatoBase = ref(null);
+const fotoBase = ref(null);
+//--------------------------------------------------------------------
 
 switch (props.tabTipo) {
   case "propietario":
     candidatoBase.value = propietario_1.value;
+    fotoBase.value = foto_1.value;
     break;
   case "suplente":
     candidatoBase.value = suplente_1.value;
+    fotoBase.value = foto_2.value;
     break;
   case "sindico_propietario":
     candidatoBase.value = propietario_2.value;
+    fotoBase.value = foto_3.value;
     break;
   case "sindico_suplente":
     candidatoBase.value = suplente_2.value;
+    fotoBase.value = foto_4.value;
     break;
 }
 
@@ -340,6 +350,7 @@ watchEffect(() => {
         candidatoBase.value.grupo_Vulnerable_3;
       propietario_1.value.grupo_Vulnerable_4 =
         candidatoBase.value.grupo_Vulnerable_4;
+      propietario_1.value.url_Foto = candidatoBase.value.url_Foto;
       break;
     case "suplente":
       suplente_1.value.nombres = candidatoBase.value.nombres;
@@ -367,6 +378,7 @@ watchEffect(() => {
         candidatoBase.value.grupo_Vulnerable_3;
       suplente_1.value.grupo_Vulnerable_4 =
         candidatoBase.value.grupo_Vulnerable_4;
+      suplente_1.value.url_Foto = candidatoBase.value.url_Foto;
       break;
     case "sindico_propietario":
       propietario_2.value.nombres = candidatoBase.value.nombres;
@@ -398,6 +410,7 @@ watchEffect(() => {
         candidatoBase.value.grupo_Vulnerable_3;
       propietario_2.value.grupo_Vulnerable_4 =
         candidatoBase.value.grupo_Vulnerable_4;
+      propietario_2.value.url_Foto = candidatoBase.value.url_Foto;
       break;
     case "sindico_suplente":
       suplente_2.value.nombres = candidatoBase.value.nombres;
@@ -425,6 +438,7 @@ watchEffect(() => {
         candidatoBase.value.grupo_Vulnerable_3;
       suplente_2.value.grupo_Vulnerable_4 =
         candidatoBase.value.grupo_Vulnerable_4;
+      suplente_2.value.url_Foto = candidatoBase.value.url_Foto;
       break;
     default:
       break;
@@ -445,7 +459,76 @@ watch(propietario_1.value, (val) => {
       fechaActual.setMonth(mes);
       fechaActual.setFullYear(año);
 
-      edad.value = Math.floor(
+      propietario_1.value.edad = Math.floor(
+        (fechaActual - fechaNace) / (1000 * 60 * 60 * 24) / 365
+      );
+
+      return edad;
+    }
+  }
+});
+
+watch(propietario_2.value, (val) => {
+  if (val != null) {
+    if (val.fecha_Nacimiento != null) {
+      var fechaNace = new Date(val.fecha_Nacimiento);
+      var fechaActual = new Date();
+
+      var mes = fechaActual.getMonth();
+      var dia = fechaActual.getDate();
+      var año = fechaActual.getFullYear();
+
+      fechaActual.setDate(dia);
+      fechaActual.setMonth(mes);
+      fechaActual.setFullYear(año);
+
+      propietario_2.value.edad = Math.floor(
+        (fechaActual - fechaNace) / (1000 * 60 * 60 * 24) / 365
+      );
+
+      return edad;
+    }
+  }
+});
+
+watch(suplente_1.value, (val) => {
+  if (val != null) {
+    if (val.fecha_Nacimiento != null) {
+      var fechaNace = new Date(val.fecha_Nacimiento);
+      var fechaActual = new Date();
+
+      var mes = fechaActual.getMonth();
+      var dia = fechaActual.getDate();
+      var año = fechaActual.getFullYear();
+
+      fechaActual.setDate(dia);
+      fechaActual.setMonth(mes);
+      fechaActual.setFullYear(año);
+
+      suplente_1.value.edad = Math.floor(
+        (fechaActual - fechaNace) / (1000 * 60 * 60 * 24) / 365
+      );
+
+      return edad;
+    }
+  }
+});
+
+watch(suplente_2.value, (val) => {
+  if (val != null) {
+    if (val.fecha_Nacimiento != null) {
+      var fechaNace = new Date(val.fecha_Nacimiento);
+      var fechaActual = new Date();
+
+      var mes = fechaActual.getMonth();
+      var dia = fechaActual.getDate();
+      var año = fechaActual.getFullYear();
+
+      fechaActual.setDate(dia);
+      fechaActual.setMonth(mes);
+      fechaActual.setFullYear(año);
+
+      suplente_2.value.edad = Math.floor(
         (fechaActual - fechaNace) / (1000 * 60 * 60 * 24) / 365
       );
 
@@ -455,45 +538,45 @@ watch(propietario_1.value, (val) => {
 });
 
 watch(telefonos, (val) => {
-  if (val != null) {
-    if (val[2] != null) {
-      isExtension.value = true;
-    } else {
-      isExtension.value = false;
-    }
-    switch (props.tabTipo) {
-      case "propietario":
-        propietario_1.value.telefono = `${val[0] != undefined ? val[0] : ""},${
-          val[1] != undefined ? val[1] : ""
-        },${val[2] != undefined ? val[2] : ""}, ${
-          num_Extension.value != null ? num_Extension.value : ""
-        }`;
-        break;
-      case "suplente":
-        suplente_1.value.telefono = `${val[0] != undefined ? val[0] : ""},${
-          val[1] != undefined ? val[1] : ""
-        },${val[2] != undefined ? val[2] : ""}, ${
-          num_Extension.value != null ? num_Extension.value : ""
-        }`;
-        break;
-      case "sindico_propietario":
-        propietario_2.value.telefono = `${val[0] != undefined ? val[0] : ""},${
-          val[1] != undefined ? val[1] : ""
-        },${val[2] != undefined ? val[2] : ""}, ${
-          num_Extension.value != null ? num_Extension.value : ""
-        }`;
-        break;
-      case "sindico_suplente":
-        suplente_2.value.telefono = `${val[0] != undefined ? val[0] : ""},${
-          val[1] != undefined ? val[1] : ""
-        },${val[2] != undefined ? val[2] : ""}, ${
-          num_Extension.value != null ? num_Extension.value : ""
-        }`;
-        break;
-      default:
-        break;
-    }
-  }
+  // if (val != null) {
+  //   if (val[2] != null) {
+  //     isExtension.value = true;
+  //   } else {
+  //     isExtension.value = false;
+  //   }
+  //   switch (props.tabTipo) {
+  //     case "propietario":
+  //       propietario_1.value.telefono = `${val[0] != undefined ? val[0] : ""},${
+  //         val[1] != undefined ? val[1] : ""
+  //       },${val[2] != undefined ? val[2] : ""}, ${
+  //         num_Extension.value != null ? num_Extension.value : ""
+  //       }`;
+  //       break;
+  //     case "suplente":
+  //       suplente_1.value.telefono = `${val[0] != undefined ? val[0] : ""},${
+  //         val[1] != undefined ? val[1] : ""
+  //       },${val[2] != undefined ? val[2] : ""}, ${
+  //         num_Extension.value != null ? num_Extension.value : ""
+  //       }`;
+  //       break;
+  //     case "sindico_propietario":
+  //       propietario_2.value.telefono = `${val[0] != undefined ? val[0] : ""},${
+  //         val[1] != undefined ? val[1] : ""
+  //       },${val[2] != undefined ? val[2] : ""}, ${
+  //         num_Extension.value != null ? num_Extension.value : ""
+  //       }`;
+  //       break;
+  //     case "sindico_suplente":
+  //       suplente_2.value.telefono = `${val[0] != undefined ? val[0] : ""},${
+  //         val[1] != undefined ? val[1] : ""
+  //       },${val[2] != undefined ? val[2] : ""}, ${
+  //         num_Extension.value != null ? num_Extension.value : ""
+  //       }`;
+  //       break;
+  //     default:
+  //       break;
+  //   }
+  // }
 });
 
 //--------------------------------------------------------------------

@@ -16,7 +16,6 @@
           :label="tipo.nombre"
         />
       </q-tabs>
-
       <q-tab-panels v-model="tab" animated class="text-white">
         <q-tab-panel
           v-for="tipo in tipo_Elecciones"
@@ -34,7 +33,18 @@
             :filter="filter"
             class="my-sticky-last-column-table"
             v-model:pagination="pagination"
+            :loading="loading"
+            color="pink"
           >
+            <template v-slot:top-left>
+              <q-btn
+                type="button"
+                color="pink-1"
+                icon-right="gavel"
+                label="Aprobar"
+                @click="aprobar"
+              />
+            </template>
             <template v-slot:top-right>
               <q-input
                 borderless
@@ -55,6 +65,12 @@
               >
                 <q-card bordered class="no-shadow">
                   <q-item>
+                    <q-checkbox
+                      v-if="props.row.validado == false"
+                      color="green"
+                      v-model="props.row.aprobar"
+                      @click="updateSelection(props.row)"
+                    />
                     <q-item-section avatar>
                       <q-avatar size="60px" class="shadow-10">
                         <img :src="props.row.url_Foto_Propietario" />
@@ -114,7 +130,7 @@
                           round
                           color="pink-5"
                           icon="edit_square"
-                          @click="actualizarModal(true)"
+                          @click="editar(props.row.id)"
                         >
                           <q-tooltip>Editar información</q-tooltip>
                         </q-btn>
@@ -129,6 +145,12 @@
               <q-tr :props="props">
                 <q-td v-for="col in props.cols" :key="col.name" :props="props">
                   <div v-if="col.name === 'id_Expand'">
+                    <q-checkbox
+                      v-if="props.row.validado == false"
+                      color="green"
+                      v-model="props.row.aprobar"
+                      @click="updateSelection(props.row)"
+                    />
                     <q-btn
                       size="sm"
                       color="pink-8"
@@ -156,12 +178,12 @@
                       </q-item-section>
                     </q-item>
                   </div>
-                  <div v-else-if="col.name === 'activo'">
+                  <div v-else-if="col.name === 'validado'">
                     <q-btn
                       flat
                       round
-                      :color="props.row.activo == true ? 'green' : 'red'"
-                      :icon="props.row.activo == true ? 'done' : 'close'"
+                      :color="props.row.validado == true ? 'green' : 'red'"
+                      :icon="props.row.validado == true ? 'done' : 'close'"
                     >
                     </q-btn>
                   </div>
@@ -209,7 +231,6 @@
                   <label v-else>{{ col.value }}</label>
                 </q-td>
               </q-tr>
-              <!--------------------------------------------------------------------------->
               <q-tr v-show="isRowExpanded(props.row)" :props="props">
                 <q-td colspan="100%">
                   <div class="row" v-if="suplente_1.nombres != null">
@@ -226,7 +247,7 @@
                       <q-item>
                         <q-item-section avatar>
                           <q-avatar>
-                            <img :src="suplente_1.url_Logo_Partido" />
+                            <img :src="suplente_1.url_Foto" />
                           </q-avatar>
                         </q-item-section>
 
@@ -244,84 +265,69 @@
                     <div class="col-1">{{ candidato.tipo_Candidato }}</div>
                     <div class="col-1">
                       <q-avatar>
-                        <img
-                          :src="candidato.url_Logo_Partido_Partido_Suplente"
-                          alt=""
-                        />
-                        <q-tooltip>{{ candidato.partido_Suplente }}</q-tooltip>
+                        <img :src="suplente_1.url_Logo_Partido" alt="" />
+                        <q-tooltip>{{ suplente_1.partido_Suplente }}</q-tooltip>
                       </q-avatar>
                     </div>
                   </div>
-                  <div
-                    v-if="candidato.nombres_Propietario_2 != null"
-                    class="row q-pb-xs"
-                  >
-                    <div class="col-2">Propietario sindico</div>
+                  <div v-if="propietario_2.nombres != null" class="row q-pb-xs">
+                    <div class="col-1">Prop. Sindico</div>
                     <div class="col-lg-3 col-md-3">
                       <q-item>
                         <q-item-section avatar>
                           <q-avatar>
-                            <img :src="candidato.url_Foto_Propietario_2" />
+                            <img :src="propietario_2.url_Foto" />
                           </q-avatar>
                         </q-item-section>
 
                         <q-item-section class="text-left">
                           <q-item-label>{{
-                            candidato.nombre_Completo_Propietario_2
+                            propietario_2.nombre_Completo
                           }}</q-item-label>
                           <q-item-label caption class="">{{
-                            candidato.correo_Propietario_2
+                            propietario_2.correo
                           }}</q-item-label>
                         </q-item-section>
                       </q-item>
                     </div>
-                    <div class="col-1">{{ candidato.sexo_Propietario_2 }}</div>
+                    <div class="col-1">{{ propietario_2.sexo }}</div>
                     <div class="col-1">{{ candidato.tipo_Candidato }}</div>
                     <div class="col-1">
                       <q-avatar>
-                        <img
-                          :src="candidato.url_Logo_Partido_Propietario_2"
-                          alt=""
-                        />
+                        <img :src="propietario_2.url_Logo_Partido" alt="" />
                         <q-tooltip>{{
-                          candidato.partido_Propietario_2
+                          propietario_2.partido_Propietario_2
                         }}</q-tooltip>
                       </q-avatar>
                     </div>
                   </div>
-                  <div
-                    v-if="candidato.nombres_Suplente_2 != null"
-                    class="row q-pb-xs"
-                  >
-                    <div class="col-2">Suplente sindico</div>
+                  <div v-if="suplente_2.nombres != null" class="row q-pb-xs">
+                    <div class="col-1">Sup. Sindico</div>
                     <div class="col-lg-3 col-md-3">
                       <q-item>
                         <q-item-section avatar>
                           <q-avatar>
-                            <img :src="candidato.url_Foto_Suplente_2" />
+                            <img :src="suplente_2.url_Foto" />
                           </q-avatar>
                         </q-item-section>
 
                         <q-item-section class="text-left">
                           <q-item-label>{{
-                            candidato.nombre_Completo_Suplente_2
+                            suplente_2.nombre_Completo
                           }}</q-item-label>
                           <q-item-label caption class="">{{
-                            candidato.correo_Suplente_2
+                            suplente_2.correo
                           }}</q-item-label>
                         </q-item-section>
                       </q-item>
                     </div>
-                    <div class="col-1">{{ candidato.sexo_Suplente_2 }}</div>
+                    <div class="col-1">{{ suplente_2.sexo }}</div>
                     <div class="col-1">{{ candidato.tipo_Candidato }}</div>
                     <div class="col-1">
                       <q-avatar>
-                        <img
-                          :src="candidato.url_Logo_Partido_Partido_Suplente_2"
-                          alt=""
-                        />
+                        <img :src="suplente_2.url_Logo_Partido" alt="" />
                         <q-tooltip>{{
-                          candidato.partido_Suplente_2
+                          suplente_2.partido_Suplente_2
                         }}</q-tooltip>
                       </q-avatar>
                     </div>
@@ -332,6 +338,7 @@
           </q-table>
           <ModalRegistro :tab="tab" :tipo_Id="tipo.id" />
           <ModalSustituir :tab="tab" />
+          <ModalAprobar :tipo_Id="tipo.id" />
         </q-tab-panel>
       </q-tab-panels>
     </q-card>
@@ -346,36 +353,47 @@
 import { storeToRefs } from "pinia";
 import { useQuasar } from "quasar";
 import { useCandidatosStore } from "src/stores/candidatos-store";
+import { useAprobarStore } from "src/stores/aprobar-store";
 import { computed, ref, onBeforeMount, watch } from "vue";
 import { useConfiguracionStore } from "src/stores/configuracion-store";
 import ModalRegistro from "../components/ModalRegistro.vue";
 import ModalSustituir from "../components/ModalSustituir.vue";
-
+import ModalAprobar from "../../aprobar/components/ModalComp.vue";
 //--------------------------------------------------------------------
 
 const $q = useQuasar();
 const candidatoStore = useCandidatosStore();
 const configuracionStore = useConfiguracionStore();
+const aprobarStore = useAprobarStore();
 const { tipo_Elecciones } = storeToRefs(configuracionStore);
-const { list_Candidatos, candidato, suplente_1 } = storeToRefs(candidatoStore);
+const {
+  list_Candidatos,
+  candidato,
+  propietario_2,
+  suplente_1,
+  suplente_2,
+  loading,
+} = storeToRefs(candidatoStore);
+const { list_Detalle } = storeToRefs(aprobarStore);
 const visisble_columns = ref("");
 const expandedRow = ref(null);
 const tab = ref("DIP");
 const list_Candidatos_Filtro = ref({ ...list_Candidatos.value });
+const listCandidatos = ref([]);
+
 //--------------------------------------------------------------------
 
-onBeforeMount(async () => {
-  $q.loading.show();
-  await candidatoStore.loadCandidatos();
+onBeforeMount(() => {
+  candidatoStore.loadCandidatos();
   configuracionStore.loadTipoElecciones();
   cargarColumnas(tab.value);
-  $q.loading.hide();
 });
 
 //--------------------------------------------------------------------
 
 watch(tab, (val) => {
   cargarColumnas(val);
+  aprobarStore.initAprobacion();
 });
 
 watch(list_Candidatos, (val) => {
@@ -383,7 +401,18 @@ watch(list_Candidatos, (val) => {
     cargarColumnas(tab.value);
   }
 });
+
 //--------------------------------------------------------------------
+
+const updateSelection = (row) => {
+  const isSelected = listCandidatos.value.includes(row);
+  if (!isSelected) {
+    listCandidatos.value.push(row);
+  } else {
+    const index = listCandidatos.value.indexOf(row.id);
+    listCandidatos.value.splice(index, 1);
+  }
+};
 
 const cargarColumnas = (tab) => {
   switch (tab) {
@@ -391,7 +420,7 @@ const cargarColumnas = (tab) => {
       visisble_columns.value = [
         "id_Expand",
         "nombre_Completo_Propietario",
-        "activo",
+        "validado",
         "genero_Propietario",
         "tipo_Candidato",
         "coalicion",
@@ -409,7 +438,7 @@ const cargarColumnas = (tab) => {
       visisble_columns.value = [
         "id_Expand",
         "nombre_Completo_Propietario",
-        "activo",
+        "validado",
         "genero_Propietario",
         "tipo_Candidato",
         "coalicion",
@@ -428,7 +457,7 @@ const cargarColumnas = (tab) => {
       visisble_columns.value = [
         "id_Expand",
         "nombre_Completo_Propietario",
-        "activo",
+        "validado",
         "genero_Propietario",
         "coalicion",
         "partido",
@@ -445,7 +474,7 @@ const cargarColumnas = (tab) => {
       visisble_columns.value = [
         "id_Expand",
         "nombre_Completo_Propietario",
-        "activo",
+        "validado",
         "genero_Propietario",
         "tipo_Candidato",
         "coalicion",
@@ -457,7 +486,7 @@ const cargarColumnas = (tab) => {
         "id",
       ];
       list_Candidatos_Filtro.value = list_Candidatos.value.filter(
-        (x) => x.tipo_Eleccion == "Regidurias"
+        (x) => x.tipo_Eleccion == "Regidurías"
       );
       break;
     }
@@ -465,9 +494,28 @@ const cargarColumnas = (tab) => {
 };
 
 const editar = async (id) => {
+  $q.loading.show();
   candidatoStore.actualizarModal(true);
   candidatoStore.updateEditar(true);
   await candidatoStore.loadCandidato(id);
+  $q.loading.hide();
+};
+
+const aprobar = async () => {
+  $q.loading.show();
+  aprobarStore.actualizarModal(true);
+  if (listCandidatos.value.length != 0) {
+    listCandidatos.value.forEach((element) => {
+      list_Detalle.value.push({
+        candidato_Id: element.id,
+        candidato: element.nombre_Completo_Propietario,
+        partido_Logo: element.url_Logo_Partido_Propietario,
+        coalicion_Logo: element.url_Logo_Coalicion,
+      });
+    });
+  }
+  //listCandidatos.value = [];
+  $q.loading.hide();
 };
 
 const modalSustituir = (id) => {
@@ -483,6 +531,7 @@ const toggleRowExpand = (row) => {
     candidatoStore.loadCandidato(row.id);
   }
 };
+
 const isRowExpanded = (row) => {
   return expandedRow.value === row;
 };
@@ -497,7 +546,7 @@ const columns = [
   {
     name: "id_Expand",
     align: "center",
-    label: "Ver mas",
+    label: "Ver más",
     field: "id_Expand",
     sortable: true,
   },
@@ -509,10 +558,10 @@ const columns = [
     sortable: true,
   },
   {
-    name: "activo",
+    name: "validado",
     align: "center",
-    label: "Activo",
-    field: "activo",
+    label: "Aprobado",
+    field: "validado",
     sortable: true,
   },
   {
@@ -560,7 +609,7 @@ const columns = [
   {
     name: "coalicion",
     align: "center",
-    label: "Coalicion",
+    label: "Coalición",
     field: "coalicion",
     sortable: true,
   },

@@ -6,7 +6,9 @@ export const useCandidatosStore = defineStore("useCandidatosStore", {
     modal: false,
     isEditar: false,
     modalSustituir: false,
+    loading: false,
     list_Candidatos: [],
+    list_RP: [],
     candidato: {
       id: null,
       tipo_Eleccion_Id: null,
@@ -20,6 +22,18 @@ export const useCandidatosStore = defineStore("useCandidatosStore", {
       orden: null,
       activo: null,
       fecha_Registro: null,
+    },
+    foto_1: {
+      url_Foto: null,
+    },
+    foto_2: {
+      url_Foto: null,
+    },
+    foto_3: {
+      url_Foto: null,
+    },
+    foto_4: {
+      url_Foto: null,
     },
     propietario_1: {
       nombre_Completo: null,
@@ -39,11 +53,13 @@ export const useCandidatosStore = defineStore("useCandidatosStore", {
       pertenece_Grupo_Vulnerable: false,
       grupo_Vulnerable: null,
       partido_Id: null,
+      partido_Propietario: null,
       url_Logo_Partido: null,
       grupo_Vulnerable_1: null,
       grupo_Vulnerable_2: null,
       grupo_Vulnerable_3: null,
       grupo_Vulnerable_4: null,
+      edad: null,
     },
     propietario_2: {
       nombre_Completo: null,
@@ -58,16 +74,18 @@ export const useCandidatosStore = defineStore("useCandidatosStore", {
       curp: null,
       fecha_Nacimiento: null,
       ocupacion: null,
-      telefono: null,
+      telefono: [],
       correo: null,
       pertenece_Grupo_Vulnerable: false,
       grupo_Vulnerable: null,
       partido_Id: null,
+      partido_Propietario_2: null,
       url_Logo_Partido: null,
       grupo_Vulnerable_1: null,
       grupo_Vulnerable_2: null,
       grupo_Vulnerable_3: null,
       grupo_Vulnerable_4: null,
+      edad: null,
     },
     suplente_1: {
       nombre_Completo: null,
@@ -82,16 +100,18 @@ export const useCandidatosStore = defineStore("useCandidatosStore", {
       curp: null,
       fecha_Nacimiento: null,
       ocupacion: null,
-      telefono: null,
+      telefono: [],
       correo: null,
       pertenece_Grupo_Vulnerable: false,
       grupo_Vulnerable: null,
       partido_Id: null,
+      partido_Suplente: null,
       url_Logo_Partido: null,
       grupo_Vulnerable_1: null,
       grupo_Vulnerable_2: null,
       grupo_Vulnerable_3: null,
       grupo_Vulnerable_4: null,
+      edad: null,
     },
     suplente_2: {
       nombre_Completo: null,
@@ -111,11 +131,13 @@ export const useCandidatosStore = defineStore("useCandidatosStore", {
       pertenece_Grupo_Vulnerable: false,
       grupo_Vulnerable: null,
       partido_Id: null,
+      partido_Suplente_2: null,
       url_Logo_Partido: null,
       grupo_Vulnerable_1: null,
       grupo_Vulnerable_2: null,
       grupo_Vulnerable_3: null,
       grupo_Vulnerable_4: null,
+      edad: null,
     },
   }),
   actions: {
@@ -141,6 +163,11 @@ export const useCandidatosStore = defineStore("useCandidatosStore", {
       this.candidato.tipo_Candidato = null;
       this.candidato.orden = null;
       this.candidato.activo = null;
+      this.candidato.partido_Id = null;
+      this.foto_1.url_Foto = null;
+      this.foto_2.url_Foto = null;
+      this.foto_3.url_Foto = null;
+      this.foto_4.url_Foto = null;
       //---------------------------------
       //PROPIETARIO 1
       this.propietario_1.nombre_Completo = null;
@@ -165,6 +192,7 @@ export const useCandidatosStore = defineStore("useCandidatosStore", {
       this.propietario_1.grupo_Vulnerable_2 = null;
       this.propietario_1.grupo_Vulnerable_3 = null;
       this.propietario_1.grupo_Vulnerable_4 = null;
+      this.propietario_1.edad = null;
       //---------------------------------
       //PROPIETARIO 2
       this.propietario_2.nombre_Completo = null;
@@ -189,6 +217,7 @@ export const useCandidatosStore = defineStore("useCandidatosStore", {
       this.propietario_2.grupo_Vulnerable_2 = null;
       this.propietario_2.grupo_Vulnerable_3 = null;
       this.propietario_2.grupo_Vulnerable_4 = null;
+      this.propietario_2.edad = null;
       //---------------------------------
       //SUPLENTE 1
       this.suplente_1.nombre_Completo = null;
@@ -213,6 +242,7 @@ export const useCandidatosStore = defineStore("useCandidatosStore", {
       this.suplente_1.grupo_Vulnerable_2 = null;
       this.suplente_1.grupo_Vulnerable_3 = null;
       this.suplente_1.grupo_Vulnerable_4 = null;
+      this.suplente_1.edad = null;
       //---------------------------------
       //SUPLENTE 2
       this.suplente_2.nombre_Completo = null;
@@ -237,6 +267,7 @@ export const useCandidatosStore = defineStore("useCandidatosStore", {
       this.suplente_2.grupo_Vulnerable_2 = null;
       this.suplente_2.grupo_Vulnerable_3 = null;
       this.suplente_2.grupo_Vulnerable_4 = null;
+      this.suplente_2.edad = null;
     },
     //----------------------------------------------------------------------
     //CANDIDATO
@@ -302,10 +333,12 @@ export const useCandidatosStore = defineStore("useCandidatosStore", {
 
     async loadCandidatos() {
       try {
+        this.loading = true;
         let resp = await api.get("/Candidatos");
         let { data } = resp.data;
         let listCandidatos = data.map((candidato) => {
           return {
+            aprobar: false,
             id: candidato.id,
             id_Expand: candidato.id,
             tipo_Eleccion_Id: candidato.tipo_Eleccion_Id,
@@ -322,6 +355,7 @@ export const useCandidatosStore = defineStore("useCandidatosStore", {
             tipo_Candidato: candidato.tipo_Candidato,
             orden: candidato.orden,
             activo: candidato.activo,
+            validado: candidato.validado,
             fecha_registro: candidato.fecha_Registro,
             //----------------------------------------------------
             //PROPIETARIO 1
@@ -428,7 +462,7 @@ export const useCandidatosStore = defineStore("useCandidatosStore", {
               candidato.url_Logo_Partido_Partido_Suplente_2,
           };
         });
-
+        this.loading = false;
         this.list_Candidatos = listCandidatos;
       } catch (error) {
         return {
@@ -445,7 +479,6 @@ export const useCandidatosStore = defineStore("useCandidatosStore", {
         resp = await api.get(`/Candidatos/${id}`);
         if (resp.status == 200) {
           const { success, data } = resp.data;
-          console.log(data);
           if (success == true) {
             this.candidato.activo = data.activo;
             this.candidato.id = data.id;
@@ -482,8 +515,11 @@ export const useCandidatosStore = defineStore("useCandidatosStore", {
             this.propietario_1.grupo_Vulnerable =
               data.grupo_Vulnerable_Propietario;
             this.propietario_1.partido_Id = data.partido_Id;
-            this.propietario_1.partido = data.partido;
-            this.propietario_1.telefono = data.telefono_Propietario;
+            this.propietario_1.partido_Propietario = data.partido_Propietario;
+            if (data.telefono_Propietario != null) {
+              this.propietario_1.telefono =
+                data.telefono_Propietario.split(",");
+            }
             //-----------------------------------------------------
             //PROPIETARIO 2
             this.propietario_2.nombre_Completo = `${data.nombres_Propietario_2} ${data.apellido_Paterno_Propietario_2} ${data.apellido_Materno_Propietario_2}`;
@@ -496,18 +532,25 @@ export const useCandidatosStore = defineStore("useCandidatosStore", {
             this.propietario_2.sexo = data.sexo_Propietario_2;
             this.propietario_2.clave_Elector = data.clave_Elector_Propietario_2;
             this.propietario_2.url_Foto = data.url_Foto_Propietario_2;
-            this.propietario_2.rfc = data.rfc_Propietario_2;
-            this.propietario_2.curp = data.curp_Propietario_2;
+            this.propietario_2.rfc = data.rfC_Propietario_2;
+            this.propietario_2.curp = data.curP_Propietario_2;
             this.propietario_2.fecha_Nacimiento =
               data.fecha_Nacimiento_Propietario_2;
             this.propietario_2.ocupacion = data.ocupacion_Propietario_2;
-            this.propietario_2.telefono = data.telefono_Propietario_2;
+            if (data.telefono_Propietario_2 != null) {
+              this.propietario_2.telefono =
+                data.telefono_Propietario_2.split(",");
+            }
             this.propietario_2.correo = data.correo_Propietario_2;
             this.propietario_2.pertenece_Grupo_Vulnerable =
               data.pertenece_Grupo_Vulerable_Propietario_2;
             this.propietario_2.grupo_Vulnerable =
               data.grupo_Vulnerable_Propietario_2;
             this.propietario_2.partido_Id = data.partido_Propietario_2_Id;
+            this.propietario_2.partido_Propietario_2 =
+              data.partido_Propietario_2;
+            this.propietario_2.url_Logo_Partido =
+              data.url_Logo_Partido_Propietario_2;
             //-----------------------------------------------------
             //SUPLENTE 1
             this.suplente_1.nombre_Completo = `${data.nombres_Suplente} ${data.apellido_Paterno_Suplente} ${data.apellido_Materno_Suplente}`;
@@ -522,7 +565,9 @@ export const useCandidatosStore = defineStore("useCandidatosStore", {
             this.suplente_1.curp = data.curP_Suplente;
             this.suplente_1.fecha_Nacimiento = data.fecha_Nacimiento_Suplente;
             this.suplente_1.ocupacion = data.ocupacion_Suplente;
-            this.suplente_1.telefono = data.telefono_Suplente;
+            if (data.telefono_Suplente != null) {
+              this.suplente_1.telefono = data.telefono_Suplente.split(",");
+            }
             this.suplente_1.correo = data.correo_Suplente;
             this.suplente_1.pertenece_Grupo_Vulnerable =
               data.pertenece_Grupo_Vulnerable_Suplente;
@@ -530,6 +575,7 @@ export const useCandidatosStore = defineStore("useCandidatosStore", {
             this.suplente_1.partido_Id = data.partido_Suplente_Id;
             this.suplente_1.url_Logo_Partido =
               data.url_Logo_Partido_Partido_Suplente;
+            this.suplente_1.partido_Suplente = data.partido_Suplente;
             //-----------------------------------------------------
             //SUPLENTE 2
             this.suplente_2.nombre_Completo = `${data.nombres_Suplente_2} ${data.apellido_Paterno_Suplente_2} ${data.apellido_Materno_Suplente_2}`;
@@ -540,16 +586,21 @@ export const useCandidatosStore = defineStore("useCandidatosStore", {
             this.suplente_2.sexo = data.sexo_Suplente_2;
             this.suplente_2.url_Foto = data.url_Foto_Suplente_2;
             this.suplente_2.clave_Elector = data.clave_Elector_Suplente_2;
-            this.suplente_2.rfc = data.rfc_Suplente_2;
-            this.suplente_2.curp = data.curp_Suplente_2;
+            this.suplente_2.rfc = data.rfC_Suplente_2;
+            this.suplente_2.curp = data.curP_Suplente_2;
             this.suplente_2.fecha_Nacimiento = data.fecha_Nacimiento_Suplente_2;
             this.suplente_2.ocupacion = data.ocupacion_Suplente_2;
-            this.suplente_2.telefono = data.telefono_Suplente_2;
+            if (data.telefono_Suplente_2 != null) {
+              this.suplente_2.telefono = data.telefono_Suplente_2.split(",");
+            }
             this.suplente_2.correo = data.correo_Suplente_2;
             this.suplente_2.pertenece_Grupo_Vulnerable =
               data.pertenece_Grupo_Vulnerable_Suplente_2;
             this.suplente_2.grupo_Vulnerable = data.grupo_Vulnerable;
             this.suplente_2.partido_Id = data.partido_Suplente_2_Id;
+            this.suplente_2.partido_Suplente_2 = data.partido_Suplente_2;
+            this.suplente_2.url_Logo_Partido =
+              data.url_Logo_Partido_Partido_Suplente_2;
             this.suplente_2.correo = data.correo_Suplente_2;
 
             if (data.pertenece_Grupo_Vulnerable_Propietario == true) {
@@ -566,6 +617,51 @@ export const useCandidatosStore = defineStore("useCandidatosStore", {
               }
               if (elementos[3] != undefined) {
                 this.propietario_1.grupo_Vulnerable_4 = elementos[3];
+              }
+            }
+            if (data.pertenece_Grupo_Vulnerable_Suplente == true) {
+              let elementos = data.grupo_Vulnerable_Suplente.split("|");
+              if (elementos[0] != undefined) {
+                this.suplente_1.grupo_Vulnerable_1 = elementos[0];
+              }
+              if (elementos[1] != undefined) {
+                this.suplente_1.grupo_Vulnerable_2 = elementos[1];
+              }
+              if (elementos[2] != undefined) {
+                this.suplente_1.grupo_Vulnerable_3 = elementos[2];
+              }
+              if (elementos[3] != undefined) {
+                this.suplente_1.grupo_Vulnerable_4 = elementos[3];
+              }
+            }
+            if (data.pertenece_Grupo_Vulnerable_Propietario_2 == true) {
+              let elementos = data.grupo_Vulnerable_Propietario_2.split("|");
+              if (elementos[0] != undefined) {
+                this.propietario_2.grupo_Vulnerable_1 = elementos[0];
+              }
+              if (elementos[1] != undefined) {
+                this.propietario_2.grupo_Vulnerable_2 = elementos[1];
+              }
+              if (elementos[2] != undefined) {
+                this.propietario_2.grupo_Vulnerable_3 = elementos[2];
+              }
+              if (elementos[3] != undefined) {
+                this.propietario_2.grupo_Vulnerable_4 = elementos[3];
+              }
+            }
+            if (data.pertenece_Grupo_Vulnerable_Suplente_2 == true) {
+              let elementos = data.grupo_Vulnerable_Suplente_2.split("|");
+              if (elementos[0] != undefined) {
+                this.suplente_2.grupo_Vulnerable_1 = elementos[0];
+              }
+              if (elementos[1] != undefined) {
+                this.suplente_2.grupo_Vulnerable_2 = elementos[1];
+              }
+              if (elementos[2] != undefined) {
+                this.suplente_2.grupo_Vulnerable_3 = elementos[2];
+              }
+              if (elementos[3] != undefined) {
+                this.suplente_2.grupo_Vulnerable_4 = elementos[3];
               }
             }
           }

@@ -27,7 +27,7 @@
         <q-form class="q-col-gutter-xs" @submit="onSubmit">
           <div class="row">
             <div
-              v-if="props.tab != 'PYS'"
+              v-if="props.tab != 'PYS' && props.tab != 'GUB'"
               class="col-lg-2 col-md-2 col-sm-2 col-xs-12 q-pr-xs"
             >
               <q-select
@@ -78,6 +78,7 @@
               />
             </div>
             <div
+              v-if="cargo_Id != 'RP'"
               :class="
                 props.tab == 'PYS'
                   ? 'col-lg-2 col-md-2 col-sm-2 col-xs-2 text-center'
@@ -128,7 +129,8 @@
               class="col-lg-2 col-md-2 col-sm-2 col-xs-2"
             >
               <q-input
-                v-model.number="candidato.orden"
+                disable
+                v-model.number="orden"
                 type="number"
                 label="Orden de prelación"
                 hint="Orden de prelación"
@@ -191,7 +193,7 @@
                       <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
                         <q-select
                           v-model="partido_Id_prop"
-                          :options="list_Partidos_Politicos"
+                          :options="list_Filtro_Partidos"
                           label="Partido postulante"
                           hint="Seleccione el partido postulante"
                         />
@@ -229,7 +231,7 @@
                       <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
                         <q-select
                           v-model="partido_Id_sup"
-                          :options="list_Partidos_Politicos"
+                          :options="list_Filtro_Partidos"
                           label="Partido postulante"
                           hint="Seleccione el partido postulante"
                         />
@@ -268,7 +270,7 @@
                       <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
                         <q-select
                           v-model="partido_Id_prop2"
-                          :options="list_Partidos_Politicos"
+                          :options="list_Filtro_Partidos"
                           label="Partido postulante"
                           hint="Seleccione el partido postulante"
                         />
@@ -307,7 +309,7 @@
                       <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
                         <q-select
                           v-model="partido_Id_sup2"
-                          :options="list_Partidos_Politicos"
+                          :options="list_Filtro_Partidos"
                           label="Partido postulante"
                           hint="Seleccione el partido postulante"
                         />
@@ -329,6 +331,13 @@
                 </q-list>
               </q-tab-panel>
             </q-tab-panels>
+            <div class="q-pt-md" v-if="cargo_Id == 'RP' && partido_Id != null">
+              <TablaRP
+                :partido_Id="partido_Id.value"
+                :tab="props.tab"
+                :municipio_Id="municipio_Id != null ? municipio_Id.value : 0"
+              />
+            </div>
           </div>
           <q-space />
           <div class="col-12 justify-end">
@@ -359,7 +368,7 @@ import { useQuasar } from "quasar";
 import { storeToRefs } from "pinia";
 import { useCandidatosStore } from "src/stores/candidatos-store";
 import { useConfiguracionStore } from "src/stores/configuracion-store";
-import { ref, defineProps, onBeforeMount, watch } from "vue";
+import { ref, defineProps, onBeforeMount, watch, watchEffect } from "vue";
 import FormularioDatosGenerales from "./FormularioDatosGenerales.vue";
 import FormularioDocumentacion from "./FormularioDocumentacion.vue";
 import TablaRP from "./TablaRP.vue";
@@ -369,7 +378,6 @@ import TablaRP from "./TablaRP.vue";
 const $q = useQuasar();
 const configuracionStore = useConfiguracionStore();
 const candidatoStore = useCandidatosStore();
-
 const {
   modal,
   candidato,
@@ -378,6 +386,11 @@ const {
   propietario_2,
   suplente_1,
   suplente_2,
+  foto_1,
+  foto_2,
+  foto_3,
+  foto_4,
+  list_RP,
 } = storeToRefs(candidatoStore);
 const {
   list_Municipios,
@@ -400,6 +413,8 @@ const demarcacion_Id = ref(null);
 const tabTab = ref("propietario");
 const expansion = ref(true);
 const expansion2 = ref(false);
+const orden = ref(null);
+const list_Filtro_Partidos = ref(null);
 
 //--------------------------------------------------------------------
 
@@ -419,6 +434,14 @@ onBeforeMount(() => {
 
 //--------------------------------------------------------------------
 
+watch(coalicion_Id, (val) => {
+  if (val != null) {
+    list_Filtro_Partidos.value = list_Partidos_Politicos.value.filter(
+      (x) => x.coalicion_Id == val.value
+    );
+  }
+});
+
 watch(candidato.value, (val) => {
   if (val != null) {
     cargarDistrito(val);
@@ -426,16 +449,44 @@ watch(candidato.value, (val) => {
     cargarPartidoPolitico(val);
     cargarCoalicion(val);
     cargarMunicipio(val);
-    cargarDemarcacion(val);
+    orden.value = val.orden;
   }
 });
 
 watch(municipio_Id, (val) => {
   if (val != null) {
-    configuracionStore.loadDemarcaciones(val.value);
+    //configuracionStore.loadDemarcaciones(val.value);
   }
 });
 
+watch(list_RP, (val) => {
+  if (val != null && isEditar.value == false) {
+    let last = val[val.length - 1];
+    let next = null;
+    if (last != undefined) {
+      if (last.orden == 12) {
+        $q.dialog({
+          title: "Ya existen 12 candidatos registrados en el partido",
+          message: "Deberá editar si necesita",
+          icon: "Warning",
+          persistent: true,
+          transitionShow: "scale",
+          transitionHide: "scale",
+
+          cancel: {
+            color: "negative",
+            label: "Cerrar",
+          },
+        });
+      } else {
+        next = last.orden + 1;
+      }
+    } else {
+      next = 1;
+    }
+    orden.value = next;
+  }
+});
 //--------------------------------------------------------------------
 
 const cargarDistrito = (val) => {
@@ -460,25 +511,25 @@ const cargarPartidoPolitico = (val) => {
   if (val.is_Coalicion == true) {
     if (partido_Id_prop.value == null) {
       let partidoFiltrado = list_Partidos_Politicos.value.find(
-        (x) => x.value == `${val.partido_Id}`
+        (x) => x.value == `${propietario_1.value.partido_Id}`
       );
       partido_Id_prop.value = partidoFiltrado;
     }
     if (partido_Id_sup.value == null) {
       let partidoFiltrado = list_Partidos_Politicos.value.find(
-        (x) => x.value == `${val.partido_Suplente_Id}`
+        (x) => x.value == `${suplente_1.value.partido_Id}`
       );
       partido_Id_sup.value = partidoFiltrado;
     }
     if (partido_Id_prop2.value == null) {
       let partidoFiltrado = list_Partidos_Politicos.value.find(
-        (x) => x.value == `${val.partido_Propietario_2_Id}`
+        (x) => x.value == `${propietario_2.value.partido_Id}`
       );
       partido_Id_prop2.value = partidoFiltrado;
     }
     if (partido_Id_sup2.value == null) {
       let partidoFiltrado = list_Partidos_Politicos.value.find(
-        (x) => x.value == `${val.partido_Suplente_2_Id}`
+        (x) => x.value == `${suplente_2.value.partido_Id}`
       );
       partido_Id_sup2.value = partidoFiltrado;
     }
@@ -501,13 +552,15 @@ const cargarCoalicion = (val) => {
   }
 };
 
-const cargarMunicipio = (val) => {
+const cargarMunicipio = async (val) => {
+  await configuracionStore.loadDemarcaciones(val.municipio_Id);
   if (municipio_Id.value == null) {
     let municipioFiltrado = list_Municipios.value.find(
       (x) => x.value == `${val.municipio_Id}`
     );
     municipio_Id.value = municipioFiltrado;
   }
+  cargarDemarcacion(val);
 };
 
 const cargarDemarcacion = (val) => {
@@ -533,8 +586,8 @@ const getTitle = () => {
 
 const actualizarModal = (valor) => {
   $q.loading.show();
-  candidatoStore.actualizarModal(valor);
   limpiar();
+  candidatoStore.actualizarModal(valor);
   $q.loading.hide();
 };
 
@@ -543,6 +596,12 @@ const limpiar = () => {
   distrito_Id.value = null;
   municipio_Id.value = null;
   demarcacion_Id.value = null;
+  partido_Id.value = null;
+  partido_Id_prop.value = null;
+  partido_Id_prop2.value = null;
+  partido_Id_sup.value = null;
+  partido_Id_sup2.value = null;
+  coalicion_Id.value = null;
   candidatoStore.initCandidato();
 };
 
@@ -551,7 +610,7 @@ const onSubmit = async () => {
   candidatoFormData.append("Is_Coalicion", candidato.value.is_Coalicion);
   candidatoFormData.append("Tipo_Eleccion_Id", props.tipo_Id);
 
-  if (props.tab == "PYS") {
+  if (props.tab == "PYS" || props.tab == "GUB") {
     candidatoFormData.append("Tipo_Candidato", "MR");
   } else {
     candidatoFormData.append("Tipo_Candidato", cargo_Id.value);
@@ -565,8 +624,7 @@ const onSubmit = async () => {
   if (coalicion_Id.value != null)
     candidatoFormData.append("Coalicion_Id", coalicion_Id.value.value);
 
-  if (candidato.value.orden != null)
-    candidatoFormData.append("Orden", candidato.value.orden);
+  if (orden.value != null) candidatoFormData.append("Orden", orden.value);
   //------------PROPIETARIO------------
   if (propietario_1.value.nombres != null)
     candidatoFormData.append(
@@ -587,8 +645,8 @@ const onSubmit = async () => {
     candidatoFormData.append("Mote_Propietario", propietario_1.value.mote);
   if (propietario_1.value.sexo != null)
     candidatoFormData.append("Sexo_Propietario", propietario_1.value.sexo);
-  if (propietario_1.value.url_Foto != null)
-    candidatoFormData.append("Foto_Propietario", propietario_1.value.url_Foto);
+  if (foto_1.value.url_Foto != null)
+    candidatoFormData.append("Foto_Propietario", foto_1.value.url_Foto);
   if (propietario_1.value.clave_Elector != null)
     candidatoFormData.append(
       "Clave_Elector_Propietario",
@@ -609,10 +667,8 @@ const onSubmit = async () => {
       propietario_1.value.ocupacion
     );
   if (propietario_1.value.telefono != null) {
-    candidatoFormData.append(
-      "Telefono_Propietario",
-      propietario_1.value.telefono
-    );
+    let newTelefono = propietario_1.value.telefono.toString(", ");
+    candidatoFormData.append("Telefono_Propietario", newTelefono);
   }
   if (propietario_1.value.correo != null)
     candidatoFormData.append("Correo_Propietario", propietario_1.value.correo);
@@ -666,11 +722,8 @@ const onSubmit = async () => {
     candidatoFormData.append("Mote_Propietario_2", propietario_2.value.mote);
   if (propietario_2.value.sexo != null)
     candidatoFormData.append("Sexo_Propietario_2", propietario_2.value.sexo);
-  if (propietario_2.value.url_Foto != null)
-    candidatoFormData.append(
-      "Foto_Propietario_2",
-      propietario_2.value.url_Foto
-    );
+  if (foto_3.value.url_Foto != null)
+    candidatoFormData.append("Foto_Propietario_2", foto_3.value.url_Foto);
   if (propietario_2.value.clave_Elector != null)
     candidatoFormData.append(
       "Clave_Elector_Propietario_2",
@@ -690,11 +743,10 @@ const onSubmit = async () => {
       "Ocupacion_Propietario_2",
       propietario_2.value.ocupacion
     );
-  if (propietario_2.value.telefono != null)
-    candidatoFormData.append(
-      "Telefono_Propietario_2",
-      propietario_2.value.telefono
-    );
+  if (propietario_2.value.telefono != null) {
+    let newTelefono = propietario_2.value.telefono.toString(", ");
+    candidatoFormData.append("Telefono_Propietario_2", newTelefono);
+  }
   if (propietario_2.value.correo != null)
     candidatoFormData.append(
       "Correo_Propietario_2",
@@ -747,8 +799,8 @@ const onSubmit = async () => {
     candidatoFormData.append("Mote_Suplente", suplente_1.value.mote);
   if (suplente_1.value.sexo != null)
     candidatoFormData.append("Sexo_Suplente", suplente_1.value.sexo);
-  if (suplente_1.value.url_Foto != null)
-    candidatoFormData.append("Foto_Suplente", suplente_1.value.url_Foto);
+  if (foto_2.value.url_Foto != null)
+    candidatoFormData.append("Foto_Suplente", foto_2.value.url_Foto);
   if (suplente_1.value.clave_Elector != null)
     candidatoFormData.append(
       "Clave_Elector_Suplente",
@@ -765,8 +817,10 @@ const onSubmit = async () => {
     );
   if (suplente_1.value.ocupacion != null)
     candidatoFormData.append("Ocupacion_Suplente", suplente_1.value.ocupacion);
-  if (suplente_1.value.telefono != null)
-    candidatoFormData.append("Telefono_Suplente", suplente_1.value.telefono);
+  if (suplente_1.value.telefono != null) {
+    let newTelefono = suplente_1.value.telefono.toString(", ");
+    candidatoFormData.append("Telefono_Suplente", newTelefono);
+  }
   if (suplente_1.value.correo != null)
     candidatoFormData.append("Correo_Suplente", suplente_1.value.correo);
   if (suplente_1.value.pertenece_Grupo_Vulnerable == true) {
@@ -816,8 +870,8 @@ const onSubmit = async () => {
     candidatoFormData.append("Mote_Suplente_2", suplente_2.value.mote);
   if (suplente_2.value.sexo != null)
     candidatoFormData.append("Sexo_Suplente_2", suplente_2.value.sexo);
-  if (suplente_2.value.url_Foto != null)
-    candidatoFormData.append("Foto_Suplente_2", suplente_2.value.url_Foto);
+  if (foto_4.value.url_Foto != null)
+    candidatoFormData.append("Foto_Suplente_2", foto_4.value.url_Foto);
   if (suplente_2.value.clave_Elector != null)
     candidatoFormData.append(
       "Clave_Elector_Suplente_2",
@@ -837,8 +891,10 @@ const onSubmit = async () => {
       "Ocupacion_Suplente_2",
       suplente_2.value.ocupacion
     );
-  if (suplente_2.value.telefono != null)
-    candidatoFormData.append("Telefono_Suplente_2", suplente_2.value.telefono);
+  if (suplente_2.value.telefono != null) {
+    let newTelefono = suplente_2.value.telefono.toString(", ");
+    candidatoFormData.append("Telefono_Suplente_2", newTelefono);
+  }
   if (suplente_2.value.correo != null)
     candidatoFormData.append("Correo_Suplente_2", suplente_2.value.correo);
   if (suplente_2.value.pertenece_Grupo_Vulnerable == true) {
@@ -918,6 +974,7 @@ const onSubmit = async () => {
       message: resp.data,
     });
     candidatoStore.loadCandidatos();
+    limpiar();
     actualizarModal(false);
   } else {
     $q.notify({

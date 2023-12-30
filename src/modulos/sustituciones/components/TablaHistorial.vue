@@ -5,7 +5,15 @@
         Historial de sustituciones
       </div>
     </div>
-    <q-table :rows="rows" :columns="columns" row-key="name">
+    <q-table
+      :rows="list_Candidatos"
+      :columns="columns"
+      :filter="filter"
+      row-key="name"
+      :loading="loading"
+      color="pink"
+      v-model:pagination="pagination"
+    >
       <template v-slot:top-right>
         <q-input
           borderless
@@ -22,18 +30,48 @@
       <template v-slot:body="props">
         <q-tr :props="props">
           <q-td v-for="col in props.cols" :key="col.name" :props="props">
-            <div v-if="col.name === 'documento'">
+            <div v-if="col.name === 'id_Expand'">
+              <q-btn
+                size="sm"
+                color="pink-8"
+                round
+                dense
+                @click="toggleRowExpand(props.row)"
+                :icon="isRowExpanded(props.row) ? 'remove' : 'add'"
+              />
+            </div>
+            <div v-else-if="col.name === 'activo'">
               <q-btn
                 flat
                 round
-                color="pink"
-                icon="description"
-                @click="verOficio(true)"
+                :color="props.row.activo == true ? 'green' : 'red'"
+                :icon="props.row.activo == true ? 'done' : 'close'"
               >
-                <q-tooltip>Ver oficio</q-tooltip>
               </q-btn>
             </div>
+
             <label v-else>{{ col.value }}</label>
+          </q-td>
+        </q-tr>
+        <q-tr v-show="isRowExpanded(props.row)" :props="props">
+          <q-td colspan="100%">
+            <q-table
+              :rows="list_Sustituciones"
+              :columns="columns_2"
+              row-key="name"
+            >
+              <template v-slot:body="props">
+                <q-tr :props="props">
+                  <q-td
+                    v-for="col in props.cols"
+                    :key="col.name"
+                    :props="props"
+                  >
+                    <label>{{ col.value }}</label>
+                  </q-td>
+                </q-tr>
+              </template></q-table
+            >
           </q-td>
         </q-tr>
       </template>
@@ -43,107 +81,171 @@
 
 <script setup>
 import { storeToRefs } from "pinia";
+import { useCandidatosStore } from "src/stores/candidatos-store";
 import { useSustituirStore } from "src/stores/sustituir-store";
-import { ref } from "vue";
+import { onBeforeMount, ref } from "vue";
 
 const sustituirStore = useSustituirStore();
+const candidatosStore = useCandidatosStore();
+const { list_Candidatos, loading } = storeToRefs(candidatosStore);
+const { list_Sustituciones } = storeToRefs(sustituirStore);
+const expandedRow = ref(null);
 
-const rows = [
-  {
-    actual: "Karla",
-    anterior: "Jazmin",
-    capturista: "Jose",
-    fecha: "20/01/2023",
-    oficio: "A745896",
-  },
-  {
-    actual: "Karla",
-    anterior: "Jazmin",
-    capturista: "Jose",
-    fecha: "20/01/2023",
-    oficio: "A745896",
-  },
-  {
-    actual: "Karla",
-    anterior: "Jazmin",
-    capturista: "Jose",
-    fecha: "20/01/2023",
-    oficio: "A745896",
-  },
-  {
-    actual: "Karla",
-    anterior: "Jazmin",
-    capturista: "Jose",
-    fecha: "20/01/2023",
-    oficio: "A745896",
-  },
-  {
-    actual: "Karla",
-    anterior: "Jazmin",
-    capturista: "Jose",
-    fecha: "20/01/2023",
-    oficio: "A745896",
-  },
+onBeforeMount(() => {
+  candidatosStore.loadCandidatos();
+});
 
-  {
-    actual: "Karla",
-    anterior: "Jazmin",
-    capturista: "Jose",
-    fecha: "20/01/2023",
-    oficio: "A745896",
-  },
-  {
-    actual: "Karla",
-    anterior: "Jazmin",
-    capturista: "Jose",
-    fecha: "20/01/2023",
-    oficio: "A745896",
-  },
-];
 const columns = [
   {
-    name: "actual",
+    name: "id_Expand",
     align: "center",
-    label: "Actual",
-    field: "actual",
+    label: "Ver mas",
+    field: "id_Expand",
     sortable: true,
   },
   {
-    name: "anterior",
+    name: "nombre_Completo_Propietario",
     align: "center",
-    label: "Anterior",
-    field: "anterior",
+    label: "Nombre",
+    field: "nombre_Completo_Propietario",
     sortable: true,
   },
   {
-    name: "capturista",
+    name: "activo",
     align: "center",
-    label: "Capturista",
-    field: "capturista",
+    label: "Activo",
+    field: "activo",
     sortable: true,
   },
   {
-    name: "fecha",
+    name: "genero_Propietario",
     align: "center",
-    label: "Fecha de sustitución",
-    field: "fecha",
+    label: "Género",
+    field: "genero_Propietario",
     sortable: true,
   },
   {
-    name: "oficio",
+    name: "tipo_Eleccion",
     align: "center",
-    label: "Oficio",
-    field: "oficio",
+    label: "Elección",
+    field: "tipo_Eleccion",
     sortable: true,
   },
   {
-    name: "documento",
+    name: "tipo_Candidato",
     align: "center",
-    label: "Ver oficio",
-    field: "documento",
+    label: "Tipo",
+    field: "tipo_Candidato",
+    sortable: true,
+  },
+  {
+    name: "partido",
+    align: "center",
+    label: "Partido",
+    field: "partido",
+    sortable: true,
+  },
+  {
+    name: "fecha_registro",
+    align: "center",
+    label: "Fecha de registro",
+    field: "fecha_registro",
     sortable: true,
   },
 ];
+
+const columns_2 = [
+  {
+    name: "no_Acuerdo",
+    align: "center",
+    label: "Acuerdo",
+    field: "no_Acuerdo",
+    sortable: true,
+  },
+  {
+    name: "tipo_Sustitucion",
+    align: "center",
+    label: "Tipo de sustitución",
+    field: "tipo_Sustitucion",
+    sortable: true,
+  },
+  {
+    name: "nombres_Anterior",
+    align: "center",
+    label: "Nombres anterior",
+    field: "nombres_Anterior",
+    sortable: true,
+  },
+  {
+    name: "apellido_Paterno_Anterior",
+    align: "center",
+    label: "Apellido paterno anterior",
+    field: "apellido_Paterno_Anterior",
+    sortable: true,
+  },
+  {
+    name: "apellido_Materno_Anterior",
+    align: "center",
+    label: "Apellido materno anterior",
+    field: "apellido_Materno_Anterior",
+    sortable: true,
+  },
+  {
+    name: "nombres_Nuevo",
+    align: "center",
+    label: "Nombres nuevo",
+    field: "nombres_Nuevo",
+    sortable: true,
+  },
+  {
+    name: "apellido_Paterno_Nuevo",
+    align: "center",
+    label: "Apellido paterno nuevo",
+    field: "apellido_Paterno_Nuevo",
+    sortable: true,
+  },
+  {
+    name: "apellido_Materno_Nuevo",
+    align: "center",
+    label: "Apellido materno nuevo",
+    field: "apellido_Materno_Nuevo",
+    sortable: true,
+  },
+  {
+    name: "empleado",
+    align: "center",
+    label: "Personal responsable",
+    field: "empleado",
+    sortable: true,
+  },
+  {
+    name: "fecha_Sustitucion",
+    align: "center",
+    label: "Fecha sustitución",
+    field: "fecha_Sustitucion",
+    sortable: true,
+  },
+];
+const filter = ref("");
+const pagination = ref({
+  sortBy: "desc",
+  descending: false,
+  page: 1,
+  rowsPerPage: 5,
+});
+
+const toggleRowExpand = (row) => {
+  if (expandedRow.value === row) {
+    expandedRow.value = null;
+  } else {
+    expandedRow.value = row;
+    sustituirStore.loadSustitucionByCandidato(row.id);
+  }
+};
+
+const isRowExpanded = (row) => {
+  return expandedRow.value === row;
+};
 
 const verOficio = (valor) => {
   sustituirStore.actualizarModalOficio(valor);

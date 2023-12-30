@@ -19,6 +19,11 @@ const routes = [
         name: "historial_sustituciones",
         component: () => import("../modulos/sustituciones/pages/IndexPage.vue"),
       },
+      {
+        path: "/aprobacion_candidaturas",
+        name: "aprobacion_candidaturas",
+        component: () => import("../modulos/aprobar/pages/IndexPage.vue"),
+      },
     ],
   },
 

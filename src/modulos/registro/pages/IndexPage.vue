@@ -28,7 +28,6 @@
   </q-page>
 </template>
 <script setup>
-import { storeToRefs } from "pinia";
 import { useCandidatosStore } from "src/stores/candidatos-store";
 import TablaPrincipalTipoEleccion from "../components/TablaPrincipalTipoEleccion.vue";
 
