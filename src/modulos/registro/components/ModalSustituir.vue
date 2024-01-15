@@ -42,7 +42,6 @@
           color="teal"
         />
       </q-card-section>
-
       <q-card-section>
         <q-form class="q-col-gutter-xs" @submit="onSubmit">
           <div class="row" v-if="sustituirPor != null">
@@ -219,6 +218,8 @@ import { useQuasar } from "quasar";
 import { useSustituirStore } from "src/stores/sustituir-store";
 import SustituirCandidato from "../../sustituciones/components/SustituirCandidato.vue";
 
+//--------------------------------------------------------------------
+
 const $q = useQuasar();
 const candidatoStore = useCandidatosStore();
 const sustituirStore = useSustituirStore();
@@ -231,26 +232,17 @@ const {
   suplente_2,
 } = storeToRefs(candidatoStore);
 const {
-  candidatoSustituir,
   sustitucion,
   sust_propietario_1,
   sust_propietario_2,
   sust_suplente_1,
   sust_suplente_2,
 } = storeToRefs(sustituirStore);
-const is_Candidato = ref(false);
 const sustituirPor = ref(null);
 const tabTab = ref("propietario");
-const tabs = ref([
-  "Propietario",
-  "Suplente",
-  "Propietario sindico",
-  "Propietario suplente",
-]);
 const options = ref(["Fórmula", "Propietario", "Suplente"]);
 const expansion = ref(true);
 const expansion2 = ref(false);
-//-----------------------------------------------------------
 //Get fecha actual
 const dateActual = new Date();
 const year = dateActual.getFullYear();
@@ -261,9 +253,13 @@ const minutes = String(dateActual.getMinutes());
 const seconds = String(dateActual.getSeconds());
 const date = ref(`${year}/${month}/${day} ${hours}:${minutes}:${seconds}`);
 
+//--------------------------------------------------------------------
+
 const props = defineProps({
   tab: { type: String, required: true },
 });
+
+//--------------------------------------------------------------------
 
 const actualizarModal = (valor) => {
   $q.loading.show();

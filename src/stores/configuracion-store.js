@@ -19,7 +19,9 @@ export const useConfiguracionStore = defineStore("useConfiguracionStore", {
     list_Distritos: [],
     list_Demarcaciones: [],
     list_Partidos_Politicos: [],
+    list_Partidos_Politicos_Coalcion: [],
     list_Coaliciones: [],
+    list_Requisitos: [],
   }),
   actions: {
     //----------------------------------------------------------------------
@@ -160,13 +162,43 @@ export const useConfiguracionStore = defineStore("useConfiguracionStore", {
       }
     },
 
+    async loadPartidosPoliticosCoalicion() {
+      try {
+        let resp = await api.get("/Partidos_Politicos");
+        let { data } = resp.data;
+        let listPartidosFiltro = [];
+        listPartidosFiltro = data.filter((x) => x.is_Coalicion == true);
+        let listPartidos = listPartidosFiltro.map((partido) => {
+          return {
+            value: partido.id,
+            label: partido.siglas,
+            nombre: partido.nombre,
+            siglas: partido.siglas,
+            logo_URL: partido.logo_URL,
+            independiente: partido.independiente,
+            prioridad: partido.prioridad,
+            pantone_Fondo: partido.pantone_Fondo,
+            pantone_Letra: partido.pantone_Letra,
+            coalicion_Id: partido.coalicion_Id,
+            coalicion: partido.coalicion,
+            is_Coalicion: partido.is_Coalicion,
+          };
+        });
+        this.list_Partidos_Politicos_Coalcion = listPartidos;
+      } catch (error) {
+        return {
+          success: false,
+          data: "Ocurrió un error, inténtelo de nuevo. Si el error persiste, contacte a soporte",
+        };
+      }
+    },
+
     //----------------------------------------------------------------------
     //MUNICIPIOS
     async loadMunicipios() {
       try {
         let resp = await api.get("/Municipios");
         let { data } = resp.data;
-
         let listNayarit = [];
         listNayarit = data.filter((x) => x.estado_Id == 18);
         let listMunicipios = listNayarit.map((municipio) => {
@@ -197,6 +229,30 @@ export const useConfiguracionStore = defineStore("useConfiguracionStore", {
           };
         });
         this.list_Coaliciones = listCoaliciones;
+      } catch (error) {
+        return {
+          success: false,
+          data: "Ocurrió un error, inténtelo de nuevo. Si el error persiste, contacte a soporte",
+        };
+      }
+    },
+
+    //----------------------------------------------------------------------
+    //GET REQUISITOS BY ELECCION
+    async loadRequisitos(id) {
+      try {
+        let resp = await api.get(`/Tipos_Eleccion_Requerimientos/${id}`);
+        let { data } = resp.data;
+        let listRequisitos = data.map((requisito) => {
+          return {
+            id: requisito.id,
+            nombre: requisito.nombre,
+            genero: requisito.genero,
+            activo: requisito.activo,
+            archivo: requisito.archivo,
+          };
+        });
+        this.list_Requisitos = listRequisitos;
       } catch (error) {
         return {
           success: false,

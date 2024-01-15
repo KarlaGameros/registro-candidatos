@@ -42,10 +42,13 @@
 <script setup>
 import { storeToRefs } from "pinia";
 import { useSustituirStore } from "src/stores/sustituir-store";
-import { ref } from "vue";
+
+//--------------------------------------------------------------------
 
 const sustituirStore = useSustituirStore();
 const { modalOficio } = storeToRefs(sustituirStore);
+
+//--------------------------------------------------------------------
 
 const actualizarModal = (valor) => {
   sustituirStore.actualizarModalOficio(valor);

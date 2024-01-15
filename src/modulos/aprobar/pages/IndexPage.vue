@@ -17,8 +17,4 @@
 <script setup>
 import ModalComp from "../components/ModalComp.vue";
 import TablaComp from "../components/TablaComp.vue";
-
-//--------------------------------------------------------------------
 </script>
-
-<style scope></style>

@@ -46,6 +46,8 @@
                 :options="list_Distritos"
                 label="Distrito"
                 hint="Seleccione un distrito"
+                lazy-rules
+                :rules="[(val) => !!val || 'El distrito es requerido']"
               />
             </div>
             <div
@@ -63,6 +65,8 @@
                 :options="list_Municipios"
                 label="Municipio"
                 hint="Seleccione un municipio"
+                lazy-rules
+                :rules="[(val) => !!val || 'El municipio es requerido']"
               />
             </div>
             <div
@@ -75,6 +79,8 @@
                 :options="list_Demarcaciones"
                 label="Demarcación"
                 hint="Seleccione una demarcación"
+                lazy-rules
+                :rules="[(val) => !!val || 'La demarcación es requerida']"
               />
             </div>
             <div
@@ -107,6 +113,8 @@
                 :options="list_Coaliciones"
                 label="Coalición"
                 hint="Seleccione una coalición"
+                lazy-rules
+                :rules="[(val) => !!val || 'La coalición es requerida']"
               />
             </div>
             <div
@@ -122,6 +130,10 @@
                 :options="list_Partidos_Politicos"
                 label="Partido postulante"
                 hint="Seleccione el partido postulante"
+                lazy-rules
+                :rules="[
+                  (val) => !!val || 'El partiddo postulante es requerido',
+                ]"
               />
             </div>
             <div
@@ -201,7 +213,7 @@
                     </div>
                     <FormularioDatosGenerales :tabTipo="tabTab" />
                   </q-expansion-item>
-                  <!-- <q-expansion-item
+                  <q-expansion-item
                     v-model="expansion2"
                     @show="expansion = false"
                     @hide="expansion = true"
@@ -209,8 +221,8 @@
                     icon="folder_open"
                     label="Documentación Requerida"
                   >
-                    <FormularioDocumentacion />
-                  </q-expansion-item> -->
+                    <FormularioDocumentacion :tipo_Id="tipo_Id" />
+                  </q-expansion-item>
                 </q-list>
               </q-tab-panel>
               <!--SUPLENTE-->
@@ -239,8 +251,7 @@
                     </div>
                     <FormularioDatosGenerales :tabTipo="tabTab" />
                   </q-expansion-item>
-
-                  <!-- <q-expansion-item
+                  <q-expansion-item
                     v-model="expansion2"
                     @show="expansion = false"
                     @hide="expansion = true"
@@ -248,8 +259,8 @@
                     icon="folder_open"
                     label="Documentación Requerida"
                   >
-                    <FormularioDocumentacion />
-                  </q-expansion-item> -->
+                    <FormularioDocumentacion :tipo_Id="tipo_Id" />
+                  </q-expansion-item>
                 </q-list>
               </q-tab-panel>
               <!--SINDICO PROPIETARIO-->
@@ -278,8 +289,7 @@
                     </div>
                     <FormularioDatosGenerales :tabTipo="tabTab" />
                   </q-expansion-item>
-
-                  <!-- <q-expansion-item
+                  <q-expansion-item
                     v-model="expansion2"
                     @show="expansion = false"
                     @hide="expansion = true"
@@ -287,8 +297,8 @@
                     icon="folder_open"
                     label="Documentación Requerida"
                   >
-                    <FormularioDocumentacion />
-                  </q-expansion-item> -->
+                    <FormularioDocumentacion :tipo_Id="tipo_Id" />
+                  </q-expansion-item>
                 </q-list>
               </q-tab-panel>
               <!--SINDICO SUPLENTE-->
@@ -317,8 +327,7 @@
                     </div>
                     <FormularioDatosGenerales :tabTipo="tabTab" />
                   </q-expansion-item>
-
-                  <!-- <q-expansion-item
+                  <q-expansion-item
                     v-model="expansion2"
                     @show="expansion = false"
                     @hide="expansion = true"
@@ -326,8 +335,8 @@
                     icon="folder_open"
                     label="Documentación Requerida"
                   >
-                    <FormularioDocumentacion />
-                  </q-expansion-item> -->
+                    <FormularioDocumentacion :tipo_Id="tipo_Id" />
+                  </q-expansion-item>
                 </q-list>
               </q-tab-panel>
             </q-tab-panels>
@@ -368,7 +377,7 @@ import { useQuasar } from "quasar";
 import { storeToRefs } from "pinia";
 import { useCandidatosStore } from "src/stores/candidatos-store";
 import { useConfiguracionStore } from "src/stores/configuracion-store";
-import { ref, defineProps, onBeforeMount, watch, watchEffect } from "vue";
+import { ref, defineProps, onBeforeMount, watch } from "vue";
 import FormularioDatosGenerales from "./FormularioDatosGenerales.vue";
 import FormularioDocumentacion from "./FormularioDocumentacion.vue";
 import TablaRP from "./TablaRP.vue";
@@ -397,6 +406,7 @@ const {
   list_Distritos,
   list_Demarcaciones,
   list_Partidos_Politicos,
+  list_Partidos_Politicos_Coalcion,
   list_Coaliciones,
 } = storeToRefs(configuracionStore);
 const coalicion_Id = ref(null);
@@ -425,20 +435,16 @@ const props = defineProps({
 
 //--------------------------------------------------------------------
 
-onBeforeMount(() => {
-  configuracionStore.loadMunicipios();
-  configuracionStore.loadDistritos();
-  configuracionStore.loadPartidosPoliticos();
-  configuracionStore.loadCoaliciones();
-});
-
-//--------------------------------------------------------------------
-
-watch(coalicion_Id, (val) => {
+watch(coalicion_Id, async (val) => {
   if (val != null) {
-    list_Filtro_Partidos.value = list_Partidos_Politicos.value.filter(
+    await configuracionStore.loadPartidosPoliticosCoalicion();
+    list_Filtro_Partidos.value = list_Partidos_Politicos_Coalcion.value.filter(
       (x) => x.coalicion_Id == val.value
     );
+    partido_Id_prop.value = null;
+    partido_Id_prop2.value = null;
+    partido_Id_sup.value = null;
+    partido_Id_sup2.value = null;
   }
 });
 
@@ -487,6 +493,7 @@ watch(list_RP, (val) => {
     orden.value = next;
   }
 });
+
 //--------------------------------------------------------------------
 
 const cargarDistrito = (val) => {
@@ -507,28 +514,32 @@ const cargarTipoCandidato = (val) => {
   }
 };
 
-const cargarPartidoPolitico = (val) => {
+const cargarPartidoPolitico = async (val) => {
   if (val.is_Coalicion == true) {
+    await configuracionStore.loadPartidosPoliticosCoalicion();
+    list_Partidos_Politicos_Coalcion.value.filter(
+      (x) => x.coalicion_Id == val.value
+    );
     if (partido_Id_prop.value == null) {
-      let partidoFiltrado = list_Partidos_Politicos.value.find(
+      let partidoFiltrado = list_Partidos_Politicos_Coalcion.value.find(
         (x) => x.value == `${propietario_1.value.partido_Id}`
       );
       partido_Id_prop.value = partidoFiltrado;
     }
     if (partido_Id_sup.value == null) {
-      let partidoFiltrado = list_Partidos_Politicos.value.find(
+      let partidoFiltrado = list_Partidos_Politicos_Coalcion.value.find(
         (x) => x.value == `${suplente_1.value.partido_Id}`
       );
       partido_Id_sup.value = partidoFiltrado;
     }
     if (partido_Id_prop2.value == null) {
-      let partidoFiltrado = list_Partidos_Politicos.value.find(
+      let partidoFiltrado = list_Partidos_Politicos_Coalcion.value.find(
         (x) => x.value == `${propietario_2.value.partido_Id}`
       );
       partido_Id_prop2.value = partidoFiltrado;
     }
     if (partido_Id_sup2.value == null) {
-      let partidoFiltrado = list_Partidos_Politicos.value.find(
+      let partidoFiltrado = list_Partidos_Politicos_Coalcion.value.find(
         (x) => x.value == `${suplente_2.value.partido_Id}`
       );
       partido_Id_sup2.value = partidoFiltrado;

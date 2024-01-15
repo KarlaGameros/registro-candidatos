@@ -46,8 +46,12 @@ import { ref } from "vue";
 import { storeToRefs } from "pinia";
 import { useAprobarStore } from "src/stores/aprobar-store";
 
+//-----------------------------------------------------------
+
 const aprobarStore = useAprobarStore();
 const { list_Detalle } = storeToRefs(aprobarStore);
+
+//-----------------------------------------------------------
 
 const columns = [
   {

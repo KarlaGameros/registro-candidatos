@@ -33,7 +33,6 @@
             :filter="filter"
             class="my-sticky-last-column-table"
             v-model:pagination="pagination"
-            :loading="loading"
             color="pink"
           >
             <template v-slot:top-left>
@@ -65,12 +64,23 @@
               >
                 <q-card bordered class="no-shadow">
                   <q-item>
-                    <q-checkbox
-                      v-if="props.row.validado == false"
-                      color="green"
-                      v-model="props.row.aprobar"
-                      @click="updateSelection(props.row)"
-                    />
+                    <div>
+                      <q-btn
+                        size="sm"
+                        color="pink-8"
+                        round
+                        dense
+                        @click="toggleRowExpand(props.row)"
+                        :icon="isRowExpanded(props.row) ? 'remove' : 'add'"
+                      />
+                      <q-checkbox
+                        v-if="props.row.validado == false"
+                        color="green"
+                        v-model="props.row.aprobar"
+                        @click="updateSelection(props.row)"
+                      />
+                    </div>
+
                     <q-item-section avatar>
                       <q-avatar size="60px" class="shadow-10">
                         <img :src="props.row.url_Foto_Propietario" />
@@ -137,11 +147,16 @@
                       </q-item-label>
                     </q-item-section>
                   </q-item>
+                  <q-tr v-show="isRowExpanded(props.row)" :props="props">
+                    <q-td>
+                      <TablaSuplentesComp />
+                    </q-td>
+                  </q-tr>
                 </q-card>
               </div>
             </template>
             <!--TEMPLATE SCREEN DESKTOP-->
-            <template v-slot:body="props">
+            <template v-else v-slot:body="props">
               <q-tr :props="props">
                 <q-td v-for="col in props.cols" :key="col.name" :props="props">
                   <div v-if="col.name === 'id_Expand'">
@@ -232,106 +247,8 @@
                 </q-td>
               </q-tr>
               <q-tr v-show="isRowExpanded(props.row)" :props="props">
-                <q-td colspan="100%">
-                  <div class="row" v-if="suplente_1.nombres != null">
-                    <div class="col-1 text-caption text-bold"></div>
-                    <div class="col-3 text-caption text-bold">Nombre</div>
-                    <div class="col-1 text-caption text-bold">Genero</div>
-                    <div class="col-1 text-caption text-bold">Tipo</div>
-                    <div class="col-1 text-caption text-bold">Partido</div>
-                  </div>
-                  <div v-else>No hay mas registros</div>
-                  <div v-if="suplente_1.nombres != null" class="row q-pb-xs">
-                    <div class="col-1">Suplente</div>
-                    <div class="col-lg-3 col-md-3">
-                      <q-item>
-                        <q-item-section avatar>
-                          <q-avatar>
-                            <img :src="suplente_1.url_Foto" />
-                          </q-avatar>
-                        </q-item-section>
-
-                        <q-item-section class="text-left">
-                          <q-item-label>{{
-                            suplente_1.nombre_Completo
-                          }}</q-item-label>
-                          <q-item-label caption class="">{{
-                            suplente_1.correo
-                          }}</q-item-label>
-                        </q-item-section>
-                      </q-item>
-                    </div>
-                    <div class="col-1">{{ suplente_1.sexo }}</div>
-                    <div class="col-1">{{ candidato.tipo_Candidato }}</div>
-                    <div class="col-1">
-                      <q-avatar>
-                        <img :src="suplente_1.url_Logo_Partido" alt="" />
-                        <q-tooltip>{{ suplente_1.partido_Suplente }}</q-tooltip>
-                      </q-avatar>
-                    </div>
-                  </div>
-                  <div v-if="propietario_2.nombres != null" class="row q-pb-xs">
-                    <div class="col-1">Prop. Sindico</div>
-                    <div class="col-lg-3 col-md-3">
-                      <q-item>
-                        <q-item-section avatar>
-                          <q-avatar>
-                            <img :src="propietario_2.url_Foto" />
-                          </q-avatar>
-                        </q-item-section>
-
-                        <q-item-section class="text-left">
-                          <q-item-label>{{
-                            propietario_2.nombre_Completo
-                          }}</q-item-label>
-                          <q-item-label caption class="">{{
-                            propietario_2.correo
-                          }}</q-item-label>
-                        </q-item-section>
-                      </q-item>
-                    </div>
-                    <div class="col-1">{{ propietario_2.sexo }}</div>
-                    <div class="col-1">{{ candidato.tipo_Candidato }}</div>
-                    <div class="col-1">
-                      <q-avatar>
-                        <img :src="propietario_2.url_Logo_Partido" alt="" />
-                        <q-tooltip>{{
-                          propietario_2.partido_Propietario_2
-                        }}</q-tooltip>
-                      </q-avatar>
-                    </div>
-                  </div>
-                  <div v-if="suplente_2.nombres != null" class="row q-pb-xs">
-                    <div class="col-1">Sup. Sindico</div>
-                    <div class="col-lg-3 col-md-3">
-                      <q-item>
-                        <q-item-section avatar>
-                          <q-avatar>
-                            <img :src="suplente_2.url_Foto" />
-                          </q-avatar>
-                        </q-item-section>
-
-                        <q-item-section class="text-left">
-                          <q-item-label>{{
-                            suplente_2.nombre_Completo
-                          }}</q-item-label>
-                          <q-item-label caption class="">{{
-                            suplente_2.correo
-                          }}</q-item-label>
-                        </q-item-section>
-                      </q-item>
-                    </div>
-                    <div class="col-1">{{ suplente_2.sexo }}</div>
-                    <div class="col-1">{{ candidato.tipo_Candidato }}</div>
-                    <div class="col-1">
-                      <q-avatar>
-                        <img :src="suplente_2.url_Logo_Partido" alt="" />
-                        <q-tooltip>{{
-                          suplente_2.partido_Suplente_2
-                        }}</q-tooltip>
-                      </q-avatar>
-                    </div>
-                  </div>
+                <q-td colspan="15%">
+                  <TablaSuplentesComp />
                 </q-td>
               </q-tr>
             </template>
@@ -359,6 +276,8 @@ import { useConfiguracionStore } from "src/stores/configuracion-store";
 import ModalRegistro from "../components/ModalRegistro.vue";
 import ModalSustituir from "../components/ModalSustituir.vue";
 import ModalAprobar from "../../aprobar/components/ModalComp.vue";
+import TablaSuplentesComp from "../components/TablaSuplentesComp.vue";
+
 //--------------------------------------------------------------------
 
 const $q = useQuasar();
@@ -366,14 +285,7 @@ const candidatoStore = useCandidatosStore();
 const configuracionStore = useConfiguracionStore();
 const aprobarStore = useAprobarStore();
 const { tipo_Elecciones } = storeToRefs(configuracionStore);
-const {
-  list_Candidatos,
-  candidato,
-  propietario_2,
-  suplente_1,
-  suplente_2,
-  loading,
-} = storeToRefs(candidatoStore);
+const { list_Candidatos } = storeToRefs(candidatoStore);
 const { list_Detalle } = storeToRefs(aprobarStore);
 const visisble_columns = ref("");
 const expandedRow = ref(null);
@@ -384,8 +296,7 @@ const listCandidatos = ref([]);
 //--------------------------------------------------------------------
 
 onBeforeMount(() => {
-  candidatoStore.loadCandidatos();
-  configuracionStore.loadTipoElecciones();
+  cargarData();
   cargarColumnas(tab.value);
 });
 
@@ -403,6 +314,17 @@ watch(list_Candidatos, (val) => {
 });
 
 //--------------------------------------------------------------------
+
+const cargarData = async () => {
+  $q.loading.show();
+  await candidatoStore.loadCandidatos();
+  await configuracionStore.loadTipoElecciones();
+  await configuracionStore.loadDistritos();
+  await configuracionStore.loadPartidosPoliticos();
+  await configuracionStore.loadCoaliciones();
+  await configuracionStore.loadMunicipios();
+  $q.loading.hide();
+};
 
 const updateSelection = (row) => {
   const isSelected = listCandidatos.value.includes(row);
@@ -528,7 +450,7 @@ const toggleRowExpand = (row) => {
     expandedRow.value = null;
   } else {
     expandedRow.value = row;
-    candidatoStore.loadCandidato(row.id);
+    candidatoStore.loadCandidatoToArray(tab.value, row.id);
   }
 };
 

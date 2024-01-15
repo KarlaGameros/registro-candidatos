@@ -17,8 +17,4 @@
 <script setup>
 import ModalVerOficio from "../components/ModalVerOficio.vue";
 import TablaHistorial from "../components/TablaHistorial.vue";
-
-//--------------------------------------------------------------------
 </script>
-
-<style scope></style>

@@ -4,6 +4,7 @@
     :rows="list_RP"
     :columns="columns"
     row-key="name"
+    v-model:pagination="pagination"
   >
     <template v-slot:top-right>
       <q-input
@@ -57,6 +58,7 @@ watchEffect(() => {
       break;
   }
 });
+
 //--------------------------------------------------------------------
 
 const columns = [

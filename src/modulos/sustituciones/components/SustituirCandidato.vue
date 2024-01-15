@@ -299,6 +299,8 @@ const isExtension = ref(false);
 const num_Extension = ref(null);
 const candidatoBase = ref(null);
 
+//--------------------------------------------------------------------
+
 switch (props.tabTipo) {
   case "propietario":
     candidatoBase.value = sust_propietario_1.value;
@@ -313,6 +315,7 @@ switch (props.tabTipo) {
     candidatoBase.value = sust_suplente_2.value;
     break;
 }
+
 //--------------------------------------------------------------------
 
 watchEffect(() => {

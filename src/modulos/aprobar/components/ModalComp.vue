@@ -20,7 +20,6 @@
           v-close-popup
         />
       </q-card-section>
-
       <q-form @submit="onSubmit">
         <q-card-section class="row q-col-gutter-xs">
           <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
@@ -112,6 +111,7 @@ import { useQuasar } from "quasar";
 import { storeToRefs } from "pinia";
 import { useAprobarStore } from "src/stores/aprobar-store";
 import TablaDetalle from "./TablaDetalle.vue";
+
 //-----------------------------------------------------------
 
 const $q = useQuasar();
@@ -120,6 +120,7 @@ const { modal, isEditar, aprobacion, list_Detalle } = storeToRefs(aprobarStore);
 const props = defineProps({
   tipo_Id: { type: Number },
 });
+
 //-----------------------------------------------------------
 //Get fecha actual
 const dateActual = new Date();
@@ -143,30 +144,59 @@ const actualizarModal = (valor) => {
 
 const onSubmit = async () => {
   let resp = null;
-  $q.loading.show();
   aprobacion.value.detalle = list_Detalle.value;
   aprobacion.value.fecha_Aprobacion = date.value;
-  if (isEditar.value == true) {
-    resp = await aprobarStore.updateAprobacion(aprobacion.value);
-  } else {
-    resp = await aprobarStore.aprobarCandidatos(
-      props.tipo_Id,
-      aprobacion.value
-    );
-  }
-  if (resp.success) {
-    $q.notify({
-      position: "top-right",
-      type: "positive",
-      message: resp.data,
+  $q.loading.show();
+  if (list_Detalle.value.length == 0) {
+    $q.dialog({
+      title: "Atención",
+      message: "Debe de agregar mínimo una candidatura a la lista",
+      icon: "Warning",
+      persistent: true,
+      transitionShow: "scale",
+      transitionHide: "scale",
     });
-    aprobarStore.loadAprobacionCandidaturas();
-    actualizarModal(false);
   } else {
-    $q.notify({
-      position: "top-right",
-      type: "negative",
-      message: resp.data,
+    $q.dialog({
+      title: "Aprobar candidatos",
+      message: `¿Está seguro de aprobar los ${list_Detalle.value.length} candidatos seleccionados?`,
+      icon: "Warning",
+      persistent: true,
+      transitionShow: "scale",
+      transitionHide: "scale",
+      ok: {
+        color: "positive",
+        label: "¡Sí!, aprobar",
+      },
+      cancel: {
+        color: "negative",
+        label: " No Cancelar",
+      },
+    }).onOk(async () => {
+      $q.loading.show();
+      if (isEditar.value == true) {
+        resp = await aprobarStore.updateAprobacion(aprobacion.value);
+      } else {
+        resp = await aprobarStore.aprobarCandidatos(
+          props.tipo_Id,
+          aprobacion.value
+        );
+      }
+      if (resp.success) {
+        $q.notify({
+          position: "top-right",
+          type: "positive",
+          message: resp.data,
+        });
+        aprobarStore.loadAprobacionCandidaturas();
+        actualizarModal(false);
+      } else {
+        $q.notify({
+          position: "top-right",
+          type: "negative",
+          message: resp.data,
+        });
+      }
     });
   }
   $q.loading.hide();

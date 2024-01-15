@@ -22,7 +22,6 @@
               class="cursor-pointer"
             />
           </template>
-
           <template v-slot:hint> Agregar fotografía </template>
         </q-file>
       </div>
@@ -68,6 +67,7 @@
       </div>
       <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12 q-pr-xs">
         <q-input
+          class="text-uppercase"
           v-model.trim="candidatoBase.clave_Elector"
           label="Clave de elector"
           hint="Ingrese su clave de elector"
@@ -85,6 +85,7 @@
       </div>
       <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12 q-pr-xs">
         <q-input
+          class="text-uppercase"
           v-model.trim="candidatoBase.curp"
           label="CURP"
           hint="Ingrese su CURP"
@@ -101,6 +102,7 @@
       </div>
       <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12 q-pr-xs">
         <q-input
+          class="text-uppercase"
           v-model.trim="candidatoBase.rfc"
           label="RFC"
           hint="Ingrese su RFC"
@@ -131,6 +133,9 @@
                   v-model="candidatoBase.fecha_Nacimiento"
                   color="pink-4"
                   :options="optionsDate"
+                  lazy-rules
+                  mask="YYYY/MM/DD"
+                  :rules="[(val) => !!val || 'La fecha es requerida']"
                 >
                   <div class="row items-center justify-end">
                     <q-btn v-close-popup label="Close" color="pink" flat />
@@ -148,6 +153,8 @@
           type="number"
           label="Edad"
           hint="Ingrese su edad"
+          lazy-rules
+          :rules="[(val) => !!val || 'Ingrese fecha de nacimiento']"
         >
         </q-input>
       </div>
@@ -222,7 +229,6 @@
         >
         </q-input>
       </div>
-
       <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
         <br />
         <q-checkbox
@@ -295,6 +301,7 @@ const isExtension = ref(false);
 const num_Extension = ref(null);
 const candidatoBase = ref(null);
 const fotoBase = ref(null);
+
 //--------------------------------------------------------------------
 
 switch (props.tabTipo) {
@@ -447,93 +454,25 @@ watchEffect(() => {
 
 watch(propietario_1.value, (val) => {
   if (val != null) {
-    if (val.fecha_Nacimiento != null) {
-      var fechaNace = new Date(val.fecha_Nacimiento);
-      var fechaActual = new Date();
-
-      var mes = fechaActual.getMonth();
-      var dia = fechaActual.getDate();
-      var año = fechaActual.getFullYear();
-
-      fechaActual.setDate(dia);
-      fechaActual.setMonth(mes);
-      fechaActual.setFullYear(año);
-
-      propietario_1.value.edad = Math.floor(
-        (fechaActual - fechaNace) / (1000 * 60 * 60 * 24) / 365
-      );
-
-      return edad;
-    }
+    calcularEdad(val.fecha_Nacimiento, "propietario_1");
   }
 });
 
 watch(propietario_2.value, (val) => {
   if (val != null) {
-    if (val.fecha_Nacimiento != null) {
-      var fechaNace = new Date(val.fecha_Nacimiento);
-      var fechaActual = new Date();
-
-      var mes = fechaActual.getMonth();
-      var dia = fechaActual.getDate();
-      var año = fechaActual.getFullYear();
-
-      fechaActual.setDate(dia);
-      fechaActual.setMonth(mes);
-      fechaActual.setFullYear(año);
-
-      propietario_2.value.edad = Math.floor(
-        (fechaActual - fechaNace) / (1000 * 60 * 60 * 24) / 365
-      );
-
-      return edad;
-    }
+    calcularEdad(val.fecha_Nacimiento, "propietario_2");
   }
 });
 
 watch(suplente_1.value, (val) => {
   if (val != null) {
-    if (val.fecha_Nacimiento != null) {
-      var fechaNace = new Date(val.fecha_Nacimiento);
-      var fechaActual = new Date();
-
-      var mes = fechaActual.getMonth();
-      var dia = fechaActual.getDate();
-      var año = fechaActual.getFullYear();
-
-      fechaActual.setDate(dia);
-      fechaActual.setMonth(mes);
-      fechaActual.setFullYear(año);
-
-      suplente_1.value.edad = Math.floor(
-        (fechaActual - fechaNace) / (1000 * 60 * 60 * 24) / 365
-      );
-
-      return edad;
-    }
+    calcularEdad(val.fecha_Nacimiento, "suplente_1");
   }
 });
 
 watch(suplente_2.value, (val) => {
   if (val != null) {
-    if (val.fecha_Nacimiento != null) {
-      var fechaNace = new Date(val.fecha_Nacimiento);
-      var fechaActual = new Date();
-
-      var mes = fechaActual.getMonth();
-      var dia = fechaActual.getDate();
-      var año = fechaActual.getFullYear();
-
-      fechaActual.setDate(dia);
-      fechaActual.setMonth(mes);
-      fechaActual.setFullYear(año);
-
-      suplente_2.value.edad = Math.floor(
-        (fechaActual - fechaNace) / (1000 * 60 * 60 * 24) / 365
-      );
-
-      return edad;
-    }
+    calcularEdad(val.fecha_Nacimiento, "suplente_2");
   }
 });
 
@@ -580,6 +519,43 @@ watch(telefonos, (val) => {
 });
 
 //--------------------------------------------------------------------
+
+const calcularEdad = (fecha_Nacimiento, tipo) => {
+  if (fecha_Nacimiento != null) {
+    if (fecha_Nacimiento != null) {
+      var fechaNace = new Date(fecha_Nacimiento);
+      var fechaActual = new Date();
+
+      var mes = fechaActual.getMonth();
+      var dia = fechaActual.getDate();
+      var año = fechaActual.getFullYear();
+
+      fechaActual.setDate(dia);
+      fechaActual.setMonth(mes);
+      fechaActual.setFullYear(año);
+
+      if (tipo == "propietario_1") {
+        propietario_1.value.edad = Math.floor(
+          (fechaActual - fechaNace) / (1000 * 60 * 60 * 24) / 365
+        );
+      } else if (tipo == "propietario_2") {
+        propietario_2.value.edad = Math.floor(
+          (fechaActual - fechaNace) / (1000 * 60 * 60 * 24) / 365
+        );
+      } else if (tipo == "suplente_1") {
+        suplente_1.value.edad = Math.floor(
+          (fechaActual - fechaNace) / (1000 * 60 * 60 * 24) / 365
+        );
+      } else if (tipo == "suplente_2") {
+        suplente_2.value.edad = Math.floor(
+          (fechaActual - fechaNace) / (1000 * 60 * 60 * 24) / 365
+        );
+      }
+
+      return edad;
+    }
+  }
+};
 
 const optionsDate = (fecha) => {
   const dateActual = new Date();

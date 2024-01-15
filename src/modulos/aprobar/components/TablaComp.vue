@@ -8,7 +8,6 @@
       :columns="columns"
       :filter="filter"
       row-key="name"
-      :loading="loading"
       v-model:pagination="pagination"
       color="pink"
     >
@@ -58,13 +57,23 @@ import {
   getDataDevice,
 } from "../../../helpers/currentLocation";
 
+//-----------------------------------------------------------
+
 const $q = useQuasar();
 const aprobarStore = useAprobarStore();
-const { list_Aprobacion_Candidaturas, loading } = storeToRefs(aprobarStore);
+const { list_Aprobacion_Candidaturas } = storeToRefs(aprobarStore);
+
+//-----------------------------------------------------------
 
 onBeforeMount(() => {
-  aprobarStore.loadAprobacionCandidaturas();
+  cargarData();
 });
+
+//-----------------------------------------------------------
+
+const cargarData = async () => {
+  await aprobarStore.loadAprobacionCandidaturas();
+};
 
 const ver = async (id) => {
   // let { latitude, longitude } = await getCurrentLocation();
@@ -76,6 +85,8 @@ const ver = async (id) => {
   await aprobarStore.loadDetalle(id);
   $q.loading.hide();
 };
+
+//-----------------------------------------------------------
 
 const columns = [
   {

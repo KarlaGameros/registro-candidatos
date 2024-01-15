@@ -70,8 +70,8 @@
                     <label>{{ col.value }}</label>
                   </q-td>
                 </q-tr>
-              </template></q-table
-            >
+              </template>
+            </q-table>
           </q-td>
         </q-tr>
       </template>
@@ -81,19 +81,33 @@
 
 <script setup>
 import { storeToRefs } from "pinia";
+import { useQuasar } from "quasar";
 import { useCandidatosStore } from "src/stores/candidatos-store";
 import { useSustituirStore } from "src/stores/sustituir-store";
 import { onBeforeMount, ref } from "vue";
 
+//--------------------------------------------------------------------
+
+const $q = useQuasar();
 const sustituirStore = useSustituirStore();
 const candidatosStore = useCandidatosStore();
 const { list_Candidatos, loading } = storeToRefs(candidatosStore);
 const { list_Sustituciones } = storeToRefs(sustituirStore);
 const expandedRow = ref(null);
 
+//--------------------------------------------------------------------
+
 onBeforeMount(() => {
-  candidatosStore.loadCandidatos();
+  cargarData();
 });
+
+//--------------------------------------------------------------------
+
+const cargarData = async () => {
+  $q.loading.show();
+  await candidatosStore.loadCandidatos();
+  $q.loading.hide();
+};
 
 const columns = [
   {
@@ -245,10 +259,6 @@ const toggleRowExpand = (row) => {
 
 const isRowExpanded = (row) => {
   return expandedRow.value === row;
-};
-
-const verOficio = (valor) => {
-  sustituirStore.actualizarModalOficio(valor);
 };
 </script>
 
