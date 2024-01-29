@@ -24,6 +24,11 @@ export const useCandidatosStore = defineStore("useCandidatosStore", {
       activo: null,
       fecha_Registro: null,
     },
+    candidato2: {
+      tipo: null,
+      nombre_Completo: null,
+      partido: null,
+    },
     foto_1: {
       url_Foto: null,
     },
@@ -40,6 +45,7 @@ export const useCandidatosStore = defineStore("useCandidatosStore", {
       id: null,
       tipo: null,
       nombre_Completo: null,
+      estatus: null,
       nombres: null,
       apellido_Paterno: null,
       apellido_Materno: null,
@@ -72,6 +78,7 @@ export const useCandidatosStore = defineStore("useCandidatosStore", {
       apellido_Paterno: null,
       apellido_Materno: null,
       mote: null,
+      estatus: null,
       sexo: null,
       url_Foto: null,
       clave_Elector: null,
@@ -99,6 +106,7 @@ export const useCandidatosStore = defineStore("useCandidatosStore", {
       nombres: null,
       apellido_Paterno: null,
       apellido_Materno: null,
+      estatus: null,
       mote: null,
       sexo: null,
       url_Foto: null,
@@ -128,6 +136,7 @@ export const useCandidatosStore = defineStore("useCandidatosStore", {
       apellido_Paterno: null,
       apellido_Materno: null,
       mote: null,
+      estatus: null,
       sexo: null,
       url_Foto: null,
       clave_Elector: null,
@@ -159,8 +168,7 @@ export const useCandidatosStore = defineStore("useCandidatosStore", {
     actualizarModalSustituir(valor) {
       this.modalSustituir = valor;
     },
-    //----------------------------------------------------------------------
-    //INTI CANDIDATO
+    //-----------------------------------------------------------
     initCandidato() {
       this.candidato.id = null;
       this.candidato.tipo_Eleccion_Id = null;
@@ -278,8 +286,8 @@ export const useCandidatosStore = defineStore("useCandidatosStore", {
       this.suplente_2.grupo_Vulnerable_4 = null;
       this.suplente_2.edad = null;
     },
-    //----------------------------------------------------------------------
-    //CANDIDATO
+
+    //-----------------------------------------------------------
     async createCandidato(candidato) {
       try {
         const resp = await api.post("/Candidatos", candidato, {
@@ -309,7 +317,6 @@ export const useCandidatosStore = defineStore("useCandidatosStore", {
     },
 
     //-----------------------------------------------------------
-
     async updateCandidato(id, candidato) {
       try {
         const resp = await api.put(`/Candidatos/${id}`, candidato, {
@@ -339,7 +346,6 @@ export const useCandidatosStore = defineStore("useCandidatosStore", {
     },
 
     //-----------------------------------------------------------
-
     async loadCandidatos() {
       try {
         this.loading = true;
@@ -365,6 +371,7 @@ export const useCandidatosStore = defineStore("useCandidatosStore", {
             orden: candidato.orden,
             activo: candidato.activo,
             validado: candidato.validado,
+            estatus: candidato.estatus,
             fecha_registro: candidato.fecha_Registro,
             //----------------------------------------------------
             //PROPIETARIO 1
@@ -399,6 +406,7 @@ export const useCandidatosStore = defineStore("useCandidatosStore", {
             partido: candidato.partido,
             url_Logo_Partido_Propietario:
               candidato.url_Logo_Partido_Propietario,
+            edad_Propietario: candidato.edad_Propietario,
             //----------------------------------------------------
             //PROPIETARIO 2
             nombre_Completo_Propietario_2: `${candidato.nombres_Propietario_2} ${candidato.apellido_Paterno_Propietario_2} ${candidato.apellido_Materno_Propietario_2}`,
@@ -425,6 +433,7 @@ export const useCandidatosStore = defineStore("useCandidatosStore", {
             partido_Propietario_2_Id: candidato.partido_Propietario_2_Id,
             url_Logo_Partido_Propietario_2:
               candidato.url_Logo_Partido_Propietario_2,
+            edad_Propietario_2: candidato.edad_Propietario_2,
             //----------------------------------------------------
             //SUPLENTE 1
             nombre_Completo_Suplente: `${candidato.nombres_Suplente} ${candidato.apellido_Paterno_Suplente} ${candidato.apellido_Materno_Suplente}`,
@@ -447,6 +456,7 @@ export const useCandidatosStore = defineStore("useCandidatosStore", {
             partido_Suplente_Id: candidato.partido_Suplente_Id,
             url_Logo_Partido_Partido_Suplente:
               candidato.url_Logo_Partido_Partido_Suplente,
+            edad_Suplente: candidato.edad_Suplente,
             //----------------------------------------------------
             //SUPLENTE 2
             nombre_Completo_Suplente_2: `${candidato.nombres_Suplente_2} ${candidato.apellido_Paterno_Suplente_2} ${candidato.apellido_Materno_Suplente_2}`,
@@ -469,6 +479,7 @@ export const useCandidatosStore = defineStore("useCandidatosStore", {
             partido_Suplente_Id_2: candidato.partido_Suplente_Id_2,
             url_Logo_Partido_Partido_Suplente_2:
               candidato.url_Logo_Partido_Partido_Suplente_2,
+            edad_Suplente_2: candidato.edad_Suplente_2,
           };
         });
         this.loading = false;
@@ -492,6 +503,7 @@ export const useCandidatosStore = defineStore("useCandidatosStore", {
             this.candidato.activo = data.activo;
             this.candidato.id = data.id;
             this.candidato.tipo_Eleccion_Id = data.tipo_Eleccion_Id;
+            this.candidato.tipo_Eleccion = data.tipo_Eleccion;
             this.candidato.municipio_Id = data.municipio_Id;
             this.candidato.distrito_Id = data.distrito_Id;
             this.candidato.distrito = data.distrito;
@@ -501,6 +513,7 @@ export const useCandidatosStore = defineStore("useCandidatosStore", {
             this.candidato.tipo_Candidato = data.tipo_Candidato;
             this.candidato.orden = data.orden;
             this.candidato.partido_Id = data.partido_Id;
+            this.candidato.fecha_Registro = data.fecha_Registro;
             //-----------------------------------------------------
             //PROPIETARIO 1
             this.propietario_1.nombre_Completo = `${data.nombres_Propietario} ${data.apellido_Paterno_Propietario} ${data.apellido_Materno_Propietario}`;
@@ -683,6 +696,7 @@ export const useCandidatosStore = defineStore("useCandidatosStore", {
       }
     },
 
+    //-----------------------------------------------------------
     async loadCandidatoToArray(tipo, id) {
       try {
         let resp = null;
@@ -693,22 +707,23 @@ export const useCandidatosStore = defineStore("useCandidatosStore", {
             this.propietario_2.tipo_Eleccion = data.tipo_Eleccion;
             this.suplente_1.tipo_Eleccion = data.tipo_Eleccion;
             this.suplente_2.tipo_Eleccion = data.tipo_Eleccion;
-
             this.suplente_1.tipo_Candidato = data.tipo_Candidato;
             this.propietario_2.tipo_Candidato = data.tipo_Candidato;
             this.suplente_2.tipo_Candidato = data.tipo_Candidato;
             //-----------------------------------------------------
             //PROPIETARIO 1
+            this.propietario_1.validado = data.validado;
             this.propietario_1.tipo_Eleccion = data.tipo_Eleccion;
             this.propietario_1.tipo_Candidato = data.tipo_Candidato;
             this.propietario_1.id = data.id;
-            this.propietario_1.tipo = "Propietario 1";
+            this.propietario_1.tipo = "Propietario";
             this.propietario_1.nombre_Completo = `${data.nombres_Propietario} ${data.apellido_Paterno_Propietario} ${data.apellido_Materno_Propietario}`;
             this.propietario_1.nombres = data.nombres_Propietario;
             this.propietario_1.apellido_Paterno =
               data.apellido_Paterno_Propietario;
             this.propietario_1.apellido_Materno =
               data.apellido_Materno_Propietario;
+            this.propietario_1.estatus = data.estatus;
             this.propietario_1.mote = data.mote_Propietario;
             this.propietario_1.sexo = data.sexo_Propietario;
             this.propietario_1.url_Foto = data.url_Foto_Propietario;
@@ -724,13 +739,17 @@ export const useCandidatosStore = defineStore("useCandidatosStore", {
             this.propietario_1.grupo_Vulnerable =
               data.grupo_Vulnerable_Propietario;
             this.propietario_1.partido_Id = data.partido_Id;
-            this.propietario_1.partido = data.partido_Propietario;
+            this.propietario_1.url_Logo_Partido =
+              data.url_Logo_Partido_Propietario;
+            this.propietario_1.partido = data.partido;
+            this.propietario_1.edad = data.edad_Propietario;
             if (data.telefono_Propietario != null) {
               this.propietario_1.telefono =
                 data.telefono_Propietario.split(",");
             }
             //-----------------------------------------------------
             //PROPIETARIO 2
+            this.propietario_2.validado = data.validado;
             this.propietario_2.id = data.id;
             this.propietario_2.tipo = "Propietario sindico";
             this.propietario_2.nombre_Completo = `${data.nombres_Propietario_2} ${data.apellido_Paterno_Propietario_2} ${data.apellido_Materno_Propietario_2}`;
@@ -740,6 +759,7 @@ export const useCandidatosStore = defineStore("useCandidatosStore", {
             this.propietario_2.apellido_Materno =
               data.apellido_Materno_Propietario_2;
             this.propietario_2.mote = data.mote_Propietario_2;
+            this.propietario_2.estatus = data.estatus;
             this.propietario_2.sexo = data.sexo_Propietario_2;
             this.propietario_2.clave_Elector = data.clave_Elector_Propietario_2;
             this.propietario_2.url_Foto = data.url_Foto_Propietario_2;
@@ -761,8 +781,10 @@ export const useCandidatosStore = defineStore("useCandidatosStore", {
             this.propietario_2.partido = data.partido_Propietario_2;
             this.propietario_2.url_Logo_Partido =
               data.url_Logo_Partido_Propietario_2;
+            this.propietario_2.edad = data.edad_Propietario_2;
             //-----------------------------------------------------
             //SUPLENTE 1
+            this.suplente_1.validado = data.validado;
             this.suplente_1.id = data.id;
             this.suplente_1.tipo = "Suplente";
             this.suplente_1.nombre_Completo = `${data.nombres_Suplente} ${data.apellido_Paterno_Suplente} ${data.apellido_Materno_Suplente}`;
@@ -774,6 +796,7 @@ export const useCandidatosStore = defineStore("useCandidatosStore", {
             this.suplente_1.clave_Elector = data.clave_Elector_Suplente;
             this.suplente_1.url_Foto = data.url_Foto_Suplente;
             this.suplente_1.rfc = data.rfC_Suplente;
+            this.suplente_1.estatus = data.estatus;
             this.suplente_1.curp = data.curP_Suplente;
             this.suplente_1.fecha_Nacimiento = data.fecha_Nacimiento_Suplente;
             this.suplente_1.ocupacion = data.ocupacion_Suplente;
@@ -787,10 +810,13 @@ export const useCandidatosStore = defineStore("useCandidatosStore", {
             this.suplente_1.partido_Id = data.partido_Suplente_Id;
             this.suplente_1.url_Logo_Partido = data.url_Logo_Partido_Suplente;
             this.suplente_1.partido = data.partido_Suplente;
+            this.suplente_1.edad = data.edad_Suplente;
             //-----------------------------------------------------
             //SUPLENTE 2
+            this.suplente_2.validado = data.validado;
             this.suplente_2.id = data.id;
             this.suplente_2.tipo = "Suplente sindico";
+            this.suplente_2.estatus = data.estatus;
             this.suplente_2.nombre_Completo = `${data.nombres_Suplente_2} ${data.apellido_Paterno_Suplente_2} ${data.apellido_Materno_Suplente_2}`;
             this.suplente_2.nombres = data.nombres_Suplente_2;
             this.suplente_2.apellido_Paterno = data.apellido_Paterno_Suplente_2;
@@ -803,6 +829,7 @@ export const useCandidatosStore = defineStore("useCandidatosStore", {
             this.suplente_2.curp = data.curP_Suplente_2;
             this.suplente_2.fecha_Nacimiento = data.fecha_Nacimiento_Suplente_2;
             this.suplente_2.ocupacion = data.ocupacion_Suplente_2;
+            this.suplente_2.edad = data.edad_Suplente_2;
             if (data.telefono_Suplente_2 != null) {
               this.suplente_2.telefono = data.telefono_Suplente_2.split(",");
             }
@@ -816,15 +843,58 @@ export const useCandidatosStore = defineStore("useCandidatosStore", {
 
             this.list_Suplentes = [];
             if (tipo == "DIP" || tipo == "REG") {
-              this.list_Suplentes.push(this.suplente_1);
+              if (this.propietario_1.nombres != null) {
+                this.list_Suplentes.push(this.propietario_1);
+              }
+              if (this.suplente_1.nombres != null) {
+                this.list_Suplentes.push(this.suplente_1);
+              }
             } else if (tipo == "PYS") {
               this.list_Suplentes.push(
+                this.propietario_1,
                 this.suplente_1,
                 this.propietario_2,
                 this.suplente_2
               );
             }
-            console.log("suplentes", this.list_Suplentes);
+          }
+        }
+      } catch (error) {
+        return {
+          success: false,
+          data: "Ocurrió un error, inténtelo de nuevo. Si el error persiste, contacte a soporte",
+        };
+      }
+    },
+
+    //-----------------------------------------------------------
+    async loadCandidatoByCargo(cargo, id) {
+      try {
+        let resp = null;
+        resp = await api.get(`/Candidatos/${id}`);
+        if (resp.status == 200) {
+          const { success, data } = resp.data;
+          if (success == true) {
+            this.candidato2.tipo = cargo;
+            this.candidato2.is_Coalicion = data.is_Coalicion;
+            this.candidato2.coalicion_Id = data.coalicion_Id;
+            if (cargo == "Propietario") {
+              this.candidato2.nombre_Completo = `${data.nombres_Propietario} ${data.apellido_Paterno_Propietario} ${data.apellido_Materno_Propietario}`;
+              this.candidato2.partido = data.partido;
+              this.candidato2.url_Foto = data.url_Foto_Propietario;
+            } else if (cargo == "Suplente") {
+              this.candidato2.nombre_Completo = `${data.nombres_Suplente} ${data.apellido_Paterno_Suplente} ${data.apellido_Materno_Suplente}`;
+              this.candidato2.partido = data.partido_Suplente;
+              this.candidato2.url_Foto = data.url_Foto_Suplente;
+            } else if (cargo == "Propietario sindico") {
+              this.candidato2.nombre_Completo = `${data.nombres_Propietario_2} ${data.apellido_Paterno_Propietario_2} ${data.apellido_Materno_Propietario_2}`;
+              this.candidato2.partido = data.partido_Propietario_2;
+              this.candidato2.url_Foto = data.url_Foto_Propietario_2;
+            } else if (cargo == "Suplente sindico") {
+              this.candidato2.nombre_Completo = `${data.nombres_Suplente_2} ${data.apellido_Paterno_Suplente_2} ${data.apellido_Materno_Suplente_2}`;
+              this.candidato2.partido = data.partido_Suplente_2;
+              this.candidato2.url_Foto_Suplente_2 = data.url_Foto_Suplente_2;
+            }
           }
         }
       } catch (error) {

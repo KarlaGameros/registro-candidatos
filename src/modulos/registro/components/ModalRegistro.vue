@@ -377,7 +377,7 @@ import { useQuasar } from "quasar";
 import { storeToRefs } from "pinia";
 import { useCandidatosStore } from "src/stores/candidatos-store";
 import { useConfiguracionStore } from "src/stores/configuracion-store";
-import { ref, defineProps, onBeforeMount, watch } from "vue";
+import { ref, defineProps, watch } from "vue";
 import FormularioDatosGenerales from "./FormularioDatosGenerales.vue";
 import FormularioDocumentacion from "./FormularioDocumentacion.vue";
 import TablaRP from "./TablaRP.vue";
@@ -437,14 +437,14 @@ const props = defineProps({
 
 watch(coalicion_Id, async (val) => {
   if (val != null) {
-    await configuracionStore.loadPartidosPoliticosCoalicion();
-    list_Filtro_Partidos.value = list_Partidos_Politicos_Coalcion.value.filter(
-      (x) => x.coalicion_Id == val.value
-    );
     partido_Id_prop.value = null;
     partido_Id_prop2.value = null;
     partido_Id_sup.value = null;
     partido_Id_sup2.value = null;
+    await configuracionStore.loadPartidosPoliticosCoalicion();
+    list_Filtro_Partidos.value = list_Partidos_Politicos_Coalcion.value.filter(
+      (x) => x.coalicion_Id == val.value
+    );
   }
 });
 
@@ -456,12 +456,19 @@ watch(candidato.value, (val) => {
     cargarCoalicion(val);
     cargarMunicipio(val);
     orden.value = val.orden;
+    if (val.is_Coalicion == false) {
+      partido_Id_prop.value = null;
+      partido_Id_prop2.value = null;
+      partido_Id_sup.value = null;
+      partido_Id_sup2.value = null;
+      coalicion_Id.value = null;
+    }
   }
 });
 
 watch(municipio_Id, (val) => {
   if (val != null) {
-    //configuracionStore.loadDemarcaciones(val.value);
+    configuracionStore.loadDemarcaciones(val.value);
   }
 });
 
@@ -603,6 +610,7 @@ const actualizarModal = (valor) => {
 };
 
 const limpiar = () => {
+  candidatoStore.initCandidato();
   cargo_Id.value = null;
   distrito_Id.value = null;
   municipio_Id.value = null;
@@ -613,7 +621,6 @@ const limpiar = () => {
   partido_Id_sup.value = null;
   partido_Id_sup2.value = null;
   coalicion_Id.value = null;
-  candidatoStore.initCandidato();
 };
 
 const onSubmit = async () => {
@@ -712,6 +719,8 @@ const onSubmit = async () => {
     candidatoFormData.append("Pertenece_Grupo_Vulnerable_Propietario", false);
     candidatoFormData.append("Grupo_Vulnerable_Propietario", "");
   }
+  if (propietario_1.value.edad != null)
+    candidatoFormData.append("Edad_Propietario", propietario_1.value.edad);
 
   //------------PROPIETARIO 2------------
   if (propietario_2.value.nombres != null)
@@ -792,6 +801,8 @@ const onSubmit = async () => {
     candidatoFormData.append("Pertenece_Grupo_Vulnerable_Propietario_2", false);
     candidatoFormData.append("Grupo_Vulnerable_Propietario_2", "");
   }
+  if (propietario_2.value.edad != null)
+    candidatoFormData.append("Edad_Propietario_2", propietario_2.value.edad);
 
   //------------SUPLENTE------------
   if (suplente_1.value.nombres != null)
@@ -863,7 +874,8 @@ const onSubmit = async () => {
     candidatoFormData.append("Pertenece_Grupo_Vulnerable_Suplente", false);
     candidatoFormData.append("Grupo_Vulnerable_Suplente", "");
   }
-
+  if (suplente_1.value.edad != null)
+    candidatoFormData.append("Edad_Suplente", suplente_1.value.edad);
   //------------SUPLENTE 2------------
   if (suplente_2.value.nombres != null)
     candidatoFormData.append("Nombres_Suplente_2", suplente_2.value.nombres);
@@ -936,6 +948,9 @@ const onSubmit = async () => {
   } else {
     candidatoFormData.append("Pertenece_Grupo_Vulnerable_Suplente_2", false);
     candidatoFormData.append("Grupo_Vulnerable_Suplente_2", "");
+  }
+  if (suplente_2.value.edad != null) {
+    candidatoFormData.append("Edad_Suplente_2", suplente_2.value.edad);
   }
 
   if (candidato.value.is_Coalicion == true) {

@@ -110,6 +110,91 @@ export const useSustituirStore = defineStore("useSustituirStore", {
     actualizarModalOficio(valor) {
       this.modalOficio = valor;
     },
+    initSustituir() {
+      this.sust_propietario_1.Nombres_Nuevo = null;
+      this.sust_propietario_1.Apellido_Paterno_Nuevo = null;
+      this.sust_propietario_1.Apellido_Materno_Nuevo = null;
+      this.sust_propietario_1.Mote_Nuevo = null;
+      this.sust_propietario_1.Sexo_Nuevo = null;
+      this.sust_propietario_1.Clave_Elector_Nuevo = null;
+      this.sust_propietario_1.RFC_Nuevo = null;
+      this.sust_propietario_1.CURP_Nuevo = null;
+      this.sust_propietario_1.Fecha_Nacimiento_Nuevo = null;
+      this.sust_propietario_1.Ocupacion_Nuevo = null;
+      this.sust_propietario_1.Telefono_Nuevo = null;
+      this.sust_propietario_1.Correo_Nuevo = null;
+      this.sust_propietario_1.Pertenece_Grupo_Vulnerable_Nuevo = null;
+      this.sust_propietario_1.Grupo_Vulnerable_Nuevo = null;
+      this.sust_propietario_1.Partido_Id_Nuevo = null;
+      this.sust_propietario_1.Foto_Nuevo = null;
+      this.sust_propietario_1.grupo_Vulnerable_1 = null;
+      this.sust_propietario_1.grupo_Vulnerable_2 = null;
+      this.sust_propietario_1.grupo_Vulnerable_3 = null;
+      this.sust_propietario_1.grupo_Vulnerable_4 = null;
+
+      this.sust_propietario_2.Nombres_Nuevo = null;
+      this.sust_propietario_2.Apellido_Paterno_Nuevo = null;
+      this.sust_propietario_2.Apellido_Materno_Nuevo = null;
+      this.sust_propietario_2.Mote_Nuevo = null;
+      this.sust_propietario_2.Sexo_Nuevo = null;
+      this.sust_propietario_2.Clave_Elector_Nuevo = null;
+      this.sust_propietario_2.RFC_Nuevo = null;
+      this.sust_propietario_2.CURP_Nuevo = null;
+      this.sust_propietario_2.Fecha_Nacimiento_Nuevo = null;
+      this.sust_propietario_2.Ocupacion_Nuevo = null;
+      this.sust_propietario_2.Telefono_Nuevo = null;
+      this.sust_propietario_2.Correo_Nuevo = null;
+      this.sust_propietario_2.Pertenece_Grupo_Vulnerable_Nuevo = null;
+      this.sust_propietario_2.Grupo_Vulnerable_Nuevo = null;
+      this.sust_propietario_2.Partido_Id_Nuevo = null;
+      this.sust_propietario_2.Foto_Nuevo = null;
+      this.sust_propietario_2.grupo_Vulnerable_1 = null;
+      this.sust_propietario_2.grupo_Vulnerable_2 = null;
+      this.sust_propietario_2.grupo_Vulnerable_3 = null;
+      this.sust_propietario_2.grupo_Vulnerable_4 = null;
+
+      this.sust_suplente_1.Nombres_Nuevo = null;
+      this.sust_suplente_1.Apellido_Paterno_Nuevo = null;
+      this.sust_suplente_1.Apellido_Materno_Nuevo = null;
+      this.sust_suplente_1.Mote_Nuevo = null;
+      this.sust_suplente_1.Sexo_Nuevo = null;
+      this.sust_suplente_1.Clave_Elector_Nuevo = null;
+      this.sust_suplente_1.RFC_Nuevo = null;
+      this.sust_suplente_1.CURP_Nuevo = null;
+      this.sust_suplente_1.Fecha_Nacimiento_Nuevo = null;
+      this.sust_suplente_1.Ocupacion_Nuevo = null;
+      this.sust_suplente_1.Telefono_Nuevo = null;
+      this.sust_suplente_1.Correo_Nuevo = null;
+      this.sust_suplente_1.Pertenece_Grupo_Vulnerable_Nuevo = null;
+      this.sust_suplente_1.Grupo_Vulnerable_Nuevo = null;
+      this.sust_suplente_1.Partido_Id_Nuevo = null;
+      this.sust_suplente_1.Foto_Nuevo = null;
+      this.sust_suplente_1.grupo_Vulnerable_1 = null;
+      this.sust_suplente_1.grupo_Vulnerable_2 = null;
+      this.sust_suplente_1.grupo_Vulnerable_3 = null;
+      this.sust_suplente_1.grupo_Vulnerable_4 = null;
+
+      this.sust_suplente_2.Nombres_Nuevo = null;
+      this.sust_suplente_2.Apellido_Paterno_Nuevo = null;
+      this.sust_suplente_2.Apellido_Materno_Nuevo = null;
+      this.sust_suplente_2.Mote_Nuevo = null;
+      this.sust_suplente_2.Sexo_Nuevo = null;
+      this.sust_suplente_2.Clave_Elector_Nuevo = null;
+      this.sust_suplente_2.RFC_Nuevo = null;
+      this.sust_suplente_2.CURP_Nuevo = null;
+      this.sust_suplente_2.Fecha_Nacimiento_Nuevo = null;
+      this.sust_suplente_2.Ocupacion_Nuevo = null;
+      this.sust_suplente_2.Telefono_Nuevo = null;
+      this.sust_suplente_2.Correo_Nuevo = null;
+      this.sust_suplente_2.Pertenece_Grupo_Vulnerable_Nuevo = null;
+      this.sust_suplente_2.Grupo_Vulnerable_Nuevo = null;
+      this.sust_suplente_2.Partido_Id_Nuevo = null;
+      this.sust_suplente_2.Foto_Nuevo = null;
+      this.sust_suplente_2.grupo_Vulnerable_1 = null;
+      this.sust_suplente_2.grupo_Vulnerable_2 = null;
+      this.sust_suplente_2.grupo_Vulnerable_3 = null;
+      this.sust_suplente_2.grupo_Vulnerable_4 = null;
+    },
     //----------------------------------------------------------------------
     //SUSTITUIR CANDIDATO
     async sustituirCandidato(CandidatoId, candidatoFormData) {

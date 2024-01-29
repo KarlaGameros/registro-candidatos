@@ -63,24 +63,23 @@
                 class="q-pa-xs col-xs-12 col-sm-6 col-md-4 col-lg-3 grid-style-transition"
               >
                 <q-card bordered class="no-shadow">
+                  <div class="q-pa-xs">
+                    <q-btn
+                      size="sm"
+                      color="pink-8"
+                      round
+                      dense
+                      @click="toggleRowExpand(props.row)"
+                      :icon="isRowExpanded(props.row) ? 'remove' : 'add'"
+                    />
+                    <q-checkbox
+                      v-if="props.row.estatus == null"
+                      color="green"
+                      v-model="props.row.aprobar"
+                      @click="updateSelection(props.row)"
+                    />
+                  </div>
                   <q-item>
-                    <div>
-                      <q-btn
-                        size="sm"
-                        color="pink-8"
-                        round
-                        dense
-                        @click="toggleRowExpand(props.row)"
-                        :icon="isRowExpanded(props.row) ? 'remove' : 'add'"
-                      />
-                      <q-checkbox
-                        v-if="props.row.validado == false"
-                        color="green"
-                        v-model="props.row.aprobar"
-                        @click="updateSelection(props.row)"
-                      />
-                    </div>
-
                     <q-item-section avatar>
                       <q-avatar size="60px" class="shadow-10">
                         <img :src="props.row.url_Foto_Propietario" />
@@ -94,11 +93,7 @@
                       <q-item-label caption>
                         Fecha de registro: {{ props.row.fecha_registro }}
                       </q-item-label>
-                      <q-item-label class="text-grey-8">
-                        {{ props.row.correo_Propietario }}
-                      </q-item-label>
                     </q-item-section>
-
                     <q-item-section side>
                       <q-item-label>
                         <q-avatar size="30px" class="shadow-10">
@@ -110,6 +105,9 @@
                   <q-separator></q-separator>
                   <q-item>
                     <q-item-section>
+                      <q-item-label class="text-grey-8 text-weight-bold">{{
+                        props.row.correo_Propietario
+                      }}</q-item-label>
                       <q-item-label class="text-grey-8 text-weight-bold">
                         Género: {{ props.row.genero_Propietario }}
                       </q-item-label>
@@ -136,13 +134,24 @@
                     <q-item-section side>
                       <q-item-label>
                         <q-btn
+                          v-if="props.row.estatus == null"
                           flat
                           round
                           color="pink-5"
                           icon="edit_square"
                           @click="editar(props.row.id)"
                         >
-                          <q-tooltip>Editar información</q-tooltip>
+                          <q-tooltip>Editar información </q-tooltip>
+                        </q-btn>
+                        <q-btn
+                          v-if="props.row.estatus != null"
+                          flat
+                          round
+                          color="pink-5"
+                          icon="sync_alt"
+                          @click="modalSustituir(props.row)"
+                        >
+                          <q-tooltip>Sustituir</q-tooltip>
                         </q-btn>
                       </q-item-label>
                     </q-item-section>
@@ -161,7 +170,7 @@
                 <q-td v-for="col in props.cols" :key="col.name" :props="props">
                   <div v-if="col.name === 'id_Expand'">
                     <q-checkbox
-                      v-if="props.row.validado == false"
+                      v-if="props.row.estatus == null"
                       color="green"
                       v-model="props.row.aprobar"
                       @click="updateSelection(props.row)"
@@ -193,12 +202,12 @@
                       </q-item-section>
                     </q-item>
                   </div>
-                  <div v-else-if="col.name === 'validado'">
+                  <div v-else-if="col.name === 'estatus'">
                     <q-btn
                       flat
                       round
-                      :color="props.row.validado == true ? 'green' : 'red'"
-                      :icon="props.row.validado == true ? 'done' : 'close'"
+                      :color="props.row.estatus == null ? 'red' : 'green'"
+                      :icon="props.row.estatus == null ? 'close' : 'done'"
                     >
                     </q-btn>
                   </div>
@@ -225,6 +234,7 @@
                   </div>
                   <div v-else-if="col.name === 'id'">
                     <q-btn
+                      v-if="props.row.estatus == null"
                       flat
                       round
                       color="pink-5"
@@ -234,13 +244,14 @@
                       <q-tooltip>Editar información</q-tooltip>
                     </q-btn>
                     <q-btn
+                      v-if="props.row.estatus != null"
                       flat
                       round
                       color="pink-5"
                       icon="sync_alt"
                       @click="modalSustituir(col.value)"
                     >
-                      <q-tooltip>Sustituir </q-tooltip>
+                      <q-tooltip>Sustituir</q-tooltip>
                     </q-btn>
                   </div>
                   <label v-else>{{ col.value }}</label>
@@ -305,6 +316,8 @@ onBeforeMount(() => {
 watch(tab, (val) => {
   cargarColumnas(val);
   aprobarStore.initAprobacion();
+  candidatoStore.initCandidato();
+  expandedRow.value = null;
 });
 
 watch(list_Candidatos, (val) => {
@@ -342,7 +355,8 @@ const cargarColumnas = (tab) => {
       visisble_columns.value = [
         "id_Expand",
         "nombre_Completo_Propietario",
-        "validado",
+        "edad_Propietario",
+        "estatus",
         "genero_Propietario",
         "tipo_Candidato",
         "coalicion",
@@ -360,7 +374,8 @@ const cargarColumnas = (tab) => {
       visisble_columns.value = [
         "id_Expand",
         "nombre_Completo_Propietario",
-        "validado",
+        "edad_Propietario",
+        "estatus",
         "genero_Propietario",
         "tipo_Candidato",
         "coalicion",
@@ -379,7 +394,8 @@ const cargarColumnas = (tab) => {
       visisble_columns.value = [
         "id_Expand",
         "nombre_Completo_Propietario",
-        "validado",
+        "edad_Propietario",
+        "estatus",
         "genero_Propietario",
         "coalicion",
         "partido",
@@ -396,7 +412,8 @@ const cargarColumnas = (tab) => {
       visisble_columns.value = [
         "id_Expand",
         "nombre_Completo_Propietario",
-        "validado",
+        "edad_Propietario",
+        "estatus",
         "genero_Propietario",
         "tipo_Candidato",
         "coalicion",
@@ -427,6 +444,7 @@ const aprobar = async () => {
   $q.loading.show();
   aprobarStore.actualizarModal(true);
   if (listCandidatos.value.length != 0) {
+    console.log(listCandidatos.value);
     listCandidatos.value.forEach((element) => {
       list_Detalle.value.push({
         candidato_Id: element.id,
@@ -440,9 +458,9 @@ const aprobar = async () => {
   $q.loading.hide();
 };
 
-const modalSustituir = (id) => {
+const modalSustituir = async (id) => {
   candidatoStore.actualizarModalSustituir(true);
-  candidatoStore.loadCandidato(id);
+  await candidatoStore.loadCandidato(id);
 };
 
 const toggleRowExpand = (row) => {
@@ -480,10 +498,17 @@ const columns = [
     sortable: true,
   },
   {
-    name: "validado",
+    name: "edad_Propietario",
+    align: "center",
+    label: "Edad",
+    field: "edad_Propietario",
+    sortable: true,
+  },
+  {
+    name: "estatus",
     align: "center",
     label: "Aprobado",
-    field: "validado",
+    field: "estatus",
     sortable: true,
   },
   {

@@ -44,17 +44,65 @@
       </q-card-section>
       <q-card-section>
         <q-form class="q-col-gutter-xs" @submit="onSubmit">
+          <div class="row" v-if="sustituirPor == 'Fórmula'">
+            <q-card
+              v-for="candidato in list_Suplentes"
+              :key="candidato"
+              class="col-3 no-shadow"
+              bordered
+            >
+              <q-item>
+                <q-item-section avatar>
+                  <q-avatar size="70px">
+                    <img :src="candidato.url_Foto" />
+                  </q-avatar>
+                </q-item-section>
+
+                <q-item-section>
+                  <q-item-label class="text-weight-bold">{{
+                    candidato.tipo
+                  }}</q-item-label>
+                  <q-item-label>{{ candidato.nombre_Completo }}</q-item-label>
+                  <q-item-label caption>
+                    {{ candidato.partido }}
+                  </q-item-label>
+                </q-item-section>
+              </q-item>
+            </q-card>
+          </div>
+
           <div class="row" v-if="sustituirPor != null">
-            <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
+            <q-card
+              v-if="sustituirPor != 'Fórmula'"
+              class="col-lg-3 col-md-3 col-sm-3 col-xs-12 no-shadow"
+              bordered
+            >
+              <q-item>
+                <q-item-section avatar>
+                  <q-avatar size="70px">
+                    <img :src="candidato2.url_Foto" />
+                  </q-avatar>
+                </q-item-section>
+
+                <q-item-section>
+                  <q-item-label class="text-weight-bold">{{
+                    candidato2.tipo
+                  }}</q-item-label>
+                  <q-item-label>{{ candidato2.nombre_Completo }}</q-item-label>
+                  <q-item-label caption>
+                    {{ candidato2.partido }}
+                  </q-item-label>
+                </q-item-section>
+              </q-item>
+            </q-card>
+            <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 q-pl-md">
               <q-input
                 v-model="sustitucion.No_Acuerdo"
-                label="Número de convenio"
-                hint="Ingrese número de convenio"
+                label="Número de acuerdo"
+                hint="Ingrese número de acuerdo"
                 autogrow
                 lazy-rules
-                :rules="[
-                  (val) => !!val || 'El número de convenio es requerido',
-                ]"
+                :rules="[(val) => !!val || 'El número de acuerdo es requerido']"
               >
               </q-input>
             </div>
@@ -226,10 +274,12 @@ const sustituirStore = useSustituirStore();
 const {
   modalSustituir,
   candidato,
+  candidato2,
   propietario_1,
   suplente_1,
   propietario_2,
   suplente_2,
+  list_Suplentes,
 } = storeToRefs(candidatoStore);
 const {
   sustitucion,
@@ -252,11 +302,20 @@ const hours = String(dateActual.getHours());
 const minutes = String(dateActual.getMinutes());
 const seconds = String(dateActual.getSeconds());
 const date = ref(`${year}/${month}/${day} ${hours}:${minutes}:${seconds}`);
+const props = defineProps({
+  tab: { type: String, required: true },
+});
 
 //--------------------------------------------------------------------
 
-const props = defineProps({
-  tab: { type: String, required: true },
+watch(sustituirPor, (val) => {
+  if (val != null) {
+    if (val == "Fórmula") {
+      candidatoStore.loadCandidatoToArray(props.tab, candidato.value.id);
+    } else {
+      candidatoStore.loadCandidatoByCargo(val, candidato.value.id);
+    }
+  }
 });
 
 //--------------------------------------------------------------------
@@ -264,6 +323,7 @@ const props = defineProps({
 const actualizarModal = (valor) => {
   $q.loading.show();
   candidatoStore.actualizarModalSustituir(valor);
+  sustituirStore.initSustituir();
   $q.loading.hide();
 };
 
@@ -1314,8 +1374,8 @@ const onSubmit = async () => {
     if (sust_suplente_2.value.Foto_Nuevo != null)
       sustituirSuplente2.append("Foto_Nuevo", sust_suplente_2.value.Foto_Nuevo);
   }
-  if (candidato.value.No_Acuerdo != null)
-    sustituirFormData.append("No_Acuerdo", candidato.value.No_Acuerdo);
+  if (sustitucion.value.No_Acuerdo != null)
+    sustituirFormData.append("No_Acuerdo", sustitucion.value.No_Acuerdo);
   sustituirFormData.append("Fecha_Sustitucion", date.value);
   sustituirFormData.append("Fecha_Registro", date.value);
 

@@ -241,7 +241,9 @@ export const useConfiguracionStore = defineStore("useConfiguracionStore", {
     //GET REQUISITOS BY ELECCION
     async loadRequisitos(id) {
       try {
-        let resp = await api.get(`/Tipos_Eleccion_Requerimientos/${id}`);
+        let resp = await api.get(
+          `/Tipos_Eleccion_Requerimientos/ByTipoEleccion/${id}`
+        );
         let { data } = resp.data;
         let listRequisitos = data.map((requisito) => {
           return {

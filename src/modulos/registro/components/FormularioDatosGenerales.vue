@@ -1,7 +1,7 @@
 <template>
   <q-card>
     <q-card-section class="row">
-      <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 q-pr-xs">
+      <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 q-pr-md">
         <q-file
           bottom-slots
           v-model="fotoBase.url_Foto"
@@ -22,10 +22,14 @@
               class="cursor-pointer"
             />
           </template>
+          <q-tooltip
+            >La fotografía no deberá tener una antigüedad mayor a 3
+            meses</q-tooltip
+          >
           <template v-slot:hint> Agregar fotografía </template>
         </q-file>
       </div>
-      <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12 q-pr-xs">
+      <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12 q-pr-md">
         <q-input
           v-model="candidatoBase.nombres"
           label="Nombre(s)"
@@ -36,7 +40,7 @@
         >
         </q-input>
       </div>
-      <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12 q-pr-xs">
+      <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12 q-pr-md">
         <q-input
           v-model="candidatoBase.apellido_Paterno"
           label="Apellido paterno"
@@ -47,7 +51,7 @@
         >
         </q-input>
       </div>
-      <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12 q-pr-xs">
+      <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
         <q-input
           v-model="candidatoBase.apellido_Materno"
           label="Apellido Materno"
@@ -56,7 +60,7 @@
         >
         </q-input>
       </div>
-      <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12 q-pr-xs">
+      <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12 q-pr-md">
         <q-input
           v-model="candidatoBase.mote"
           label="Mote"
@@ -65,7 +69,7 @@
         >
         </q-input>
       </div>
-      <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12 q-pr-xs">
+      <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12 q-pr-md">
         <q-input
           class="text-uppercase"
           v-model.trim="candidatoBase.clave_Elector"
@@ -83,7 +87,7 @@
         >
         </q-input>
       </div>
-      <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12 q-pr-xs">
+      <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12 q-pr-md">
         <q-input
           class="text-uppercase"
           v-model.trim="candidatoBase.curp"
@@ -100,7 +104,7 @@
         >
         </q-input>
       </div>
-      <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12 q-pr-xs">
+      <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
         <q-input
           class="text-uppercase"
           v-model.trim="candidatoBase.rfc"
@@ -117,7 +121,7 @@
         >
         </q-input>
       </div>
-      <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12 q-pr-xs">
+      <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12 q-pr-md">
         <q-input
           v-model="candidatoBase.fecha_Nacimiento"
           label="Fecha de nacimiento"
@@ -146,7 +150,7 @@
           </template>
         </q-input>
       </div>
-      <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12 q-pr-xs">
+      <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12 q-pr-md">
         <q-input
           readonly
           v-model.number="candidatoBase.edad"
@@ -158,7 +162,7 @@
         >
         </q-input>
       </div>
-      <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12 q-pr-xs">
+      <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12 q-pr-md">
         <q-select
           v-model="candidatoBase.sexo"
           :options="optionsGenero"
@@ -175,7 +179,7 @@
         >
         </q-input>
       </div>
-      <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 q-pr-xs">
+      <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 q-pr-md">
         <q-input
           v-model.trim="candidatoBase.correo"
           type="email"
@@ -243,7 +247,7 @@
       </div>
       <div
         v-if="candidatoBase.pertenece_Grupo_Vulnerable == true"
-        class="col-lg-6 col-md-6 col-sm-12 col-xs-12 q-pr-xs"
+        class="col-lg-6 col-md-6 col-sm-12 col-xs-12 q-pr-md"
       >
         <q-input
           v-model="candidatoBase.grupo_Vulnerable_1"
@@ -258,7 +262,7 @@
       </div>
       <div
         v-if="candidatoBase.pertenece_Grupo_Vulnerable == true"
-        class="col-lg-6 col-md-6 col-sm-12 col-xs-12 q-pr-xs"
+        class="col-lg-6 col-md-6 col-sm-12 col-xs-12 q-pr-md"
       >
         <q-input
           v-model="candidatoBase.grupo_Vulnerable_3"

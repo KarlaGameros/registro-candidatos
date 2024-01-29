@@ -2,10 +2,10 @@
   <q-card>
     <q-card-section>
       <div class="text-subtitle2">
-        Lorem ipsum, dolor sit amet consectetur adipisicing elit. Facere,
-        perspiciatis aspernatur eum temporibus quo perferendis corporis illum
-        facilis. Quibusdam sint unde eum aliquid soluta non earum voluptatem
-        dolor provident quidem!
+        Lorem ipsum dolor sit amet consectetur adipisicing elit. Aliquid
+        doloribus, explicabo maxime dicta deleniti blanditiis repudiandae
+        pariatur harum deserunt libero provident totam quae. Eum quam
+        exercitationem magnam, tempora animi velit.
       </div>
       <br />
       <div class="row">
@@ -19,7 +19,6 @@
             color="pink"
             outlined
             label-color="grey"
-            v-model="actaNacimiento"
             :label="requisito.nombre"
             :hint="`Subir ${requisito.nombre}`"
           >

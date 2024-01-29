@@ -1,5 +1,4 @@
 const getCurrentLocation = () => {
-  console.log("entrooooo");
   return new Promise((resolve, reject) => {
     navigator.geolocation.getCurrentPosition(
       (position) => {
@@ -50,7 +49,6 @@ const getDataDevice = () => {
     deviceInfo.os = "Unknown";
   }
 
-  console.log("deviceInfo", deviceInfo);
   return deviceInfo;
 };
 

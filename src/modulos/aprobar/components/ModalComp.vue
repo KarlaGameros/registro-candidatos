@@ -34,8 +34,55 @@
             >
             </q-input>
           </div>
-          <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
-            <q-input v-model="date" :disable="isEditar">
+          <div v-if="isEditar" class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+            <q-input v-model="aprobacion.fecha_Aprobacion">
+              <template v-slot:prepend>
+                <q-icon name="event" class="cursor-pointer">
+                  <q-popup-proxy
+                    cover
+                    transition-show="scale"
+                    transition-hide="scale"
+                  >
+                    <q-date
+                      v-model="aprobacion.fecha_Aprobacion"
+                      mask="YYYY-MM-DD HH:mm"
+                    >
+                      <div class="row items-center justify-end">
+                        <q-btn
+                          v-close-popup
+                          label="Close"
+                          color="primary"
+                          flat
+                        />
+                      </div>
+                    </q-date>
+                  </q-popup-proxy>
+                </q-icon>
+              </template>
+              <template v-slot:append>
+                <q-icon name="access_time" class="cursor-pointer">
+                  <q-popup-proxy
+                    cover
+                    transition-show="scale"
+                    transition-hide="scale"
+                  >
+                    <q-time v-model="date" mask="YYYY-MM-DD HH:mm" format24h>
+                      <div class="row items-center justify-end">
+                        <q-btn
+                          v-close-popup
+                          label="Close"
+                          color="primary"
+                          flat
+                        />
+                      </div>
+                    </q-time>
+                  </q-popup-proxy>
+                </q-icon>
+              </template>
+            </q-input>
+          </div>
+          <div v-else class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+            <q-input v-model="date">
               <template v-slot:prepend>
                 <q-icon name="event" class="cursor-pointer">
                   <q-popup-proxy
@@ -106,16 +153,18 @@
 </template>
 
 <script setup>
-import { defineProps, ref } from "vue";
+import { defineProps, ref, watch } from "vue";
 import { useQuasar } from "quasar";
 import { storeToRefs } from "pinia";
 import { useAprobarStore } from "src/stores/aprobar-store";
 import TablaDetalle from "./TablaDetalle.vue";
+import { useCandidatosStore } from "src/stores/candidatos-store";
 
 //-----------------------------------------------------------
 
 const $q = useQuasar();
 const aprobarStore = useAprobarStore();
+const candidatosStore = useCandidatosStore();
 const { modal, isEditar, aprobacion, list_Detalle } = storeToRefs(aprobarStore);
 const props = defineProps({
   tipo_Id: { type: Number },
@@ -159,7 +208,7 @@ const onSubmit = async () => {
   } else {
     $q.dialog({
       title: "Aprobar candidatos",
-      message: `¿Está seguro de aprobar los ${list_Detalle.value.length} candidatos seleccionados?`,
+      message: `¿Está seguro de aprobar ${list_Detalle.value.length} fórmulas?`,
       icon: "Warning",
       persistent: true,
       transitionShow: "scale",
@@ -188,7 +237,8 @@ const onSubmit = async () => {
           type: "positive",
           message: resp.data,
         });
-        aprobarStore.loadAprobacionCandidaturas();
+        candidatosStore.loadCandidatos();
+        list_Detalle.value = [];
         actualizarModal(false);
       } else {
         $q.notify({

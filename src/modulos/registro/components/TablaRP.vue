@@ -43,7 +43,10 @@ watchEffect(() => {
   switch (props.tab) {
     case "DIP":
       list_RP.value = list_Candidatos.value.filter(
-        (x) => x.tipo_Candidato == "RP" && x.partido_Id == props.partido_Id
+        (x) =>
+          x.tipo_Candidato == "RP" &&
+          x.partido_Id == props.partido_Id &&
+          x.tipo_Eleccion_Id == 2
       );
       break;
     case "REG":
@@ -51,7 +54,8 @@ watchEffect(() => {
         (x) =>
           x.tipo_Candidato == "RP" &&
           x.municipio_Id == props.municipio_Id &&
-          x.partido_Id == props.partido_Id
+          x.partido_Id == props.partido_Id &&
+          x.tipo_Eleccion_Id == 4
       );
       break;
     default:

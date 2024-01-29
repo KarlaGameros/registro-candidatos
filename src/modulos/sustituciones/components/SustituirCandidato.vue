@@ -4,12 +4,14 @@
       <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 q-pr-xs">
         <q-select
           v-model="candidatoBase.Partido_Id_Nuevo"
-          :options="list_Partidos_Politicos"
+          :options="list_Filtro_Partidos"
           label="Partido postulante"
           hint="Seleccione el partido postulante"
         />
       </div>
-      <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
+    </q-card-section>
+    <q-card-section class="row">
+      <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 q-pr-xs">
         <q-file
           accept=".jpg, image/*"
           bottom-slots
@@ -31,7 +33,6 @@
           <template v-slot:hint> Agregar fotografía </template>
         </q-file>
       </div>
-      <div class="col-6"></div>
       <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12 q-pr-xs">
         <q-input
           v-model="candidatoBase.Nombres_Nuevo"
@@ -70,7 +71,7 @@
         >
         </q-input>
       </div>
-      <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 q-pr-xs">
+      <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 q-pr-xs">
         <q-input
           v-model.trim="candidatoBase.Clave_Elector_Nuevo"
           label="Clave de elector"
@@ -87,7 +88,7 @@
         >
         </q-input>
       </div>
-      <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 q-pr-xs">
+      <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 q-pr-xs">
         <q-input
           v-model.trim="candidatoBase.CURP_Nuevo"
           label="CURP"
@@ -103,7 +104,7 @@
         >
         </q-input>
       </div>
-      <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 q-pr-xs">
+      <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 q-pr-xs">
         <q-input
           v-model.trim="candidatoBase.RFC_Nuevo"
           label="RFC"
@@ -135,7 +136,7 @@
                   v-model="candidatoBase.Fecha_Nacimiento_Nuevo"
                   color="pink-4"
                   :options="optionsDate"
-                  mask="DD-MM-YYYY"
+                  mask="YYYY/MM/DD"
                 >
                   <div class="row items-center justify-end">
                     <q-btn v-close-popup label="Close" color="pink" flat />
@@ -280,7 +281,7 @@ const $q = useQuasar();
 const candidatoStore = useCandidatosStore();
 const sustituirStore = useSustituirStore();
 const configuracionStore = useConfiguracionStore();
-const { candidato } = storeToRefs(candidatoStore);
+const { candidato, candidato2 } = storeToRefs(candidatoStore);
 const {
   sustitucion,
   sust_propietario_1,
@@ -288,7 +289,8 @@ const {
   sust_suplente_1,
   sust_suplente_2,
 } = storeToRefs(sustituirStore);
-const { list_Partidos_Politicos } = storeToRefs(configuracionStore);
+const { list_Partidos_Politicos, list_Partidos_Politicos_Coalcion } =
+  storeToRefs(configuracionStore);
 const optionsGenero = ref(["Hombre", "Mujer", "No binario"]);
 const telefonos = ref([]);
 const props = defineProps({
@@ -298,6 +300,7 @@ const edad = ref("");
 const isExtension = ref(false);
 const num_Extension = ref(null);
 const candidatoBase = ref(null);
+const list_Filtro_Partidos = ref([]);
 
 //--------------------------------------------------------------------
 
@@ -431,20 +434,39 @@ watchEffect(() => {
   }
 });
 
-watch(candidato.value, (val) => {
+watch(sust_propietario_1.value, (val) => {
   if (val != null) {
-    var fechaNace = new Date(val.fecha_Nacimiento_Propietario);
-    var fechaActual = new Date();
-    var mes = fechaActual.getMonth();
-    var dia = fechaActual.getDate();
-    var año = fechaActual.getFullYear();
-    fechaActual.setDate(dia);
-    fechaActual.setMonth(mes);
-    fechaActual.setFullYear(año);
-    edad.value = Math.floor(
-      (fechaActual - fechaNace) / (1000 * 60 * 60 * 24) / 365
+    calcularEdad(val.Fecha_Nacimiento_Nuevo, "propietario_1");
+  }
+});
+
+watch(sust_propietario_2.value, (val) => {
+  if (val != null) {
+    calcularEdad(val.Fecha_Nacimiento_Nuevo, "propietario_2");
+  }
+});
+
+watch(sust_suplente_1.value, (val) => {
+  if (val != null) {
+    calcularEdad(val.Fecha_Nacimiento_Nuevo, "suplente_1");
+  }
+});
+
+watch(sust_suplente_2.value, (val) => {
+  if (val != null) {
+    calcularEdad(val.Fecha_Nacimiento_Nuevo, "suplente_2");
+  }
+});
+
+watch(candidato2.value, (val) => {
+  if (val.is_Coalicion == true) {
+    configuracionStore.loadPartidosPoliticosCoalicion();
+    list_Filtro_Partidos.value = list_Partidos_Politicos_Coalcion.value.filter(
+      (x) => x.coalicion_Id == val.coalicion_Id
     );
-    return edad;
+  } else {
+    configuracionStore.loadPartidosPoliticos();
+    list_Filtro_Partidos.value = list_Partidos_Politicos.value;
   }
 });
 
@@ -464,6 +486,27 @@ watch(telefonos, (val) => {
 });
 
 //--------------------------------------------------------------------
+
+const calcularEdad = (fecha_Nacimiento, tipo) => {
+  if (fecha_Nacimiento != null) {
+    if (fecha_Nacimiento != null) {
+      var fechaNace = new Date(fecha_Nacimiento);
+      var fechaActual = new Date();
+
+      var mes = fechaActual.getMonth();
+      var dia = fechaActual.getDate();
+      var año = fechaActual.getFullYear();
+
+      fechaActual.setDate(dia);
+      fechaActual.setMonth(mes);
+      fechaActual.setFullYear(año);
+      edad.value = Math.floor(
+        (fechaActual - fechaNace) / (1000 * 60 * 60 * 24) / 365
+      );
+      return edad;
+    }
+  }
+};
 
 const optionsDate = (fecha) => {
   const dateActual = new Date();

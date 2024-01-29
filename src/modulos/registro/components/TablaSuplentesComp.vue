@@ -61,6 +61,15 @@
                   </q-item-section>
                 </q-item>
               </div>
+              <div v-else-if="col.name == 'estatus'">
+                <q-btn
+                  flat
+                  round
+                  :color="props.row.estatus == null ? 'red' : 'green'"
+                  :icon="props.row.estatus == null ? 'close' : 'done'"
+                >
+                </q-btn>
+              </div>
               <div v-else-if="col.name === 'partido'">
                 <q-avatar>
                   <img :src="props.row.url_Logo_Partido" alt="" />
@@ -102,10 +111,24 @@ const columns = [
     sortable: true,
   },
   {
-    name: "tipo_Eleccion",
+    name: "edad",
     align: "center",
-    label: "Tipo de elección",
-    field: "tipo_Eleccion",
+    label: "Edad",
+    field: "edad",
+    sortable: true,
+  },
+  {
+    name: "estatus",
+    align: "center",
+    label: "Aprobado",
+    field: "estatus",
+    sortable: true,
+  },
+  {
+    name: "sexo",
+    align: "center",
+    label: "Género",
+    field: "sexo",
     sortable: true,
   },
   {

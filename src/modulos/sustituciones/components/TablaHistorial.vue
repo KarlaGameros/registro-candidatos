@@ -40,12 +40,16 @@
                 :icon="isRowExpanded(props.row) ? 'remove' : 'add'"
               />
             </div>
-            <div v-else-if="col.name === 'activo'">
+            <div v-else-if="col.name === 'estatus'">
               <q-btn
                 flat
                 round
-                :color="props.row.activo == true ? 'green' : 'red'"
-                :icon="props.row.activo == true ? 'done' : 'close'"
+                :color="
+                  props.row.estatus == 'Registro aprobado' ? 'green' : 'red'
+                "
+                :icon="
+                  props.row.estatus == 'Registro aprobado' ? 'done' : 'close'
+                "
               >
               </q-btn>
             </div>
@@ -84,7 +88,7 @@ import { storeToRefs } from "pinia";
 import { useQuasar } from "quasar";
 import { useCandidatosStore } from "src/stores/candidatos-store";
 import { useSustituirStore } from "src/stores/sustituir-store";
-import { onBeforeMount, ref } from "vue";
+import { onBeforeMount, ref, watch } from "vue";
 
 //--------------------------------------------------------------------
 
@@ -125,10 +129,10 @@ const columns = [
     sortable: true,
   },
   {
-    name: "activo",
+    name: "estatus",
     align: "center",
-    label: "Activo",
-    field: "activo",
+    label: "Aprobado",
+    field: "estatus",
     sortable: true,
   },
   {

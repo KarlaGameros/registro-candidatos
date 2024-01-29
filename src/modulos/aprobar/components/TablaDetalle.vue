@@ -29,7 +29,7 @@
             </q-avatar>
           </div>
           <div v-else-if="col.name === 'coalicion_Logo'">
-            <q-avatar v-if="props.row.coalicion_Logo != ''">
+            <q-avatar v-if="props.row.is_Coalicion">
               <img :src="props.row.coalicion_Logo" alt="" />
               <q-tooltip>{{ props.row.coalicion_Siglas }}</q-tooltip>
             </q-avatar>
