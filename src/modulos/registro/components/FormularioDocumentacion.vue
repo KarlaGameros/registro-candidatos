@@ -2,49 +2,53 @@
   <q-card>
     <q-card-section>
       <div class="text-subtitle2">
-        Lorem ipsum dolor sit amet consectetur adipisicing elit. Aliquid
-        doloribus, explicabo maxime dicta deleniti blanditiis repudiandae
-        pariatur harum deserunt libero provident totam quae. Eum quam
-        exercitationem magnam, tempora animi velit.
+        Favor de subir la documentación correspondiente
       </div>
       <br />
       <div class="row">
         <div
           v-for="requisito in list_Requisitos"
           :key="requisito"
-          class="col-lg-3 col-md-3 col-sm-6 col-xs-12 q-pr-xs"
+          class="q-pr-md"
         >
-          <q-file
-            v-if="requisito.activo == true && requisito.archivo == true"
+          <q-btn
+            @click="subirDocumento(requisito.id)"
             color="pink"
-            outlined
-            label-color="grey"
+            dense
+            outline
+            class="q-pa-sm"
             :label="requisito.nombre"
-            :hint="`Subir ${requisito.nombre}`"
+            icon-right="cloud_upload"
           >
-            <template v-slot:append>
-              <q-icon name="attachment" color="pink" />
-            </template>
-          </q-file>
+            <q-tooltip>Subir</q-tooltip>
+          </q-btn>
         </div>
       </div>
     </q-card-section>
   </q-card>
+  <ModalSubirDoc :puesto="props.puesto" :candidato_Id="candidato.id" />
 </template>
 
 <script setup>
-import { ref, defineProps, onMounted } from "vue";
+import { defineProps, onMounted } from "vue";
 import { useConfiguracionStore } from "src/stores/configuracion-store";
 import { storeToRefs } from "pinia";
 import { useQuasar } from "quasar";
+import { useCandidatosStore } from "src/stores/candidatos-store";
+import ModalSubirDoc from "../components/ModalSubirDoc.vue";
+import { useGeneroStore } from "src/stores/genero-store";
 
 //--------------------------------------------------------------------
 
 const $q = useQuasar();
 const configuracionStore = useConfiguracionStore();
+const candidatoStore = useCandidatosStore();
+const generoStore = useGeneroStore();
 const { list_Requisitos } = storeToRefs(configuracionStore);
+const { candidato } = storeToRefs(candidatoStore);
 const props = defineProps({
   tipo_Id: { type: Number, required: true },
+  puesto: { type: Number, required: true },
 });
 
 //--------------------------------------------------------------------
@@ -55,11 +59,24 @@ onMounted(() => {
 
 //--------------------------------------------------------------------
 
+const onRejected = () => {
+  $q.notify({
+    type: "negative",
+    message: "El tamaño del documento es muy lago",
+  });
+};
+
 const cargarData = async () => {
   $q.loading.show();
   await configuracionStore.loadRequisitos(props.tipo_Id);
   $q.loading.hide();
 };
-</script>
 
-<style></style>
+const subirDocumento = async (id) => {
+  $q.loading.show();
+  await generoStore.loadRequerimientoId(id);
+  await generoStore.getDocumentos(candidato.value.id, props.puesto, id);
+  candidatoStore.actualizarModalDocumento(true);
+  $q.loading.hide();
+};
+</script>

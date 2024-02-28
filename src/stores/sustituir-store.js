@@ -20,6 +20,7 @@ export const useSustituirStore = defineStore("useSustituirStore", {
       Apellido_Materno_Nuevo: null,
       Mote_Nuevo: null,
       Sexo_Nuevo: null,
+      Edad_Nuevo: null,
       Clave_Elector_Nuevo: null,
       RFC_Nuevo: null,
       CURP_Nuevo: null,
@@ -42,6 +43,7 @@ export const useSustituirStore = defineStore("useSustituirStore", {
       Apellido_Materno_Nuevo: null,
       Mote_Nuevo: null,
       Sexo_Nuevo: null,
+      Edad_Nuevo: null,
       Clave_Elector_Nuevo: null,
       RFC_Nuevo: null,
       CURP_Nuevo: null,
@@ -64,6 +66,7 @@ export const useSustituirStore = defineStore("useSustituirStore", {
       Apellido_Materno_Nuevo: null,
       Mote_Nuevo: null,
       Sexo_Nuevo: null,
+      Edad_Nuevo: null,
       Clave_Elector_Nuevo: null,
       RFC_Nuevo: null,
       CURP_Nuevo: null,
@@ -86,6 +89,7 @@ export const useSustituirStore = defineStore("useSustituirStore", {
       Apellido_Materno_Nuevo: null,
       Mote_Nuevo: null,
       Sexo_Nuevo: null,
+      Edad_Nuevo: null,
       Clave_Elector_Nuevo: null,
       RFC_Nuevo: null,
       CURP_Nuevo: null,
@@ -266,7 +270,12 @@ export const useSustituirStore = defineStore("useSustituirStore", {
           };
         });
         this.list_Sustituciones = listSustitucion;
-      } catch (error) {}
+      } catch (error) {
+        return {
+          success: false,
+          data: "Ocurrió un error, inténtelo de nuevo. Si el error persiste, contacte a soporte",
+        };
+      }
     },
   },
 });

@@ -44,7 +44,10 @@
       </q-card-section>
       <q-card-section>
         <q-form class="q-col-gutter-xs" @submit="onSubmit">
-          <div class="row" v-if="sustituirPor == 'Fórmula'">
+          <div
+            :class="$q.screen.xs ? '' : 'row'"
+            v-if="sustituirPor == 'Fórmula'"
+          >
             <q-card
               v-for="candidato in list_Suplentes"
               :key="candidato"
@@ -467,6 +470,8 @@ const onSubmit = async () => {
         "Foto_Nuevo",
         sust_propietario_1.value.Foto_Nuevo
       );
+    if (sust_propietario_1.value.Edad_Nuevo != null)
+      candidatoFormData.append("Edad", sust_propietario_1.value.Edad_Nuevo);
   } else if (sustituirPor.value == "Suplente") {
     sustituirFormData.append("Tipo_Sustitucion", "Suplente 1");
     if (suplente_1.value.nombres != null)
@@ -586,6 +591,8 @@ const onSubmit = async () => {
       );
     if (sust_suplente_1.value.Foto_Nuevo != null)
       sustituirFormData.append("Foto_Nuevo", sust_suplente_1.value.Foto_Nuevo);
+    if (sust_suplente_1.value.Edad_Nuevo != null)
+      candidatoFormData.append("Edad", sust_suplente_1.value.Edad_Nuevo);
   } else if (sustituirPor.value == "Propietario sindico") {
     sustituirFormData.append("Tipo_Sustitucion", "Propietario 2");
     if (propietario_2.value.nombres != null)
@@ -720,6 +727,8 @@ const onSubmit = async () => {
         "Foto_Nuevo",
         sust_propietario_2.value.Foto_Nuevo
       );
+    if (sust_propietario_2.value.Edad_Nuevo != null)
+      candidatoFormData.append("Edad", sust_propietario_2.value.Edad_Nuevo);
   } else if (sustituirPor.value == "Suplente sindico") {
     sustituirFormData.append("Tipo_Sustitucion", "Suplente 2");
     if (suplente_2.value.nombres != null)
@@ -839,6 +848,8 @@ const onSubmit = async () => {
       );
     if (sust_suplente_2.value.Foto_Nuevo != null)
       sustituirFormData.append("Foto_Nuevo", sust_suplente_2.value.Foto_Nuevo);
+    if (sust_suplente_2.value.Edad_Nuevo != null)
+      candidatoFormData.append("Edad", sust_suplente_2.value.Edad_Nuevo);
   } else if (sustituirPor.value == "Fórmula") {
     sustituirPropietario1.append("Fecha_Sustitucion", date.value);
     sustituirPropietario1.append("Fecha_Registro", date.value);
@@ -984,6 +995,8 @@ const onSubmit = async () => {
         "Foto_Nuevo",
         sust_propietario_1.value.Foto_Nuevo
       );
+    if (sust_propietario_1.value.Edad_Nuevo != null)
+      candidatoFormData.append("Edad", sust_propietario_1.value.Edad_Nuevo);
     //-----------------------------------------------------------------
     sustituirSuplente1.append("Fecha_Sustitucion", date.value);
     sustituirSuplente1.append("Fecha_Registro", date.value);
@@ -1107,6 +1120,8 @@ const onSubmit = async () => {
 
     if (sust_suplente_1.value.Foto_Nuevo != null)
       sustituirSuplente1.append("Foto_Nuevo", sust_suplente_1.value.Foto_Nuevo);
+    if (sust_suplente_1.value.Edad_Nuevo != null)
+      candidatoFormData.append("Edad", sust_suplente_1.value.Edad_Nuevo);
     //-----------------------------------------------------------------
     sustituirPropietario2.append("Fecha_Sustitucion", date.value);
     sustituirPropietario2.append("Fecha_Registro", date.value);
@@ -1252,6 +1267,8 @@ const onSubmit = async () => {
         "Foto_Nuevo",
         sust_propietario_2.value.Foto_Nuevo
       );
+    if (sust_propietario_2.value.Edad_Nuevo != null)
+      candidatoFormData.append("Edad", sust_propietario_2.value.Edad_Nuevo);
     //-----------------------------------------------------------------
     sustituirSuplente2.append("Fecha_Sustitucion", date.value);
     sustituirSuplente2.append("Fecha_Registro", date.value);
@@ -1373,6 +1390,8 @@ const onSubmit = async () => {
       );
     if (sust_suplente_2.value.Foto_Nuevo != null)
       sustituirSuplente2.append("Foto_Nuevo", sust_suplente_2.value.Foto_Nuevo);
+    if (sust_suplente_2.value.Edad_Nuevo != null)
+      candidatoFormData.append("Edad", sust_suplente_2.value.Edad_Nuevo);
   }
   if (sustitucion.value.No_Acuerdo != null)
     sustituirFormData.append("No_Acuerdo", sustitucion.value.No_Acuerdo);
@@ -1436,7 +1455,7 @@ const onSubmit = async () => {
       type: "positive",
       message: resp.data,
     });
-    candidatoStore.loadCandidatos();
+    await candidatoStore.loadCandidatos();
     actualizarModal(false);
   } else {
     $q.notify({

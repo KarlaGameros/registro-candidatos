@@ -9,21 +9,14 @@
         <template v-slot:avatar>
           <q-icon name="info" color="grey" />
         </template>
-        Módulo que muestra las aprobaciones realizadas, la opción de subir el
-        acuerdo correspondiente
-        <q-icon name="upload_file" color="pink" size="sm" /> y la opción de
-        visualizarlo después de subirlo<q-icon
-          name="visibility"
-          color="pink"
-          size="sm"
-        />.
+        Módulo que muestra las observaciones realizadas
       </q-banner>
     </div>
     <div class="bg-blue-grey-4" style="border-radius: 3px">
-      <div class="text-h6 text-center text-white">Candidaturas aprobadas</div>
+      <div class="text-h6 text-center text-white">Observaciones</div>
     </div>
     <q-table
-      :rows="list_Aprobacion_Candidaturas"
+      :rows="list"
       :columns="columns"
       :filter="filter"
       row-key="name"
@@ -48,15 +41,6 @@
           <q-td v-for="col in props.cols" :key="col.name" :props="props">
             <div v-if="col.name === 'id'">
               <q-btn
-                flat
-                round
-                color="pink"
-                icon="upload_file"
-                @click="subirAcuerdo(col.value)"
-              >
-                <q-tooltip>Subir acuerdo</q-tooltip>
-              </q-btn>
-              <q-btn
                 v-if="props.row.acuerdo_Url != null"
                 flat
                 round
@@ -77,65 +61,11 @@
 </template>
 
 <script setup>
-import { onBeforeMount, ref } from "vue";
-import { storeToRefs } from "pinia";
-import { useAprobarStore } from "src/stores/aprobar-store";
-import { useQuasar, QSpinnerCube } from "quasar";
+import { ref } from "vue";
 
 //-----------------------------------------------------------
 
-const $q = useQuasar();
-const aprobarStore = useAprobarStore();
-const { list_Aprobacion_Candidaturas } = storeToRefs(aprobarStore);
-
-//-----------------------------------------------------------
-
-onBeforeMount(() => {
-  cargarData();
-});
-
-//-----------------------------------------------------------
-
-const cargarData = async () => {
-  $q.loading.show({
-    spinner: QSpinnerCube,
-    spinnerColor: "pink",
-    spinnerSize: 140,
-    backgroundColor: "purple-2",
-    message: "Espere un momento porfavor...",
-    messageColor: "black",
-  });
-  await aprobarStore.loadAprobacionCandidaturas();
-  $q.loading.hide();
-};
-
-const subirAcuerdo = async (id) => {
-  $q.loading.show();
-  aprobarStore.actualizarModal(true);
-  aprobarStore.updateEditar(true);
-  await aprobarStore.loadAprobacionCandidaturaById(id);
-  await aprobarStore.loadDetalle(id);
-  $q.loading.hide();
-};
-
-const verDocumento = async (row) => {
-  $q.dialog({
-    title: `Acuerdo ${row.acuerdo}`,
-    style: "width: 800px; max-width: 80vw",
-    message:
-      row.acuerdo_Url != null
-        ? `<iframe
-            src="${row.acuerdo_Url}"
-            width="100%"
-            height="650"
-          ></iframe>`
-        : '<div class="text-subtitle2">Favor de subir el acuerdo correspondiente a la aprobación</div>',
-    html: true,
-    ok: "Cerrar",
-  });
-};
-
-//-----------------------------------------------------------
+const list = ref([1, 2]);
 
 const columns = [
   {

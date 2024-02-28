@@ -24,6 +24,21 @@ const routes = [
         name: "aprobacion_candidaturas",
         component: () => import("../modulos/aprobar/pages/IndexPage.vue"),
       },
+      {
+        path: "/acuses",
+        name: "acuses",
+        component: () => import("../modulos/acuse/pages/IndexPage.vue"),
+      },
+      {
+        path: "/genero",
+        name: "genero",
+        component: () => import("../modulos/genero/pages/IndexPage.vue"),
+      },
+      {
+        path: "/observaciones",
+        name: "observaciones",
+        component: () => import("../modulos/observaciones/pages/IndexPage.vue"),
+      },
     ],
   },
 

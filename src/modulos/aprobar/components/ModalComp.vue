@@ -24,7 +24,6 @@
         <q-card-section class="row q-col-gutter-xs">
           <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
             <q-input
-              :disable="isEditar"
               v-model="aprobacion.acuerdo"
               label="Acuerdo"
               hint="Ingrese nombre del acuerdo"
@@ -37,13 +36,14 @@
           <div v-if="isEditar" class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
             <q-input v-model="aprobacion.fecha_Aprobacion">
               <template v-slot:prepend>
-                <q-icon name="event" class="cursor-pointer">
+                <q-icon color="pink" name="event" class="cursor-pointer">
                   <q-popup-proxy
                     cover
                     transition-show="scale"
                     transition-hide="scale"
                   >
                     <q-date
+                      disable
                       v-model="aprobacion.fecha_Aprobacion"
                       mask="YYYY-MM-DD HH:mm"
                     >
@@ -60,7 +60,7 @@
                 </q-icon>
               </template>
               <template v-slot:append>
-                <q-icon name="access_time" class="cursor-pointer">
+                <q-icon color="pink" name="access_time" class="cursor-pointer">
                   <q-popup-proxy
                     cover
                     transition-show="scale"
@@ -84,7 +84,7 @@
           <div v-else class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
             <q-input v-model="date">
               <template v-slot:prepend>
-                <q-icon name="event" class="cursor-pointer">
+                <q-icon color="pink" name="event" class="cursor-pointer">
                   <q-popup-proxy
                     cover
                     transition-show="scale"
@@ -104,7 +104,7 @@
                 </q-icon>
               </template>
               <template v-slot:append>
-                <q-icon name="access_time" class="cursor-pointer">
+                <q-icon color="pink" name="access_time" class="cursor-pointer">
                   <q-popup-proxy
                     cover
                     transition-show="scale"
@@ -125,6 +125,13 @@
               </template>
             </q-input>
           </div>
+          <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+            <q-file accept=".pdf" v-model="acuerdoArchivo" label="Acuerdo">
+              <template v-slot:append>
+                <q-icon name="attachment" color="pink" />
+              </template>
+            </q-file>
+          </div>
         </q-card-section>
         <q-card-section>
           <TablaDetalle />
@@ -135,13 +142,13 @@
               <q-btn
                 label="Cancelar"
                 type="reset"
-                color="negative"
+                color="red"
                 @click="actualizarModal(false)"
               />
               <q-btn
                 label="Guardar"
                 type="submit"
-                color="positive"
+                color="secondary"
                 class="q-ml-sm"
               />
             </div>
@@ -169,7 +176,7 @@ const { modal, isEditar, aprobacion, list_Detalle } = storeToRefs(aprobarStore);
 const props = defineProps({
   tipo_Id: { type: Number },
 });
-
+const acuerdoArchivo = ref(null);
 //-----------------------------------------------------------
 //Get fecha actual
 const dateActual = new Date();
@@ -180,11 +187,11 @@ const hours = String(dateActual.getHours());
 const minutes = String(dateActual.getMinutes());
 const seconds = String(dateActual.getSeconds());
 const date = ref(`${year}/${month}/${day} ${hours}:${minutes}:${seconds}`);
-
 //-----------------------------------------------------------
 
 const actualizarModal = (valor) => {
   $q.loading.show();
+  acuerdoArchivo.value = null;
   aprobarStore.actualizarModal(valor);
   aprobarStore.updateEditar(false);
   aprobarStore.initAprobacion();
@@ -192,11 +199,9 @@ const actualizarModal = (valor) => {
 };
 
 const onSubmit = async () => {
-  let resp = null;
-  aprobacion.value.detalle = list_Detalle.value;
-  aprobacion.value.fecha_Aprobacion = date.value;
-  $q.loading.show();
-  if (list_Detalle.value.length == 0) {
+  let aprobarFormData = new FormData();
+
+  if (list_Detalle.value.length == 0 && isEditar.value == false) {
     $q.dialog({
       title: "Atención",
       message: "Debe de agregar mínimo una candidatura a la lista",
@@ -206,49 +211,84 @@ const onSubmit = async () => {
       transitionHide: "scale",
     });
   } else {
-    $q.dialog({
-      title: "Aprobar candidatos",
-      message: `¿Está seguro de aprobar ${list_Detalle.value.length} fórmulas?`,
-      icon: "Warning",
-      persistent: true,
-      transitionShow: "scale",
-      transitionHide: "scale",
-      ok: {
-        color: "positive",
-        label: "¡Sí!, aprobar",
-      },
-      cancel: {
-        color: "negative",
-        label: " No Cancelar",
-      },
-    }).onOk(async () => {
-      $q.loading.show();
-      if (isEditar.value == true) {
-        resp = await aprobarStore.updateAprobacion(aprobacion.value);
-      } else {
+    if (isEditar.value == false) {
+      aprobarFormData.append("Acuerdo", aprobacion.value.acuerdo);
+      aprobarFormData.append("Fecha_Aprobacion", date.value);
+      aprobarFormData.append("Archivo_Acuerdo", acuerdoArchivo.value);
+      list_Detalle.value.forEach((element) => {
+        aprobarFormData.append("Detalle[]", element.candidato_Id);
+      });
+
+      $q.dialog({
+        title: "Aprobar candidatos",
+        message: `¿Está seguro de aprobar ${list_Detalle.value.length} fórmulas?`,
+        icon: "Warning",
+        persistent: true,
+        transitionShow: "scale",
+        transitionHide: "scale",
+        ok: {
+          color: "positive",
+          label: "¡Sí!, aprobar",
+        },
+        cancel: {
+          color: "negative",
+          label: " No Cancelar",
+        },
+      }).onOk(async () => {
+        $q.loading.show();
         resp = await aprobarStore.aprobarCandidatos(
-          props.tipo_Id,
-          aprobacion.value
+          aprobarFormData,
+          props.tipo_Id
         );
-      }
-      if (resp.success) {
-        $q.notify({
-          position: "top-right",
-          type: "positive",
-          message: resp.data,
-        });
-        candidatosStore.loadCandidatos();
-        list_Detalle.value = [];
-        actualizarModal(false);
-      } else {
-        $q.notify({
-          position: "top-right",
-          type: "negative",
-          message: resp.data,
-        });
-      }
-    });
+        if (resp.success) {
+          $q.notify({
+            position: "top-right",
+            type: "positive",
+            message: resp.data,
+          });
+          await aprobarStore.loadAprobacionCandidaturas();
+          aprobarStore.initAprobacion();
+          actualizarModal(false);
+        } else {
+          $q.notify({
+            position: "top-right",
+            type: "negative",
+            message: resp.data,
+          });
+        }
+        $q.loading.hide();
+      });
+    } else {
+      aprobarFormData.append("Consentimiento", acuerdoArchivo.value);
+    }
   }
+  let resp = null;
+  let respUpdate = null;
+  $q.loading.show();
+  if (isEditar.value == true) {
+    resp = await aprobarStore.subirAcuerdo(
+      aprobacion.value.id,
+      aprobarFormData
+    );
+    respUpdate = await aprobarStore.updateAprobacion(aprobacion.value);
+    if (resp.success) {
+      $q.notify({
+        position: "top-right",
+        type: "positive",
+        message: resp.data,
+      });
+      await aprobarStore.loadAprobacionCandidaturas();
+      aprobarStore.initAprobacion();
+      actualizarModal(false);
+    } else {
+      $q.notify({
+        position: "top-right",
+        type: "negative",
+        message: resp.data,
+      });
+    }
+  }
+
   $q.loading.hide();
 };
 </script>

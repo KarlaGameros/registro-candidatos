@@ -11,8 +11,7 @@
           @click="toggleLeftDrawer"
         />
 
-        <q-toolbar-title> Registro de candidaturas </q-toolbar-title>
-        <q-badge rounded color="green" />
+        <q-toolbar-title> Registro de candidaturas locales </q-toolbar-title>
         <q-btn flat round dense icon="apps" @click="show" />
       </q-toolbar>
     </q-header>
@@ -74,6 +73,47 @@
 
           <q-item-section> Historial de aprobaciones </q-item-section>
         </q-item>
+        <q-item
+          v-if="CatalogosConList.some((element) => element == 'SRC-DOC-GEN')"
+          clickable
+          v-ripple
+          class="text-grey-8"
+          :to="{ name: 'genero' }"
+          active-class="text-pink-ieen-1"
+        >
+          <q-item-section avatar>
+            <q-icon name="wc" />
+          </q-item-section>
+
+          <q-item-section> Género </q-item-section>
+        </q-item>
+        <q-item
+          v-if="CatalogosConList.some((element) => element == 'SRC-ACU-CU')"
+          clickable
+          v-ripple
+          class="text-grey-8"
+          :to="{ name: 'acuses' }"
+          active-class="text-pink-ieen-1"
+        >
+          <q-item-section avatar>
+            <q-icon name="upload_file" />
+          </q-item-section>
+
+          <q-item-section> Acuses </q-item-section>
+        </q-item>
+        <q-item
+          clickable
+          v-ripple
+          class="text-grey-8"
+          :to="{ name: 'observaciones' }"
+          active-class="text-pink-ieen-1"
+        >
+          <q-item-section avatar>
+            <q-icon name="pending_actions" />
+          </q-item-section>
+
+          <q-item-section> Observaciones </q-item-section>
+        </q-item>
       </q-list>
     </q-drawer>
 
@@ -87,9 +127,6 @@
           <span class="text-body1 text-weight-bold">
             © Unidad Técnica de Informática y Estadística
           </span>
-          <q-space></q-space>
-          <q-btn icon="apartment" flat dense></q-btn>
-          <q-btn icon="phone" flat dense></q-btn>
         </q-card-section>
       </q-card>
     </q-footer>
@@ -175,6 +212,12 @@ export default defineComponent({
             break;
           case "SRC-HIS-AP":
             CatalogosConList.value.push("SRC-HIS-AP");
+            break;
+          case "SRC-DOC-GEN":
+            CatalogosConList.value.push("SRC-DOC-GEN");
+            break;
+          case "SRC-ACU-CU":
+            CatalogosConList.value.push("SRC-ACU-CU");
             break;
         }
       });

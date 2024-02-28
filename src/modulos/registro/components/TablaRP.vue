@@ -12,7 +12,7 @@
         dense
         debounce="300"
         v-model="filter"
-        placeholder="Search"
+        placeholder="Buscar"
       >
         <template v-slot:append>
           <q-icon name="search" />
@@ -48,6 +48,9 @@ watchEffect(() => {
           x.partido_Id == props.partido_Id &&
           x.tipo_Eleccion_Id == 2
       );
+      list_RP.value.sort(function (a, b) {
+        return a.orden - b.orden;
+      });
       break;
     case "REG":
       list_RP.value = list_Candidatos.value.filter(
@@ -57,6 +60,9 @@ watchEffect(() => {
           x.partido_Id == props.partido_Id &&
           x.tipo_Eleccion_Id == 4
       );
+      list_RP.value.sort(function (a, b) {
+        return a.orden - b.orden;
+      });
       break;
     default:
       break;

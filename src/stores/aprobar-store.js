@@ -4,6 +4,7 @@ import { api } from "src/boot/axios";
 export const useAprobarStore = defineStore("useAprobarStore", {
   state: () => ({
     modal: false,
+    modalAcuerdo: false,
     isEditar: false,
     loading: false,
     list_Aprobacion_Candidaturas: [],
@@ -11,12 +12,18 @@ export const useAprobarStore = defineStore("useAprobarStore", {
     aprobacion: {
       acuerdo: null,
       fecha_Aprobacion: null,
+      archivo_Acuerdo: null,
       detalle: [],
     },
   }),
   actions: {
+    //----------------------------------------------------------------------
     actualizarModal(valor) {
       this.modal = valor;
+    },
+
+    actualizarModalAcuerdo(valor) {
+      this.modalAcuerdo = valor;
     },
 
     updateEditar(valor) {
@@ -29,6 +36,7 @@ export const useAprobarStore = defineStore("useAprobarStore", {
       this.list_Detalle = [];
       this.aprobacion.detalle = [];
     },
+
     //----------------------------------------------------------------------
     //GET ALL APROBAR CANDIDATO
     async loadAprobacionCandidaturas() {
@@ -45,6 +53,7 @@ export const useAprobarStore = defineStore("useAprobarStore", {
             fecha_Aprobacion: aprobacion.fecha_Aprobacion,
             fecha_Registro: aprobacion.fecha_Registro,
             fecha_Aprobacion_Tabla: aprobacion.fecha_Aprobacion_Tabla,
+            acuerdo_Url: aprobacion.acuerdo_Url,
           };
         });
         this.list_Aprobacion_Candidaturas = listAprobados;
@@ -111,6 +120,7 @@ export const useAprobarStore = defineStore("useAprobarStore", {
         };
       }
     },
+
     //----------------------------------------------------------------------
     //GET APROBAR CANDIDATO BY ID
     async loadAprobacionCandidaturaById(id) {
@@ -134,11 +144,50 @@ export const useAprobarStore = defineStore("useAprobarStore", {
 
     //----------------------------------------------------------------------
     //APROBAR CANDIDATO
-    async aprobarCandidatos(id, candidatos) {
+    async aprobarCandidatos(candidatos, tipo_Eleccion_Id) {
       try {
         const resp = await api.post(
-          `/AprobacionCandidaturas/${id}`,
-          candidatos
+          `/AprobacionCandidaturas/${tipo_Eleccion_Id}`,
+          candidatos,
+          {
+            headers: {
+              "Conten-Type": "multipart/form-data",
+            },
+          }
+        );
+        if (resp.status == 200) {
+          const { success, data } = resp.data;
+          if (success === true) {
+            return { success, data };
+          } else {
+            return { success, data };
+          }
+        } else {
+          return {
+            success: false,
+            data: "Ocurrió un error, inténtelo de nuevo. Si el error persiste, contacte a soporte",
+          };
+        }
+      } catch (error) {
+        return {
+          success: false,
+          data: "Ocurrió un error, inténtelo de nuevo. Si el error persiste, contacte a soporte",
+        };
+      }
+    },
+
+    //----------------------------------------------------------------------
+    //SUBIR ACUERDO
+    async subirAcuerdo(aprobacion_Id, acuerdo) {
+      try {
+        const resp = await api.post(
+          `/AprobacionCandidaturas/SetAcuerdo/${aprobacion_Id}`,
+          acuerdo,
+          {
+            headers: {
+              "Conten-Type": "multipart/form-data",
+            },
+          }
         );
         if (resp.status == 200) {
           const { success, data } = resp.data;

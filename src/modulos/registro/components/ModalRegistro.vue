@@ -127,7 +127,7 @@
             >
               <q-select
                 v-model="partido_Id"
-                :options="list_Partidos_Politicos"
+                :options="list_Partidos_Politicos_Todos"
                 label="Partido postulante"
                 hint="Seleccione el partido postulante"
                 lazy-rules
@@ -214,6 +214,7 @@
                     <FormularioDatosGenerales :tabTipo="tabTab" />
                   </q-expansion-item>
                   <q-expansion-item
+                    v-if="candidato.id != null"
                     v-model="expansion2"
                     @show="expansion = false"
                     @hide="expansion = true"
@@ -221,7 +222,7 @@
                     icon="folder_open"
                     label="Documentación Requerida"
                   >
-                    <FormularioDocumentacion :tipo_Id="tipo_Id" />
+                    <FormularioDocumentacion :puesto="0" :tipo_Id="tipo_Id" />
                   </q-expansion-item>
                 </q-list>
               </q-tab-panel>
@@ -252,6 +253,7 @@
                     <FormularioDatosGenerales :tabTipo="tabTab" />
                   </q-expansion-item>
                   <q-expansion-item
+                    v-if="candidato.id != null"
                     v-model="expansion2"
                     @show="expansion = false"
                     @hide="expansion = true"
@@ -259,7 +261,7 @@
                     icon="folder_open"
                     label="Documentación Requerida"
                   >
-                    <FormularioDocumentacion :tipo_Id="tipo_Id" />
+                    <FormularioDocumentacion :puesto="1" :tipo_Id="tipo_Id" />
                   </q-expansion-item>
                 </q-list>
               </q-tab-panel>
@@ -290,6 +292,7 @@
                     <FormularioDatosGenerales :tabTipo="tabTab" />
                   </q-expansion-item>
                   <q-expansion-item
+                    v-if="candidato.id != null"
                     v-model="expansion2"
                     @show="expansion = false"
                     @hide="expansion = true"
@@ -297,7 +300,7 @@
                     icon="folder_open"
                     label="Documentación Requerida"
                   >
-                    <FormularioDocumentacion :tipo_Id="tipo_Id" />
+                    <FormularioDocumentacion :puesto="2" :tipo_Id="tipo_Id" />
                   </q-expansion-item>
                 </q-list>
               </q-tab-panel>
@@ -328,6 +331,7 @@
                     <FormularioDatosGenerales :tabTipo="tabTab" />
                   </q-expansion-item>
                   <q-expansion-item
+                    v-if="candidato.id != null"
                     v-model="expansion2"
                     @show="expansion = false"
                     @hide="expansion = true"
@@ -335,7 +339,7 @@
                     icon="folder_open"
                     label="Documentación Requerida"
                   >
-                    <FormularioDocumentacion :tipo_Id="tipo_Id" />
+                    <FormularioDocumentacion :puesto="3" :tipo_Id="tipo_Id" />
                   </q-expansion-item>
                 </q-list>
               </q-tab-panel>
@@ -354,14 +358,13 @@
               <q-btn
                 label="Cancelar"
                 type="reset"
-                outline
-                color="pink"
+                color="red"
                 @click="actualizarModal(false)"
               />
               <q-btn
                 label="Guardar"
                 type="submit"
-                color="pink"
+                color="secondary"
                 class="q-ml-sm"
               />
             </div>
@@ -405,6 +408,7 @@ const {
   list_Municipios,
   list_Distritos,
   list_Demarcaciones,
+  list_Partidos_Politicos_Todos,
   list_Partidos_Politicos,
   list_Partidos_Politicos_Coalcion,
   list_Coaliciones,
@@ -425,9 +429,6 @@ const expansion = ref(true);
 const expansion2 = ref(false);
 const orden = ref(null);
 const list_Filtro_Partidos = ref(null);
-
-//--------------------------------------------------------------------
-
 const props = defineProps({
   tab: { type: String, required: true },
   tipo_Id: { type: Number, required: true },
@@ -450,11 +451,13 @@ watch(coalicion_Id, async (val) => {
 
 watch(candidato.value, (val) => {
   if (val != null) {
-    cargarDistrito(val);
-    cargarTipoCandidato(val);
-    cargarPartidoPolitico(val);
-    cargarCoalicion(val);
-    cargarMunicipio(val);
+    if (isEditar.value == true) {
+      cargarDistrito(val);
+      cargarTipoCandidato(val);
+      cargarPartidoPolitico(val);
+      cargarCoalicion(val);
+      cargarMunicipio(val);
+    }
     orden.value = val.orden;
     if (val.is_Coalicion == false) {
       partido_Id_prop.value = null;
@@ -479,17 +482,15 @@ watch(list_RP, (val) => {
     if (last != undefined) {
       if (last.orden == 12) {
         $q.dialog({
-          title: "Ya existen 12 candidatos registrados en el partido",
-          message: "Deberá editar si necesita",
+          title:
+            "Ya existen 12 candidatos RP registrados en el partido registrado",
+          message: "Deberá editar si es necesario",
           icon: "Warning",
           persistent: true,
           transitionShow: "scale",
           transitionHide: "scale",
-
-          cancel: {
-            color: "negative",
-            label: "Cerrar",
-          },
+        }).onOk(async () => {
+          candidatoStore.actualizarModal(false);
         });
       } else {
         next = last.orden + 1;
@@ -498,6 +499,12 @@ watch(list_RP, (val) => {
       next = 1;
     }
     orden.value = next;
+  }
+});
+
+watch(cargo_Id, (val) => {
+  if (val == "RP") {
+    configuracionStore.loadPartidosPoliticosRP();
   }
 });
 
@@ -592,13 +599,13 @@ const cargarDemarcacion = (val) => {
 
 const getTitle = () => {
   if (props.tab == "GUB") {
-    return "candidatos a Gubernatura";
+    return "candidaturas a Gubernatura";
   } else if (props.tab == "DIP") {
-    return "candidatos a Diputaciones";
+    return "candidaturas a Diputaciones";
   } else if (props.tab == "PYS") {
-    return "candidatos a Presidencia y Sindicaturas";
+    return "candidaturas a Presidencia y Sindicaturas";
   } else {
-    return "candidatos a Regidurias";
+    return "candidaturas a Regidurias";
   }
 };
 

@@ -19,6 +19,7 @@ export const useConfiguracionStore = defineStore("useConfiguracionStore", {
     list_Distritos: [],
     list_Demarcaciones: [],
     list_Partidos_Politicos: [],
+    list_Partidos_Politicos_Todos: [],
     list_Partidos_Politicos_Coalcion: [],
     list_Coaliciones: [],
     list_Requisitos: [],
@@ -131,6 +132,39 @@ export const useConfiguracionStore = defineStore("useConfiguracionStore", {
 
     //----------------------------------------------------------------------
     //PARTIDOS POLITICOS
+    async loadPartidosPoliticosTodos() {
+      try {
+        let resp = await api.get("/Partidos_Politicos");
+        let { data } = resp.data;
+        let listPartidos = data.map((partido) => {
+          return {
+            value: partido.id,
+            label: partido.siglas,
+            nombre: partido.nombre,
+            siglas: partido.siglas,
+            logo_URL: partido.logo_URL,
+            independiente: partido.independiente,
+            prioridad: partido.prioridad,
+            pantone_Fondo: partido.pantone_Fondo,
+            pantone_Letra: partido.pantone_Letra,
+            coalicion_Id: partido.coalicion_Id,
+            coalicion: partido.coalicion,
+            is_Coalicion: partido.is_Coalicion,
+          };
+        });
+        listPartidos.splice(0, 0, {
+          value: 0,
+          label: "Todos",
+        });
+        this.list_Partidos_Politicos_Todos = listPartidos;
+      } catch (error) {
+        return {
+          success: false,
+          data: "Ocurrió un error, inténtelo de nuevo. Si el error persiste, contacte a soporte",
+        };
+      }
+    },
+
     async loadPartidosPoliticos() {
       try {
         let resp = await api.get("/Partidos_Politicos");
@@ -138,6 +172,35 @@ export const useConfiguracionStore = defineStore("useConfiguracionStore", {
         let listPartidosFiltro = [];
         listPartidosFiltro = data.filter((x) => x.is_Coalicion == false);
         let listPartidos = listPartidosFiltro.map((partido) => {
+          return {
+            value: partido.id,
+            label: partido.siglas,
+            nombre: partido.nombre,
+            siglas: partido.siglas,
+            logo_URL: partido.logo_URL,
+            independiente: partido.independiente,
+            prioridad: partido.prioridad,
+            pantone_Fondo: partido.pantone_Fondo,
+            pantone_Letra: partido.pantone_Letra,
+            coalicion_Id: partido.coalicion_Id,
+            coalicion: partido.coalicion,
+            is_Coalicion: partido.is_Coalicion,
+          };
+        });
+        this.list_Partidos_Politicos = listPartidos;
+      } catch (error) {
+        return {
+          success: false,
+          data: "Ocurrió un error, inténtelo de nuevo. Si el error persiste, contacte a soporte",
+        };
+      }
+    },
+
+    async loadPartidosPoliticosRP() {
+      try {
+        let resp = await api.get("/Partidos_Politicos");
+        let { data } = resp.data;
+        let listPartidos = data.map((partido) => {
           return {
             value: partido.id,
             label: partido.siglas,
@@ -228,6 +291,10 @@ export const useConfiguracionStore = defineStore("useConfiguracionStore", {
             label: coalicion.nombre,
           };
         });
+        listCoaliciones.splice(0, 0, {
+          value: 0,
+          label: "Todos",
+        });
         this.list_Coaliciones = listCoaliciones;
       } catch (error) {
         return {
@@ -252,6 +319,7 @@ export const useConfiguracionStore = defineStore("useConfiguracionStore", {
             genero: requisito.genero,
             activo: requisito.activo,
             archivo: requisito.archivo,
+            url: null,
           };
         });
         this.list_Requisitos = listRequisitos;

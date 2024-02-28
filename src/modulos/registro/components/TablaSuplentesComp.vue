@@ -65,13 +65,17 @@
                 <q-btn
                   flat
                   round
-                  :color="props.row.estatus == null ? 'red' : 'green'"
-                  :icon="props.row.estatus == null ? 'close' : 'done'"
+                  :color="
+                    props.row.estatus != 'Registro Aprobado' ? 'red' : 'green'
+                  "
+                  :icon="
+                    props.row.estatus != 'Registro Aprobado' ? 'close' : 'done'
+                  "
                 >
                 </q-btn>
               </div>
               <div v-else-if="col.name === 'partido'">
-                <q-avatar>
+                <q-avatar square>
                   <img :src="props.row.url_Logo_Partido" alt="" />
                 </q-avatar>
               </div>

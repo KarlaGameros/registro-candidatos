@@ -8,6 +8,8 @@
           label="Fotografía"
           counter
           accept=".jpg, image/*"
+          max-file-size="716800"
+          @rejected="onRejected"
         >
           <template v-slot:prepend>
             <q-avatar v-if="isEditar">
@@ -206,7 +208,7 @@
             : 'col-lg-6 col-md-6 col-sm-6 col-xs-12'
         "
       >
-        <q-select
+        <!-- <q-select
           label="Teléfono"
           hint="Da enter para agregar teléfono"
           v-model="candidatoBase.telefono"
@@ -221,7 +223,17 @@
           <template v-slot:prepend>
             <q-icon name="phone" color="pink" />
           </template>
-        </q-select>
+        </q-select> -->
+        <q-input
+          v-model="candidatoBase.telefono"
+          label="Phone"
+          mask="### - ### - ####"
+          hint="Número telefonico"
+        >
+          <template v-slot:prepend>
+            <q-icon name="phone" color="pink" />
+          </template>
+        </q-input>
       </div>
       <div v-if="isExtension" class="col-lg-1 col-md-1 col-sm-1 col-xs-12">
         <q-input
@@ -278,11 +290,13 @@
 
 <script setup>
 import { storeToRefs } from "pinia";
+import { useQuasar } from "quasar";
 import { useCandidatosStore } from "src/stores/candidatos-store";
 import { ref, defineProps, watch, watchEffect } from "vue";
 
 //--------------------------------------------------------------------
 
+const $q = useQuasar();
 const candidatoStore = useCandidatosStore();
 const {
   propietario_1,
@@ -300,7 +314,6 @@ const telefonos = ref();
 const props = defineProps({
   tabTipo: { type: String, required: true },
 });
-const edad = ref("");
 const isExtension = ref(false);
 const num_Extension = ref(null);
 const candidatoBase = ref(null);
@@ -362,6 +375,7 @@ watchEffect(() => {
       propietario_1.value.grupo_Vulnerable_4 =
         candidatoBase.value.grupo_Vulnerable_4;
       propietario_1.value.url_Foto = candidatoBase.value.url_Foto;
+      propietario_1.value.edad = candidatoBase.value.edad;
       break;
     case "suplente":
       suplente_1.value.nombres = candidatoBase.value.nombres;
@@ -390,6 +404,7 @@ watchEffect(() => {
       suplente_1.value.grupo_Vulnerable_4 =
         candidatoBase.value.grupo_Vulnerable_4;
       suplente_1.value.url_Foto = candidatoBase.value.url_Foto;
+      suplente_1.value.edad = candidatoBase.value.edad;
       break;
     case "sindico_propietario":
       propietario_2.value.nombres = candidatoBase.value.nombres;
@@ -422,6 +437,7 @@ watchEffect(() => {
       propietario_2.value.grupo_Vulnerable_4 =
         candidatoBase.value.grupo_Vulnerable_4;
       propietario_2.value.url_Foto = candidatoBase.value.url_Foto;
+      propietario_2.value.edad = candidatoBase.value.edad;
       break;
     case "sindico_suplente":
       suplente_2.value.nombres = candidatoBase.value.nombres;
@@ -450,6 +466,7 @@ watchEffect(() => {
       suplente_2.value.grupo_Vulnerable_4 =
         candidatoBase.value.grupo_Vulnerable_4;
       suplente_2.value.url_Foto = candidatoBase.value.url_Foto;
+      suplente_2.value.edad = candidatoBase.value.edad;
       break;
     default:
       break;
@@ -524,39 +541,42 @@ watch(telefonos, (val) => {
 
 //--------------------------------------------------------------------
 
+const onRejected = () => {
+  $q.notify({
+    type: "negative",
+    message: "El tamaño de la imagen excede el limite",
+  });
+};
+
 const calcularEdad = (fecha_Nacimiento, tipo) => {
   if (fecha_Nacimiento != null) {
-    if (fecha_Nacimiento != null) {
-      var fechaNace = new Date(fecha_Nacimiento);
-      var fechaActual = new Date();
+    var fechaNace = new Date(fecha_Nacimiento);
+    var fechaActual = new Date();
 
-      var mes = fechaActual.getMonth();
-      var dia = fechaActual.getDate();
-      var año = fechaActual.getFullYear();
+    var mes = fechaActual.getMonth();
+    var dia = fechaActual.getDate();
+    var año = fechaActual.getFullYear();
 
-      fechaActual.setDate(dia);
-      fechaActual.setMonth(mes);
-      fechaActual.setFullYear(año);
+    fechaActual.setDate(dia);
+    fechaActual.setMonth(mes);
+    fechaActual.setFullYear(año);
 
-      if (tipo == "propietario_1") {
-        propietario_1.value.edad = Math.floor(
-          (fechaActual - fechaNace) / (1000 * 60 * 60 * 24) / 365
-        );
-      } else if (tipo == "propietario_2") {
-        propietario_2.value.edad = Math.floor(
-          (fechaActual - fechaNace) / (1000 * 60 * 60 * 24) / 365
-        );
-      } else if (tipo == "suplente_1") {
-        suplente_1.value.edad = Math.floor(
-          (fechaActual - fechaNace) / (1000 * 60 * 60 * 24) / 365
-        );
-      } else if (tipo == "suplente_2") {
-        suplente_2.value.edad = Math.floor(
-          (fechaActual - fechaNace) / (1000 * 60 * 60 * 24) / 365
-        );
-      }
-
-      return edad;
+    if (tipo == "propietario_1") {
+      propietario_1.value.edad = Math.floor(
+        (fechaActual - fechaNace) / (1000 * 60 * 60 * 24) / 365
+      );
+    } else if (tipo == "propietario_2") {
+      propietario_2.value.edad = Math.floor(
+        (fechaActual - fechaNace) / (1000 * 60 * 60 * 24) / 365
+      );
+    } else if (tipo == "suplente_1") {
+      suplente_1.value.edad = Math.floor(
+        (fechaActual - fechaNace) / (1000 * 60 * 60 * 24) / 365
+      );
+    } else if (tipo == "suplente_2") {
+      suplente_2.value.edad = Math.floor(
+        (fechaActual - fechaNace) / (1000 * 60 * 60 * 24) / 365
+      );
     }
   }
 };
@@ -569,5 +589,3 @@ const optionsDate = (fecha) => {
   return fecha <= `${year}/${month}/${day}`;
 };
 </script>
-
-<style scope></style>

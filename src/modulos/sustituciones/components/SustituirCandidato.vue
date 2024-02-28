@@ -150,7 +150,7 @@
       <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12 q-pr-xs">
         <q-input
           readonly
-          v-model.number="edad"
+          v-model.number="candidatoBase.Edad_Nuevo"
           type="number"
           label="Edad"
           hint="Ingrese su edad"
@@ -196,7 +196,7 @@
             : 'col-lg-6 col-md-6 col-sm-6 col-xs-12'
         "
       >
-        <q-select
+        <!-- <q-select
           label="Teléfono"
           hint="Da enter para agregar teléfono"
           v-model="telefonos"
@@ -211,7 +211,17 @@
           <template v-slot:prepend>
             <q-icon name="phone" color="pink" />
           </template>
-        </q-select>
+        </q-select> -->
+        <q-input
+          v-model="candidatoBase.telefono"
+          label="Phone"
+          mask="### - ### - ####"
+          hint="Número telefonico"
+        >
+          <template v-slot:prepend>
+            <q-icon name="phone" color="pink" />
+          </template>
+        </q-input>
       </div>
       <!-- <div v-if="isExtension" class="col-lg-1 col-md-1 col-sm-1 col-xs-12">
         <q-input
@@ -489,22 +499,36 @@ watch(telefonos, (val) => {
 
 const calcularEdad = (fecha_Nacimiento, tipo) => {
   if (fecha_Nacimiento != null) {
-    if (fecha_Nacimiento != null) {
-      var fechaNace = new Date(fecha_Nacimiento);
-      var fechaActual = new Date();
+    var fechaNace = new Date(fecha_Nacimiento);
+    var fechaActual = new Date();
 
-      var mes = fechaActual.getMonth();
-      var dia = fechaActual.getDate();
-      var año = fechaActual.getFullYear();
+    var mes = fechaActual.getMonth();
+    var dia = fechaActual.getDate();
+    var año = fechaActual.getFullYear();
 
-      fechaActual.setDate(dia);
-      fechaActual.setMonth(mes);
-      fechaActual.setFullYear(año);
-      edad.value = Math.floor(
+    fechaActual.setDate(dia);
+    fechaActual.setMonth(mes);
+    fechaActual.setFullYear(año);
+
+    if (tipo == "propietario_1") {
+      sust_propietario_1.value.Edad_Nuevo = Math.floor(
         (fechaActual - fechaNace) / (1000 * 60 * 60 * 24) / 365
       );
-      return edad;
+    } else if (tipo == "propietario_2") {
+      sust_propietario_2.value.Edad_Nuevo = Math.floor(
+        (fechaActual - fechaNace) / (1000 * 60 * 60 * 24) / 365
+      );
+    } else if (tipo == "suplente_1") {
+      sust_suplente_1.value.Edad_Nuevo = Math.floor(
+        (fechaActual - fechaNace) / (1000 * 60 * 60 * 24) / 365
+      );
+    } else if (tipo == "suplente_2") {
+      sust_suplente_2.value.Edad_Nuevo = Math.floor(
+        (fechaActual - fechaNace) / (1000 * 60 * 60 * 24) / 365
+      );
     }
+
+    return edad;
   }
 };
 
