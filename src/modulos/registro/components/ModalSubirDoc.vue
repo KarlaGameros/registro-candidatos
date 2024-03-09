@@ -30,6 +30,8 @@
               accept=".jpg, image/*, .pdf"
               color="pink"
               lazy-rules
+              max-file-size="716800"
+              @rejected="onRejected"
               :rules="[(val) => !!val || 'El documento es requerido']"
             >
               <template v-slot:prepend>
@@ -108,6 +110,13 @@ const props = defineProps({
 const actualizarModal = (valor) => {
   candidatoStore.actualizarModalDocumento(valor);
   requisito_File.value = null;
+};
+
+const onRejected = () => {
+  $q.notify({
+    type: "negative",
+    message: "El tamaño del documento es muy lago",
+  });
 };
 
 const onSubmit = async () => {

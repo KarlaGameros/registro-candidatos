@@ -214,7 +214,7 @@
         </q-select> -->
         <q-input
           v-model="candidatoBase.telefono"
-          label="Phone"
+          label="Teléfono"
           mask="### - ### - ####"
           hint="Número telefonico"
         >
@@ -281,7 +281,7 @@
 import { useQuasar } from "quasar";
 import { storeToRefs } from "pinia";
 import { useCandidatosStore } from "src/stores/candidatos-store";
-import { ref, defineProps, watch, watchEffect } from "vue";
+import { ref, defineProps, watch, watchEffect, onMounted } from "vue";
 import { useSustituirStore } from "src/stores/sustituir-store";
 import { useConfiguracionStore } from "src/stores/configuracion-store";
 
@@ -291,7 +291,7 @@ const $q = useQuasar();
 const candidatoStore = useCandidatosStore();
 const sustituirStore = useSustituirStore();
 const configuracionStore = useConfiguracionStore();
-const { candidato, candidato2 } = storeToRefs(candidatoStore);
+const { candidato, candidato2, list_Suplentes } = storeToRefs(candidatoStore);
 const {
   sustitucion,
   sust_propietario_1,
@@ -314,17 +314,55 @@ const list_Filtro_Partidos = ref([]);
 
 //--------------------------------------------------------------------
 
+onMounted(async () => {
+  if (list_Suplentes.value.length > 0) {
+    if (list_Suplentes.value[0].is_Coalicion == false) {
+      if (list_Suplentes.value[0].tipo_Candidato == "RP") {
+        await configuracionStore.loadPartidosPoliticosRP();
+      } else {
+        await configuracionStore.loadPartidosPoliticos();
+      }
+      list_Filtro_Partidos.value = list_Partidos_Politicos.value;
+    } else {
+      await configuracionStore.loadPartidosPoliticosCoalicion();
+      list_Filtro_Partidos.value =
+        list_Partidos_Politicos_Coalcion.value.filter(
+          (x) => x.coalicion_Id == list_Suplentes.value[0].coalicion_Id
+        );
+    }
+  }
+});
+
+watch(list_Suplentes, async (val) => {
+  if (val.length > 0) {
+    if (val[0].is_Coalicion == false) {
+      if (val[0].tipo_Candidato == "RP") {
+        await configuracionStore.loadPartidosPoliticosRP();
+      } else {
+        await configuracionStore.loadPartidosPoliticos();
+      }
+      list_Filtro_Partidos.value = list_Partidos_Politicos.value;
+    } else {
+      await configuracionStore.loadPartidosPoliticosCoalicion();
+      list_Filtro_Partidos.value =
+        list_Partidos_Politicos_Coalcion.value.filter(
+          (x) => x.coalicion_Id == val[0].coalicion_Id
+        );
+    }
+  }
+});
+
 switch (props.tabTipo) {
-  case "propietario":
+  case "Propietario":
     candidatoBase.value = sust_propietario_1.value;
     break;
-  case "suplente":
+  case "Suplente":
     candidatoBase.value = sust_suplente_1.value;
     break;
-  case "sindico_propietario":
+  case "Propietario sindico":
     candidatoBase.value = sust_propietario_2.value;
     break;
-  case "sindico_suplente":
+  case "Suplente sindico":
     candidatoBase.value = sust_suplente_2.value;
     break;
 }
@@ -333,7 +371,7 @@ switch (props.tabTipo) {
 
 watchEffect(() => {
   switch (props.tabTipo) {
-    case "propietario":
+    case "Propietario":
       sust_propietario_1.value.Nombres_Nuevo =
         candidatoBase.value.Nombres_Nuevo;
       sust_propietario_1.value.Apellido_Paterno_Nuevo =
@@ -360,8 +398,9 @@ watchEffect(() => {
       sust_propietario_1.value.Partido_Id_Nuevo =
         candidatoBase.value.Partido_Id_Nuevo;
       sust_propietario_1.value.Foto_Nuevo = candidatoBase.value.Foto_Nuevo;
+      sust_propietario_1.value.Edad_Nuevo = candidatoBase.value.Edad_Nuevo;
       break;
-    case "suplente":
+    case "Suplente":
       sust_suplente_1.value.Nombres_Nuevo = candidatoBase.value.Nombres_Nuevo;
       sust_suplente_1.value.Apellido_Paterno_Nuevo =
         sust_suplente_1.value.Apellido_Paterno_Nuevo;
@@ -386,8 +425,9 @@ watchEffect(() => {
       sust_suplente_1.value.Partido_Id_Nuevo =
         candidatoBase.value.Partido_Id_Nuevo;
       sust_suplente_1.value.Foto_Nuevo = candidatoBase.value.Foto_Nuevo;
+      sust_suplente_1.value.Edad_Nuevo = candidatoBase.value.Edad_Nuevo;
       break;
-    case "sindico_propietario":
+    case "Propietario sindico":
       sust_propietario_2.value.Nombres_Nuevo =
         candidatoBase.value.Nombres_Nuevo;
       sust_propietario_2.value.Apellido_Paterno_Nuevo =
@@ -414,8 +454,9 @@ watchEffect(() => {
       sust_propietario_2.value.Partido_Id_Nuevo =
         candidatoBase.value.Partido_Id_Nuevo;
       sust_propietario_2.value.Foto_Nuevo = candidatoBase.value.Foto_Nuevo;
+      sust_propietario_2.value.Edad_Nuevo = candidatoBase.value.Edad_Nuevo;
       break;
-    case "sindico_suplente":
+    case "Suplente sindico":
       sust_suplente_2.value.Nombres_Nuevo = candidatoBase.value.Nombres_Nuevo;
       sust_suplente_2.value.Apellido_Paterno_Nuevo =
         sust_suplente_2.value.Apellido_Paterno_Nuevo;
@@ -440,6 +481,7 @@ watchEffect(() => {
       sust_suplente_2.value.Partido_Id_Nuevo =
         candidatoBase.value.Partido_Id_Nuevo;
       sust_suplente_2.value.Foto_Nuevo = candidatoBase.value.Foto_Nuevo;
+      sust_suplente_2.value.Edad_Nuevo = candidatoBase.value.Edad_Nuevo;
       break;
   }
 });
@@ -468,14 +510,14 @@ watch(sust_suplente_2.value, (val) => {
   }
 });
 
-watch(candidato2.value, (val) => {
+watch(candidato2.value, async (val) => {
   if (val.is_Coalicion == true) {
-    configuracionStore.loadPartidosPoliticosCoalicion();
+    await configuracionStore.loadPartidosPoliticosCoalicion();
     list_Filtro_Partidos.value = list_Partidos_Politicos_Coalcion.value.filter(
       (x) => x.coalicion_Id == val.coalicion_Id
     );
   } else {
-    configuracionStore.loadPartidosPoliticos();
+    await configuracionStore.loadPartidosPoliticosRP();
     list_Filtro_Partidos.value = list_Partidos_Politicos.value;
   }
 });

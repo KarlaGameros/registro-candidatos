@@ -93,7 +93,11 @@ export const useGeneroStore = defineStore("useGeneroStore", {
           `/Tipos_Eleccion_Cumplimiento/GetDocumentos/${candidato_Id}/${puesto}`
         );
         let { data } = resp.data;
-        this.list_Documentacion_Genero = data.map((requisito) => {
+        let requisitos_Genero = [];
+        requisitos_Genero = data.filter(
+          (x) => x.genero == true && x.activo == true
+        );
+        this.list_Documentacion_Genero = requisitos_Genero.map((requisito) => {
           return {
             id: requisito.id,
             requisito_Id: requisito.requisito_Id,
@@ -176,7 +180,34 @@ export const useGeneroStore = defineStore("useGeneroStore", {
         });
         if (resp.status == 200) {
           let blob = new window.Blob([resp.data], {
-            type: "application/zip",
+            type: "application/xlsx",
+          });
+          this.documentoExcel = window.URL.createObjectURL(blob);
+          return { success: true };
+        } else {
+          return {
+            success: false,
+            data: "Error al descargar archivo, intentelo de nuevo",
+          };
+        }
+      } catch (error) {
+        return {
+          success: false,
+          data: "Ocurrio un error, intentelo de nuevo. Si el error persiste contacte a soporte",
+        };
+      }
+    },
+
+    //-----------------------------------------------------------
+    async downloadExcelPrerrogativas() {
+      try {
+        this.documentoExcel = "";
+        const resp = await api.get("/Candidatos/Excel_Prerrogativas", {
+          responseType: "blob",
+        });
+        if (resp.status == 200) {
+          let blob = new window.Blob([resp.data], {
+            type: "application/xlsx",
           });
           this.documentoExcel = window.URL.createObjectURL(blob);
           return { success: true };

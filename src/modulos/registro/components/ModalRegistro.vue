@@ -101,7 +101,7 @@
               />
             </div>
             <div
-              v-if="candidato.is_Coalicion"
+              v-if="candidato.is_Coalicion == true"
               :class="
                 props.tab == 'PYS'
                   ? 'col-lg-5 col-md-5 col-sm-5 col-xs-12 q-pr-xs'
@@ -127,7 +127,7 @@
             >
               <q-select
                 v-model="partido_Id"
-                :options="list_Partidos_Politicos_Todos"
+                :options="list_Partidos_Politicos"
                 label="Partido postulante"
                 hint="Seleccione el partido postulante"
                 lazy-rules
@@ -380,7 +380,7 @@ import { useQuasar } from "quasar";
 import { storeToRefs } from "pinia";
 import { useCandidatosStore } from "src/stores/candidatos-store";
 import { useConfiguracionStore } from "src/stores/configuracion-store";
-import { ref, defineProps, watch } from "vue";
+import { ref, defineProps, watch, onMounted } from "vue";
 import FormularioDatosGenerales from "./FormularioDatosGenerales.vue";
 import FormularioDocumentacion from "./FormularioDocumentacion.vue";
 import TablaRP from "./TablaRP.vue";
@@ -408,7 +408,6 @@ const {
   list_Municipios,
   list_Distritos,
   list_Demarcaciones,
-  list_Partidos_Politicos_Todos,
   list_Partidos_Politicos,
   list_Partidos_Politicos_Coalcion,
   list_Coaliciones,
@@ -476,11 +475,11 @@ watch(municipio_Id, (val) => {
 });
 
 watch(list_RP, (val) => {
-  if (val != null && isEditar.value == false) {
+  if (val.length > 0 && isEditar.value == false) {
     let last = val[val.length - 1];
     let next = null;
     if (last != undefined) {
-      if (last.orden == 12) {
+      if (last.orden == 12 && props.tab == "DIP") {
         $q.dialog({
           title:
             "Ya existen 12 candidatos RP registrados en el partido registrado",
@@ -490,6 +489,7 @@ watch(list_RP, (val) => {
           transitionShow: "scale",
           transitionHide: "scale",
         }).onOk(async () => {
+          limpiar();
           candidatoStore.actualizarModal(false);
         });
       } else {
@@ -502,9 +502,13 @@ watch(list_RP, (val) => {
   }
 });
 
-watch(cargo_Id, (val) => {
-  if (val == "RP") {
-    configuracionStore.loadPartidosPoliticosRP();
+watch(cargo_Id, async (val) => {
+  if (val != null) {
+    if (val == "RP") {
+      candidatoStore.initIsCoalicion();
+    }
+    await configuracionStore.loadCoaliciones();
+    await configuracionStore.loadPartidosPoliticosRP();
   }
 });
 
@@ -529,6 +533,7 @@ const cargarTipoCandidato = (val) => {
 };
 
 const cargarPartidoPolitico = async (val) => {
+  await configuracionStore.loadPartidosPoliticosRP();
   if (val.is_Coalicion == true) {
     await configuracionStore.loadPartidosPoliticosCoalicion();
     list_Partidos_Politicos_Coalcion.value.filter(
@@ -612,12 +617,12 @@ const getTitle = () => {
 const actualizarModal = (valor) => {
   $q.loading.show();
   limpiar();
+  candidatoStore.initCandidato();
   candidatoStore.actualizarModal(valor);
   $q.loading.hide();
 };
 
 const limpiar = () => {
-  candidatoStore.initCandidato();
   cargo_Id.value = null;
   distrito_Id.value = null;
   municipio_Id.value = null;

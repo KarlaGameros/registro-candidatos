@@ -49,17 +49,13 @@
 <script setup>
 import { storeToRefs } from "pinia";
 import { useQuasar } from "quasar";
-import { useCandidatosStore } from "src/stores/candidatos-store";
 import { useGeneroStore } from "src/stores/genero-store";
 
 //-----------------------------------------------------------------
 
 const $q = useQuasar();
 const generoStore = useGeneroStore();
-const candidatosStore = useCandidatosStore();
-const { modal, documento, list_Documentacion_Genero } =
-  storeToRefs(generoStore);
-const { candidato } = storeToRefs(candidatosStore);
+const { modal, list_Documentacion_Genero } = storeToRefs(generoStore);
 
 //-----------------------------------------------------------------
 

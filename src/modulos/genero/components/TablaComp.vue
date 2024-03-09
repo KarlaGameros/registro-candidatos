@@ -98,7 +98,7 @@
                     >
                       <q-tooltip>Ver documentación</q-tooltip>
                     </q-btn>
-                    <q-btn
+                    <!-- <q-btn
                       flat
                       round
                       color="pink-5"
@@ -106,24 +106,16 @@
                       @click="verDetalle(props.row)"
                     >
                       <q-tooltip>Ver más</q-tooltip>
-                    </q-btn>
+                    </q-btn> -->
                   </div>
-                  <div v-else-if="col.name === 'estatus'">
-                    <q-btn
+                  <div v-else-if="col.name === 'estatus_Aprobado'">
+                    <q-icon
+                      size="sm"
                       flat
                       round
-                      :color="
-                        props.row.estatus != 'Registro Aprobado'
-                          ? 'red'
-                          : 'green'
-                      "
-                      :icon="
-                        props.row.estatus != 'Registro Aprobado'
-                          ? 'close'
-                          : 'done'
-                      "
-                    >
-                    </q-btn>
+                      :color="col.value != true ? 'red' : 'green'"
+                      :name="col.value != true ? 'close' : 'done'"
+                    />
                   </div>
                   <div v-else-if="col.name === 'logo_Coalicion'">
                     <q-avatar
@@ -166,16 +158,13 @@ const $q = useQuasar();
 const generoStore = useGeneroStore();
 const configuracionStore = useConfiguracionStore();
 const candidatosStore = useCandidatosStore();
-const { list_Candidatos_By_Eleccion } = storeToRefs(candidatosStore);
 const { tipo_Elecciones, list_Partidos_Politicos_Todos, list_Coaliciones } =
   storeToRefs(configuracionStore);
-const { list_Documentacion_Genero, list_Candidatos_Genero } =
-  storeToRefs(generoStore);
-const tab_Eleccion = ref("DIP");
-const tipo_Eleccion_Id = ref(2);
+const { list_Candidatos_Genero } = storeToRefs(generoStore);
+const tab_Eleccion = ref(null);
+const tipo_Eleccion_Id = ref(null);
 const visisble_columns = ref([]);
 const list_Candidatos_Filtro = ref([]);
-const filtro = ref(null);
 const coalicion_Id = ref(null);
 const partido_Id = ref(null);
 const list_Filtro_Partidos = ref([]);
@@ -184,21 +173,15 @@ const cargo_Id = ref(null);
 
 //-----------------------------------------------------------
 
-onBeforeMount(() => {
+onBeforeMount(async () => {
+  await configuracionStore.loadTipoElecciones();
   cargarData();
 });
 
 //-----------------------------------------------------------
 
-watch(list_Candidatos_Genero, (val) => {
-  if (val.length > 0) {
-    cargarColumnas(tab_Eleccion.value);
-  }
-});
-
 watch(tab_Eleccion, (val) => {
   if (val != null) {
-    cargarColumnas(val);
     cargarData();
   }
 });
@@ -206,6 +189,13 @@ watch(tab_Eleccion, (val) => {
 watch(coalicion_Id, (val) => {
   if (val != null) {
     partido_Id.value = { value: 0, label: "Todos" };
+  }
+});
+
+watch(tipo_Elecciones, (val) => {
+  if (val.length > 0) {
+    tab_Eleccion.value = val[0].siglas;
+    tipo_Eleccion_Id.value = val[0].id;
   }
 });
 
@@ -220,10 +210,10 @@ const cargarData = async () => {
     message: "Espere un momento porfavor...",
     messageColor: "black",
   });
-  await configuracionStore.loadTipoElecciones();
   await generoStore.loadCandidatosGenero(tipo_Eleccion_Id.value);
   await configuracionStore.loadCoaliciones();
   await configuracionStore.loadPartidosPoliticosTodos();
+  cargarColumnas(tab_Eleccion.value);
   limpiarFiltros();
   $q.loading.hide();
 };
@@ -250,7 +240,7 @@ const cargarColumnas = (tab_Eleccion) => {
       visisble_columns.value = [
         "nombre_Completo",
         "candidatura",
-        "estatus",
+        "estatus_Aprobado",
         "tipo_Candidato",
         "sexo",
         "edad",
@@ -263,7 +253,7 @@ const cargarColumnas = (tab_Eleccion) => {
       visisble_columns.value = [
         "nombre_Completo",
         "candidatura",
-        "estatus",
+        "estatus_Aprobado",
         "tipo_Candidato",
         "sexo",
         "edad",
@@ -278,7 +268,7 @@ const cargarColumnas = (tab_Eleccion) => {
       visisble_columns.value = [
         "nombre_Completo",
         "candidatura",
-        "estatus",
+        "estatus_Aprobado",
         "tipo_Candidato",
         "sexo",
         "edad",
@@ -292,7 +282,7 @@ const cargarColumnas = (tab_Eleccion) => {
       visisble_columns.value = [
         "nombre_Completo",
         "candidatura",
-        "estatus",
+        "estatus_Aprobado",
         "tipo_Candidato",
         "sexo",
         "edad",
@@ -331,10 +321,10 @@ const columns = [
     sortable: true,
   },
   {
-    name: "estatus",
+    name: "estatus_Aprobado",
     align: "center",
     label: "Aprobado",
-    field: "estatus",
+    field: "estatus_Aprobado",
     sortable: true,
   },
   {

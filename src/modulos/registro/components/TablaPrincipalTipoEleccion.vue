@@ -40,9 +40,12 @@
               :filter="filter"
               class="my-sticky-last-column-table"
               v-model:pagination="pagination"
-              color="pink"
+              color="green"
             >
               <template v-slot:top-left>
+                <div class="text-center">
+                  <q-checkbox color="green" v-model="selected" />
+                </div>
                 <q-btn
                   v-if="list_Candidatos_Filtrados.length > 0"
                   type="button"
@@ -70,7 +73,7 @@
                   color="pink"
                   class="q-pl-md"
                   v-model="coalicion_Id"
-                  :options="list_Coaliciones"
+                  :options="list_Coaliciones_Filtro"
                   label="Selecciona coalición"
                   hint="Filtrar por coalición"
                   style="width: 260px"
@@ -272,7 +275,8 @@
                       </q-item>
                     </div>
                     <div v-else-if="col.name === 'estatus'">
-                      <q-btn
+                      <q-icon
+                        size="sm"
                         flat
                         round
                         :color="
@@ -280,13 +284,12 @@
                             ? 'red'
                             : 'green'
                         "
-                        :icon="
+                        :name="
                           props.row.estatus != 'Registro Aprobado'
                             ? 'close'
                             : 'done'
                         "
-                      >
-                      </q-btn>
+                      />
                     </div>
                     <div v-else-if="col.name === 'logo_Coalicion'">
                       <q-avatar
@@ -370,13 +373,16 @@ const $q = useQuasar();
 const candidatoStore = useCandidatosStore();
 const configuracionStore = useConfiguracionStore();
 const aprobarStore = useAprobarStore();
-const { tipo_Elecciones, list_Partidos_Politicos_Todos, list_Coaliciones } =
-  storeToRefs(configuracionStore);
+const {
+  tipo_Elecciones,
+  list_Partidos_Politicos_Todos,
+  list_Coaliciones_Filtro,
+} = storeToRefs(configuracionStore);
 const { list_Candidatos } = storeToRefs(candidatoStore);
 const { list_Detalle } = storeToRefs(aprobarStore);
 const visisble_columns = ref([]);
 const expandedRow = ref(null);
-const tab = ref("DIP");
+const tab = ref(null);
 const list_Candidatos_Filtro = ref([]);
 const list_Candidatos_Filtrados = ref([]);
 const listCandidatos = ref([]);
@@ -385,12 +391,12 @@ const coalicion_Id = ref(null);
 const list_Filtro_Partidos = ref([]);
 const list_Cargo = ref(["Todos", "MR", "RP"]);
 const cargo_Id = ref(null);
+const selected = ref(false);
 
 //--------------------------------------------------------------------
 
-onBeforeMount(async () => {
-  await candidatoStore.loadCandidatos();
-  await configuracionStore.loadPartidosPoliticosTodos();
+onBeforeMount(() => {
+  cargarData();
 });
 
 //--------------------------------------------------------------------
@@ -407,12 +413,36 @@ watch(tab, (val) => {
     cargarColumnas(val);
     candidatoStore.initCandidato();
     expandedRow.value = null;
+    selected.value = false;
   }
 });
 
-watch(list_Candidatos, (val) => {
-  if (val != null) {
-    cargarData();
+watch(selected, (val) => {
+  if (val == true) {
+    list_Candidatos_Filtrados.value.forEach((element) => {
+      if (element.estatus != "Registro Aprobado") {
+        element.aprobar = true;
+        list_Detalle.value.push({
+          candidato_Id: element.id,
+          candidato: element.nombre_Completo_Propietario,
+          partido_Logo: element.url_Logo_Partido_Propietario,
+          coalicion_Logo: element.url_Logo_Coalicion,
+        });
+      }
+    });
+  } else {
+    list_Candidatos_Filtrados.value.forEach((element) => {
+      if (element.estatus != "Registro Aprobado") {
+        element.aprobar = false;
+      }
+    });
+    list_Detalle.value = [];
+  }
+});
+
+watch(tipo_Elecciones, (val) => {
+  if (val.length > 0) {
+    tab.value = val[0].siglas;
   }
 });
 
@@ -491,27 +521,37 @@ const cargarData = async () => {
     message: "Espere un momento porfavor...",
     messageColor: "black",
   });
+  await candidatoStore.loadCandidatos();
+  await configuracionStore.loadPartidosPoliticosTodos();
   await configuracionStore.loadTipoElecciones();
   await configuracionStore.loadDistritos();
   await configuracionStore.loadPartidosPoliticos();
   await configuracionStore.loadCoaliciones();
+  await configuracionStore.loadCoalicionesFiltro();
   await configuracionStore.loadMunicipios();
-  await cargarColumnas(tab.value);
+  cargarColumnas(tab.value);
   limpiarFiltros();
   $q.loading.hide();
 };
 
 const updateSelection = (row) => {
-  const isSelected = listCandidatos.value.includes(row);
-  if (!isSelected) {
-    listCandidatos.value.push(row);
+  const isSelected = list_Detalle.value.find((x) => x.candidato_Id == row.id);
+  if (isSelected == undefined) {
+    list_Detalle.value.push({
+      candidato_Id: row.id,
+      candidato: row.nombre_Completo_Propietario,
+      partido_Logo: row.url_Logo_Partido_Propietario,
+      coalicion_Logo: row.url_Logo_Coalicion,
+    });
   } else {
-    const index = listCandidatos.value.indexOf(row.id);
-    listCandidatos.value.splice(index, 1);
+    var index = list_Detalle.value
+      .map((producto) => producto.candidato_Id)
+      .indexOf(row.id);
+    list_Detalle.value.splice(index, 1);
   }
 };
 
-const cargarColumnas = async (tab) => {
+const cargarColumnas = (tab) => {
   switch (tab) {
     case "GUB": {
       visisble_columns.value = [

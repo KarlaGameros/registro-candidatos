@@ -43,7 +43,7 @@
             <q-icon name="groups" />
           </q-item-section>
 
-          <q-item-section> Registro de candidaturas </q-item-section>
+          <q-item-section> Registro de candidaturas locales </q-item-section>
         </q-item>
         <q-item
           v-if="CatalogosConList.some((element) => element == 'SRC-HIS-SU')"
@@ -101,19 +101,6 @@
 
           <q-item-section> Acuses </q-item-section>
         </q-item>
-        <q-item
-          clickable
-          v-ripple
-          class="text-grey-8"
-          :to="{ name: 'observaciones' }"
-          active-class="text-pink-ieen-1"
-        >
-          <q-item-section avatar>
-            <q-icon name="pending_actions" />
-          </q-item-section>
-
-          <q-item-section> Observaciones </q-item-section>
-        </q-item>
       </q-list>
     </q-drawer>
 
@@ -139,6 +126,7 @@ import { useQuasar } from "quasar";
 import { useAuthStore } from "src/stores/auth-store";
 import { defineComponent, onBeforeMount, ref } from "vue";
 import { useRoute } from "vue-router";
+import { EncryptStorage } from "storage-encryption";
 
 export default defineComponent({
   name: "MainLayout",
@@ -150,6 +138,7 @@ export default defineComponent({
     const $q = useQuasar();
     const route = useRoute();
     const authStore = useAuthStore();
+    const encryptStorage = new EncryptStorage("SECRET_KEY", "sessionStorage");
     const usuario = ref("");
     const { modulos, sistemas, apps } = storeToRefs(authStore);
     const CatalogosConList = ref([]);
@@ -158,19 +147,19 @@ export default defineComponent({
 
     onBeforeMount(async () => {
       if (route.query.key) {
-        localStorage.setItem("key", route.query.key);
+        encryptStorage.encrypt("key", route.query.key);
       }
 
       if (route.query.sistema) {
-        localStorage.setItem("sistema", route.query.sistema);
+        encryptStorage.encrypt("sistema", route.query.sistema);
       }
 
       if (route.query.usr) {
-        localStorage.setItem("usuario", route.query.usr);
-        usuario.value = localStorage.getItem("usuario");
+        encryptStorage.encrypt("usuario", route.query.usr);
+        usuario.value = encryptStorage.decrypt("usuario");
       } else {
-        if (localStorage.getItem("usuario") != null) {
-          usuario.value = localStorage.getItem("usuario");
+        if (encryptStorage.decrypt("usuario") != null) {
+          usuario.value = encryptStorage.decrypt("usuario");
         }
       }
       await loadMenu();
@@ -190,9 +179,9 @@ export default defineComponent({
         } else {
           window.location =
             action.url +
-            `/#/?key=${localStorage.getItem("key")}&sistema=${
+            `/#/?key=${encryptStorage.decrypt("key")}&sistema=${
               action.id
-            }&usr=${localStorage.getItem("usuario")}`;
+            }&usr=${encryptStorage.decrypt("usuario")}`;
         }
       });
     };

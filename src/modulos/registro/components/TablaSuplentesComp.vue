@@ -62,17 +62,17 @@
                 </q-item>
               </div>
               <div v-else-if="col.name == 'estatus'">
-                <q-btn
+                <q-icon
+                  size="sm"
                   flat
                   round
                   :color="
                     props.row.estatus != 'Registro Aprobado' ? 'red' : 'green'
                   "
-                  :icon="
+                  :name="
                     props.row.estatus != 'Registro Aprobado' ? 'close' : 'done'
                   "
-                >
-                </q-btn>
+                />
               </div>
               <div v-else-if="col.name === 'partido'">
                 <q-avatar square>

@@ -18,7 +18,7 @@
           v-close-popup
         />
       </q-card-section>
-      <q-card-section>
+      <q-card-section v-if="sustituirPor == null">
         <q-radio
           v-for="option in options"
           :key="option"
@@ -73,7 +73,6 @@
               </q-item>
             </q-card>
           </div>
-
           <div class="row" v-if="sustituirPor != null">
             <q-card
               v-if="sustituirPor != 'Fórmula'"
@@ -123,25 +122,25 @@
             >
               <q-tab
                 class="text-blue-grey"
-                name="propietario"
+                name="Propietario"
                 label="Propietario"
               />
               <q-tab
                 v-if="props.tab != 'GUB'"
                 class="text-blue-grey"
-                name="suplente"
+                name="Suplente"
                 label="Suplente"
               />
               <q-tab
                 v-if="props.tab == 'PYS'"
                 class="text-blue-grey"
-                name="sindico_propietario"
+                name="Propietario sindico"
                 label="Sindico propietario"
               />
               <q-tab
                 v-if="props.tab == 'PYS'"
                 class="text-blue-grey"
-                name="sindico_suplente"
+                name="Suplente sindico"
                 label="Sindico suplenete"
               />
             </q-tabs>
@@ -151,7 +150,7 @@
               class="shadow-2 rounded-borders"
             >
               <!--PROPIETARIO-->
-              <q-tab-panel name="propietario">
+              <q-tab-panel name="Propietario">
                 <q-list bordered class="rounded-borders col-12">
                   <q-expansion-item
                     v-model="expansion"
@@ -166,7 +165,7 @@
                 </q-list>
               </q-tab-panel>
               <!--SUPLENTE-->
-              <q-tab-panel name="suplente" class="row">
+              <q-tab-panel name="Suplente" class="row">
                 <q-list bordered class="rounded-borders col-12">
                   <q-expansion-item
                     v-model="expansion"
@@ -181,7 +180,7 @@
                 </q-list>
               </q-tab-panel>
               <!--SINDICO PROPIETARIO-->
-              <q-tab-panel name="sindico_propietario" class="row">
+              <q-tab-panel name="Propietario sindico" class="row">
                 <q-list bordered class="rounded-borders col-12">
                   <q-expansion-item
                     v-model="expansion"
@@ -196,7 +195,7 @@
                 </q-list>
               </q-tab-panel>
               <!--SINDICO SUPLENTE-->
-              <q-tab-panel name="sindico_suplente" class="row">
+              <q-tab-panel name="Suplente sindico" class="row">
                 <q-list bordered class="rounded-borders col-12">
                   <q-expansion-item
                     v-model="expansion"
@@ -234,7 +233,7 @@
                 :label="sustituirPor"
               />
             </q-tabs>
-            <SustituirCandidato :tabTipo="tabTab" />
+            <SustituirCandidato :tabTipo="sustituirPor" />
           </div>
           <q-space />
           <div class="col-12 justify-end">
@@ -292,7 +291,7 @@ const {
   sust_suplente_2,
 } = storeToRefs(sustituirStore);
 const sustituirPor = ref(null);
-const tabTab = ref("propietario");
+const tabTab = ref("Propietario");
 const options = ref(["Fórmula", "Propietario", "Suplente"]);
 const expansion = ref(true);
 const expansion2 = ref(false);
@@ -325,6 +324,7 @@ watch(sustituirPor, (val) => {
 
 const actualizarModal = (valor) => {
   $q.loading.show();
+  sustituirPor.value = null;
   candidatoStore.actualizarModalSustituir(valor);
   sustituirStore.initSustituir();
   $q.loading.hide();
@@ -460,7 +460,7 @@ const onSubmit = async () => {
         "Grupo_Vulnerable_Nuevo",
         sust_propietario_1.value.Grupo_Vulnerable_Nuevo
       );
-    if (sust_propietario_1.value.Partido_Id_Nuevo.value != null)
+    if (sust_propietario_1.value.Partido_Id_Nuevo != null)
       sustituirFormData.append(
         "Partido_Id_Nuevo",
         sust_propietario_1.value.Partido_Id_Nuevo.value
@@ -471,7 +471,7 @@ const onSubmit = async () => {
         sust_propietario_1.value.Foto_Nuevo
       );
     if (sust_propietario_1.value.Edad_Nuevo != null)
-      candidatoFormData.append("Edad", sust_propietario_1.value.Edad_Nuevo);
+      sustituirFormData.append("Edad", sust_propietario_1.value.Edad_Nuevo);
   } else if (sustituirPor.value == "Suplente") {
     sustituirFormData.append("Tipo_Sustitucion", "Suplente 1");
     if (suplente_1.value.nombres != null)
@@ -584,7 +584,7 @@ const onSubmit = async () => {
         "Grupo_Vulnerable_Nuevo",
         sust_suplente_1.value.Grupo_Vulnerable_Nuevo
       );
-    if (sust_suplente_1.value.Partido_Id_Nuevo.value != null)
+    if (sust_suplente_1.value.Partido_Id_Nuevo != null)
       sustituirFormData.append(
         "Partido_Id_Nuevo",
         sust_suplente_1.value.Partido_Id_Nuevo.value
@@ -592,7 +592,7 @@ const onSubmit = async () => {
     if (sust_suplente_1.value.Foto_Nuevo != null)
       sustituirFormData.append("Foto_Nuevo", sust_suplente_1.value.Foto_Nuevo);
     if (sust_suplente_1.value.Edad_Nuevo != null)
-      candidatoFormData.append("Edad", sust_suplente_1.value.Edad_Nuevo);
+      sustituirFormData.append("Edad", sust_suplente_1.value.Edad_Nuevo);
   } else if (sustituirPor.value == "Propietario sindico") {
     sustituirFormData.append("Tipo_Sustitucion", "Propietario 2");
     if (propietario_2.value.nombres != null)
@@ -717,7 +717,7 @@ const onSubmit = async () => {
         "Grupo_Vulnerable_Nuevo",
         sust_propietario_2.value.Grupo_Vulnerable_Nuevo
       );
-    if (sust_propietario_2.value.Partido_Id_Nuevo.value != null)
+    if (sust_propietario_2.value.Partido_Id_Nuevo != null)
       sustituirFormData.append(
         "Partido_Id_Nuevo",
         sust_propietario_2.value.Partido_Id_Nuevo.value
@@ -728,7 +728,7 @@ const onSubmit = async () => {
         sust_propietario_2.value.Foto_Nuevo
       );
     if (sust_propietario_2.value.Edad_Nuevo != null)
-      candidatoFormData.append("Edad", sust_propietario_2.value.Edad_Nuevo);
+      sustituirFormData.append("Edad", sust_propietario_2.value.Edad_Nuevo);
   } else if (sustituirPor.value == "Suplente sindico") {
     sustituirFormData.append("Tipo_Sustitucion", "Suplente 2");
     if (suplente_2.value.nombres != null)
@@ -841,7 +841,7 @@ const onSubmit = async () => {
         "Grupo_Vulnerable_Nuevo",
         sust_suplente_2.value.Grupo_Vulnerable_Nuevo
       );
-    if (sust_suplente_2.value.Partido_Id_Nuevo.value != null)
+    if (sust_suplente_2.value.Partido_Id_Nuevo != null)
       sustituirFormData.append(
         "Partido_Id_Nuevo",
         sust_suplente_2.value.Partido_Id_Nuevo.value
@@ -849,7 +849,7 @@ const onSubmit = async () => {
     if (sust_suplente_2.value.Foto_Nuevo != null)
       sustituirFormData.append("Foto_Nuevo", sust_suplente_2.value.Foto_Nuevo);
     if (sust_suplente_2.value.Edad_Nuevo != null)
-      candidatoFormData.append("Edad", sust_suplente_2.value.Edad_Nuevo);
+      sustituirFormData.append("Edad", sust_suplente_2.value.Edad_Nuevo);
   } else if (sustituirPor.value == "Fórmula") {
     sustituirPropietario1.append("Fecha_Sustitucion", date.value);
     sustituirPropietario1.append("Fecha_Registro", date.value);
@@ -996,7 +996,7 @@ const onSubmit = async () => {
         sust_propietario_1.value.Foto_Nuevo
       );
     if (sust_propietario_1.value.Edad_Nuevo != null)
-      candidatoFormData.append("Edad", sust_propietario_1.value.Edad_Nuevo);
+      sustituirPropietario1.append("Edad", sust_propietario_1.value.Edad_Nuevo);
     //-----------------------------------------------------------------
     sustituirSuplente1.append("Fecha_Sustitucion", date.value);
     sustituirSuplente1.append("Fecha_Registro", date.value);
@@ -1121,7 +1121,7 @@ const onSubmit = async () => {
     if (sust_suplente_1.value.Foto_Nuevo != null)
       sustituirSuplente1.append("Foto_Nuevo", sust_suplente_1.value.Foto_Nuevo);
     if (sust_suplente_1.value.Edad_Nuevo != null)
-      candidatoFormData.append("Edad", sust_suplente_1.value.Edad_Nuevo);
+      sustituirSuplente1.append("Edad", sust_suplente_1.value.Edad_Nuevo);
     //-----------------------------------------------------------------
     sustituirPropietario2.append("Fecha_Sustitucion", date.value);
     sustituirPropietario2.append("Fecha_Registro", date.value);
@@ -1268,7 +1268,7 @@ const onSubmit = async () => {
         sust_propietario_2.value.Foto_Nuevo
       );
     if (sust_propietario_2.value.Edad_Nuevo != null)
-      candidatoFormData.append("Edad", sust_propietario_2.value.Edad_Nuevo);
+      sustituirPropietario2.append("Edad", sust_propietario_2.value.Edad_Nuevo);
     //-----------------------------------------------------------------
     sustituirSuplente2.append("Fecha_Sustitucion", date.value);
     sustituirSuplente2.append("Fecha_Registro", date.value);
@@ -1391,10 +1391,14 @@ const onSubmit = async () => {
     if (sust_suplente_2.value.Foto_Nuevo != null)
       sustituirSuplente2.append("Foto_Nuevo", sust_suplente_2.value.Foto_Nuevo);
     if (sust_suplente_2.value.Edad_Nuevo != null)
-      candidatoFormData.append("Edad", sust_suplente_2.value.Edad_Nuevo);
+      sustituirSuplente2.append("Edad", sust_suplente_2.value.Edad_Nuevo);
   }
   if (sustitucion.value.No_Acuerdo != null)
     sustituirFormData.append("No_Acuerdo", sustitucion.value.No_Acuerdo);
+  sustituirPropietario1.append("No_Acuerdo", sustitucion.value.No_Acuerdo);
+  sustituirPropietario2.append("No_Acuerdo", sustitucion.value.No_Acuerdo);
+  sustituirSuplente1.append("No_Acuerdo", sustitucion.value.No_Acuerdo);
+  sustituirSuplente2.append("No_Acuerdo", sustitucion.value.No_Acuerdo);
   sustituirFormData.append("Fecha_Sustitucion", date.value);
   sustituirFormData.append("Fecha_Registro", date.value);
 

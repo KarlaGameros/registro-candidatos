@@ -31,6 +31,13 @@
         <div class="text-right">
           <q-btn
             type="button"
+            color="pink-1"
+            icon-right="download"
+            label="Descargar Excel"
+            @click="descargarExcel(true)"
+          />
+          <q-btn
+            type="button"
             class="q-ma-sm"
             color="pink-1"
             icon-right="add_circle_outline"
@@ -44,12 +51,16 @@
   </q-page>
 </template>
 <script setup>
+import { useQuasar, QSpinnerCube } from "quasar";
 import { useCandidatosStore } from "src/stores/candidatos-store";
+import { useGeneroStore } from "src/stores/genero-store";
 import TablaPrincipalTipoEleccion from "../components/TablaPrincipalTipoEleccion.vue";
 
 //--------------------------------------------------------------------
 
+const $q = useQuasar();
 const candidatoStore = useCandidatosStore();
+const generoStore = useGeneroStore();
 
 //--------------------------------------------------------------------
 
@@ -59,7 +70,21 @@ const actualizarModal = (valor) => {
   candidatoStore.initCandidato();
 };
 
-//--------------------------------------------------------------------
+const descargarExcel = async () => {
+  $q.loading.show({
+    spinner: QSpinnerCube,
+    spinnerColor: "pink",
+    spinnerSize: 140,
+    backgroundColor: "purple-2",
+    message: "Espere un momento porfavor...",
+    messageColor: "black",
+  });
+  await generoStore.downloadExcelPrerrogativas();
+  const link = document.createElement("a");
+  link.href = generoStore.documentoExcel;
+  link.setAttribute("download", "BD_CANDIDATURAS_2024.xlsx");
+  document.body.appendChild(link);
+  link.click();
+  $q.loading.hide();
+};
 </script>
-
-<style scope></style>

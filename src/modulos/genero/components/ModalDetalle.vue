@@ -7,7 +7,6 @@
   >
     <q-card style="width: 700px; max-width: 80vw">
       <q-card-section class="row">
-        <div class="text-h6"></div>
         <q-space />
         <q-btn
           icon="close"
@@ -19,9 +18,15 @@
         />
       </q-card-section>
       <q-card-section>
+        <q-card-section
+          v-if="candidato.pertenece_Grupo_Vulnerable_Propietario == true"
+          class="text-center text-h6 text-grey-9"
+          >La candidatura indicó que pertenece a un grupo
+          vulnerable</q-card-section
+        >
         <q-timeline
           v-if="candidato.pertenece_Grupo_Vulnerable_Propietario == true"
-          color="purple-4"
+          color="pink"
         >
           <q-timeline-entry
             v-if="candidato.grupo_Vulnerable_1 != null"
@@ -72,6 +77,7 @@ const { candidato } = storeToRefs(candidatosStore);
 //-----------------------------------------------------------------
 
 const actualizarModal = (valor) => {
+  candidatosStore.initCandidato();
   generoStore.actualizarModalDetalle(valor);
 };
 

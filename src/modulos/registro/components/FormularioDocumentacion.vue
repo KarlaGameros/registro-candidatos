@@ -7,17 +7,23 @@
       <br />
       <div class="row">
         <div
-          v-for="requisito in list_Requisitos"
-          :key="requisito"
+          v-for="requisito in list_Documentos"
+          :key="requisito.requisito.id"
           class="q-pr-md"
         >
+          <q-icon
+            v-if="requisito.registrado == true"
+            name="check_circle"
+            size="sm"
+            color="green"
+          />
           <q-btn
-            @click="subirDocumento(requisito.id)"
+            @click="subirDocumento(requisito.requisito.requisito_Id)"
             color="pink"
             dense
             outline
             class="q-pa-sm"
-            :label="requisito.nombre"
+            :label="requisito.requisito.requisito"
             icon-right="cloud_upload"
           >
             <q-tooltip>Subir</q-tooltip>
@@ -30,7 +36,7 @@
 </template>
 
 <script setup>
-import { defineProps, onMounted } from "vue";
+import { defineProps, onMounted, ref } from "vue";
 import { useConfiguracionStore } from "src/stores/configuracion-store";
 import { storeToRefs } from "pinia";
 import { useQuasar } from "quasar";
@@ -46,10 +52,12 @@ const candidatoStore = useCandidatosStore();
 const generoStore = useGeneroStore();
 const { list_Requisitos } = storeToRefs(configuracionStore);
 const { candidato } = storeToRefs(candidatoStore);
+const { list_Documentacion_Genero } = storeToRefs(generoStore);
 const props = defineProps({
   tipo_Id: { type: Number, required: true },
   puesto: { type: Number, required: true },
 });
+const list_Documentos = ref([]);
 
 //--------------------------------------------------------------------
 
@@ -59,16 +67,19 @@ onMounted(() => {
 
 //--------------------------------------------------------------------
 
-const onRejected = () => {
-  $q.notify({
-    type: "negative",
-    message: "El tamaño del documento es muy lago",
-  });
-};
-
 const cargarData = async () => {
   $q.loading.show();
+  await generoStore.getDocumentos(candidato.value.id, props.puesto, null);
   await configuracionStore.loadRequisitos(props.tipo_Id);
+  for (var requisito of list_Requisitos.value) {
+    let documento = list_Documentacion_Genero.value.find(
+      (x) => x.requisito_Id == requisito.id
+    );
+    list_Documentos.value.push({
+      registrado: documento.registrado,
+      requisito: documento,
+    });
+  }
   $q.loading.hide();
 };
 

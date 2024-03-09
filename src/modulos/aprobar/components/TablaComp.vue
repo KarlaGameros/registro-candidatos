@@ -176,6 +176,7 @@ const columns = [
 ];
 
 const filter = ref("");
+
 const pagination = ref({
   sortBy: "desc",
   descending: false,

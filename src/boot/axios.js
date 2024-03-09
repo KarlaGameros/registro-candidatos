@@ -1,4 +1,5 @@
 import { boot } from "quasar/wrappers";
+import { EncryptStorage } from "storage-encryption";
 import axios from "axios";
 
 // Be careful when using SSR for cross-request state pollution
@@ -7,13 +8,15 @@ import axios from "axios";
 // good idea to move this instance creation inside of the
 // "export default () => {}" function below (which runs individually
 // for each client)
+const encryptStorage = new EncryptStorage("SECRET_KEY", "sessionStorage");
 const api = axios.create({
   baseURL: "http://sistema.ieenayarit.org:9370/api",
+  //baseURL: "https://192.168.0.156:7077/api",
 });
 
 api.interceptors.request.use((config) => {
   config.headers = {
-    Authorization: `Bearer ${localStorage.getItem("key")}`,
+    Authorization: `Bearer ${encryptStorage.decrypt("key")}`,
   };
   return config;
 });

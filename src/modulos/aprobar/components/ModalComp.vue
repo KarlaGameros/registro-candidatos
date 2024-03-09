@@ -160,7 +160,7 @@
 </template>
 
 <script setup>
-import { defineProps, ref, watch } from "vue";
+import { defineProps, ref } from "vue";
 import { useQuasar } from "quasar";
 import { storeToRefs } from "pinia";
 import { useAprobarStore } from "src/stores/aprobar-store";
@@ -177,8 +177,6 @@ const props = defineProps({
   tipo_Id: { type: Number },
 });
 const acuerdoArchivo = ref(null);
-//-----------------------------------------------------------
-//Get fecha actual
 const dateActual = new Date();
 const year = dateActual.getFullYear();
 const month = String(dateActual.getMonth() + 1).padStart(2, "0");
@@ -187,6 +185,7 @@ const hours = String(dateActual.getHours());
 const minutes = String(dateActual.getMinutes());
 const seconds = String(dateActual.getSeconds());
 const date = ref(`${year}/${month}/${day} ${hours}:${minutes}:${seconds}`);
+
 //-----------------------------------------------------------
 
 const actualizarModal = (valor) => {
@@ -277,7 +276,7 @@ const onSubmit = async () => {
         type: "positive",
         message: resp.data,
       });
-      await aprobarStore.loadAprobacionCandidaturas();
+      await candidatosStore.loadCandidatos();
       aprobarStore.initAprobacion();
       actualizarModal(false);
     } else {

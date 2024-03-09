@@ -33,7 +33,7 @@ export const useAprobarStore = defineStore("useAprobarStore", {
     initAprobacion() {
       this.aprobacion.acuerdo = null;
       this.aprobacion.fecha_Aprobacion = null;
-      this.list_Detalle = [];
+      //this.list_Detalle = [];
       this.aprobacion.detalle = [];
     },
 

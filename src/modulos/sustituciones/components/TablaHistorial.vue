@@ -79,7 +79,8 @@
                     />
                   </div>
                   <div v-else-if="col.name === 'estatus'">
-                    <q-btn
+                    <q-icon
+                      size="sm"
                       flat
                       round
                       :color="
@@ -87,13 +88,12 @@
                           ? 'green'
                           : 'red'
                       "
-                      :icon="
+                      :name="
                         props.row.estatus == 'Registro Aprobado'
                           ? 'done'
                           : 'close'
                       "
-                    >
-                    </q-btn>
+                    />
                   </div>
                   <div v-else-if="col.name === 'logo_Coalicion'">
                     <q-avatar
@@ -164,14 +164,15 @@ const { tipo_Elecciones } = storeToRefs(configuracionStore);
 const { list_Candidatos } = storeToRefs(candidatosStore);
 const { list_Sustituciones } = storeToRefs(sustituirStore);
 const expandedRow = ref(null);
-const tab_Eleccion = ref("DIP");
-const tipo_Eleccion_Id = ref(2);
+const tab_Eleccion = ref(null);
+const tipo_Eleccion_Id = ref(null);
 const visisble_columns = ref([]);
 const list_Candidatos_Filtro = ref([]);
 
 //--------------------------------------------------------------------
 
-onMounted(() => {
+onMounted(async () => {
+  await configuracionStore.loadTipoElecciones();
   cargarData();
 });
 
@@ -179,8 +180,14 @@ onMounted(() => {
 
 watch(tab_Eleccion, (val) => {
   if (val != null) {
-    cargarColumnas(val);
     cargarData();
+  }
+});
+
+watch(tipo_Elecciones, (val) => {
+  if (val.length > 0) {
+    tab_Eleccion.value = val[0].siglas;
+    tipo_Eleccion_Id.value = val[0].id;
   }
 });
 
@@ -193,7 +200,6 @@ const cargarData = async () => {
     message: "Espere un momento porfavor...",
     messageColor: "black",
   });
-  await configuracionStore.loadTipoElecciones();
   await candidatosStore.loadCandidatos();
   await cargarColumnas(tab_Eleccion.value);
   $q.loading.hide();

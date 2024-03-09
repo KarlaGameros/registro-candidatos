@@ -115,6 +115,13 @@ export const useSustituirStore = defineStore("useSustituirStore", {
       this.modalOficio = valor;
     },
     initSustituir() {
+      this.sustitucion.id = null;
+      this.sustitucion.Fecha_Sustitucion = null;
+      this.sustitucion.Fecha_Registro = null;
+      this.sustitucion.Empleado_Id = null;
+      this.sustitucion.tipo_Sustitucion = null;
+      this.sustitucion.No_Acuerdo = null;
+
       this.sust_propietario_1.Nombres_Nuevo = null;
       this.sust_propietario_1.Apellido_Paterno_Nuevo = null;
       this.sust_propietario_1.Apellido_Materno_Nuevo = null;

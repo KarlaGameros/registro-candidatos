@@ -43,14 +43,18 @@
   </q-page>
 </template>
 <script setup>
+import { useGeneroStore } from "src/stores/genero-store";
+import { useQuasar, QSpinnerCube } from "quasar";
 import TablaComp from "../components/TablaComp.vue";
 import ModalComp from "../components/ModalComp.vue";
 import ModalDetalle from "../components/ModalDetalle.vue";
-import { useGeneroStore } from "src/stores/genero-store";
-import { useQuasar, QSpinnerCube } from "quasar";
+
+//-----------------------------------------------------------
 
 const $q = useQuasar();
 const generoStore = useGeneroStore();
+
+//-----------------------------------------------------------
 
 const descargarExcel = async () => {
   $q.loading.show({
@@ -64,7 +68,7 @@ const descargarExcel = async () => {
   await generoStore.downloadExcel();
   const link = document.createElement("a");
   link.href = generoStore.documentoExcel;
-  link.setAttribute("download", "BD_CANDIDATURAS_2024");
+  link.setAttribute("download", "BD_CANDIDATURAS_GENERO_2024.xlsx");
   document.body.appendChild(link);
   link.click();
   $q.loading.hide();

@@ -25,6 +25,12 @@ export const useCandidatosStore = defineStore("useCandidatosStore", {
       orden: null,
       activo: null,
       fecha_Registro: null,
+      pertenece_Grupo_Vulnerable_Propietario: null,
+      grupo_Vulnerable_Propietario: null,
+      grupo_Vulnerable_1: null,
+      grupo_Vulnerable_2: null,
+      grupo_Vulnerable_3: null,
+      grupo_Vulnerable_4: null,
     },
     candidato2: {
       tipo: null,
@@ -181,6 +187,11 @@ export const useCandidatosStore = defineStore("useCandidatosStore", {
       this.modalSustituir = valor;
     },
     //-----------------------------------------------------------
+    initIsCoalicion() {
+      this.candidato.is_Coalicion = false;
+      this.candidato.coalicion_Id = null;
+    },
+
     initCandidato() {
       this.candidato.id = null;
       this.candidato.tipo_Eleccion_Id = null;
@@ -193,6 +204,12 @@ export const useCandidatosStore = defineStore("useCandidatosStore", {
       this.candidato.orden = null;
       this.candidato.activo = null;
       this.candidato.partido_Id = null;
+      this.candidato.pertenece_Grupo_Vulnerable_Propietario = null;
+      this.candidato.grupo_Vulnerable_Propietario = null;
+      this.candidato.grupo_Vulnerable_1 = null;
+      this.candidato.grupo_Vulnerable_2 = null;
+      this.candidato.grupo_Vulnerable_3 = null;
+      this.candidato.grupo_Vulnerable_4 = null;
       this.foto_1.url_Foto = null;
       this.foto_2.url_Foto = null;
       this.foto_3.url_Foto = null;
@@ -653,7 +670,7 @@ export const useCandidatosStore = defineStore("useCandidatosStore", {
             }
             this.propietario_2.correo = data.correo_Propietario_2;
             this.propietario_2.pertenece_Grupo_Vulnerable =
-              data.pertenece_Grupo_Vulerable_Propietario_2;
+              data.pertenece_Grupo_Vulnerable_Propietario_2;
             this.propietario_2.grupo_Vulnerable =
               data.grupo_Vulnerable_Propietario_2;
             this.propietario_2.partido_Id = data.partido_Propietario_2_Id;
@@ -832,6 +849,8 @@ export const useCandidatosStore = defineStore("useCandidatosStore", {
             this.propietario_1.partido_Id = data.partido_Id;
             this.propietario_1.url_Logo_Partido =
               data.url_Logo_Partido_Propietario;
+            this.propietario_1.is_Coalicion = data.is_Coalicion;
+            this.propietario_1.coalicion_Id = data.coalicion_Id;
             this.propietario_1.partido = data.partido;
             this.propietario_1.edad = data.edad_Propietario;
 
@@ -873,6 +892,8 @@ export const useCandidatosStore = defineStore("useCandidatosStore", {
             this.propietario_2.partido = data.partido_Propietario_2;
             this.propietario_2.url_Logo_Partido =
               data.url_Logo_Partido_Propietario_2;
+            this.propietario_2.is_Coalicion = data.is_Coalicion;
+            this.propietario_2.coalicion_Id = data.coalicion_Id;
             this.propietario_2.edad = data.edad_Propietario_2;
             //-----------------------------------------------------
             //SUPLENTE 1
@@ -902,6 +923,8 @@ export const useCandidatosStore = defineStore("useCandidatosStore", {
             this.suplente_1.partido_Id = data.partido_Suplente_Id;
             this.suplente_1.url_Logo_Partido = data.url_Logo_Partido_Suplente;
             this.suplente_1.partido = data.partido_Suplente;
+            this.suplente_1.is_Coalicion = data.is_Coalicion;
+            this.suplente_1.coalicion_Id = data.coalicion_Id;
             this.suplente_1.edad = data.edad_Suplente;
             //-----------------------------------------------------
             //SUPLENTE 2
@@ -931,6 +954,8 @@ export const useCandidatosStore = defineStore("useCandidatosStore", {
             this.suplente_2.grupo_Vulnerable = data.grupo_Vulnerable;
             this.suplente_2.partido_Id = data.partido_Suplente_2_Id;
             this.suplente_2.partido = data.partido_Suplente_2;
+            this.suplente_2.is_Coalicion = data.is_Coalicion;
+            this.suplente_2.coalicion_Id = data.coalicion_Id;
             this.suplente_2.url_Logo_Partido = data.url_Logo_Partido_Suplente_2;
 
             this.list_Suplentes = [];
@@ -1019,16 +1044,16 @@ export const useCandidatosStore = defineStore("useCandidatosStore", {
               data.grupo_Vulnerable_Propietario;
             if (data.pertenece_Grupo_Vulnerable_Propietario == true) {
               let elementos = data.grupo_Vulnerable_Propietario.split("|");
-              if (elementos[0] != undefined) {
+              if (elementos[0] != undefined && elementos[0] != "") {
                 this.candidato.grupo_Vulnerable_1 = elementos[0];
               }
-              if (elementos[1] != undefined) {
+              if (elementos[1] != undefined && elementos[1] != "") {
                 this.candidato.grupo_Vulnerable_2 = elementos[1];
               }
-              if (elementos[2] != undefined) {
+              if (elementos[2] != undefined && elementos[2] != "") {
                 this.candidato.grupo_Vulnerable_3 = elementos[2];
               }
-              if (elementos[3] != undefined) {
+              if (elementos[3] != undefined && elementos[3] != "") {
                 this.candidato.grupo_Vulnerable_4 = elementos[3];
               }
             }

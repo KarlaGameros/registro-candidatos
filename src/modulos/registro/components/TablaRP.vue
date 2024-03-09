@@ -1,17 +1,53 @@
 <template>
   <q-table
-    title="Tabla RP: Propietario"
+    class="my-table"
+    title="Tabla RP: Propietarios"
     :rows="list_RP"
-    :columns="columns"
+    :columns="columnsPropietario"
     row-key="name"
     v-model:pagination="pagination"
+    style="height: 300px"
+    flat
+    bordered
+    :filter="filterPropietario"
+    virtual-scroll
+    :rows-per-page-options="[0]"
   >
     <template v-slot:top-right>
       <q-input
         borderless
         dense
         debounce="300"
-        v-model="filter"
+        v-model="filterPropietario"
+        placeholder="Buscar"
+      >
+        <template v-slot:append>
+          <q-icon name="search" />
+        </template>
+      </q-input>
+    </template>
+  </q-table>
+  <br />
+  <q-table
+    class="my-table"
+    title="Tabla RP: Suplentes"
+    :rows="list_RP"
+    :columns="columnsSuplente"
+    row-key="name"
+    v-model:pagination="pagination"
+    style="height: 300px"
+    flat
+    bordered
+    virtual-scroll
+    :rows-per-page-options="[0]"
+    :filter="filterSuplente"
+  >
+    <template v-slot:top-right>
+      <q-input
+        borderless
+        dense
+        debounce="300"
+        v-model="filterSuplente"
         placeholder="Buscar"
       >
         <template v-slot:append>
@@ -71,7 +107,7 @@ watchEffect(() => {
 
 //--------------------------------------------------------------------
 
-const columns = [
+const columnsPropietario = [
   {
     name: "nombres_Propietario",
     align: "center",
@@ -101,7 +137,38 @@ const columns = [
     sortable: true,
   },
 ];
-const filter = ref("");
+const columnsSuplente = [
+  {
+    name: "nombres_Suplente",
+    align: "center",
+    label: "Nombres",
+    field: "nombres_Suplente",
+    sortable: true,
+  },
+  {
+    name: "apellido_Paterno_Suplente",
+    align: "center",
+    label: "Apellido paterno",
+    field: "apellido_Paterno_Suplente",
+    sortable: true,
+  },
+  {
+    name: "apellido_Materno_Suplente",
+    align: "center",
+    label: "Apellido materno",
+    field: "apellido_Materno_Suplente",
+    sortable: true,
+  },
+  {
+    name: "orden",
+    align: "center",
+    label: "Orden",
+    field: "orden",
+    sortable: true,
+  },
+];
+const filterPropietario = ref("");
+const filterSuplente = ref("");
 const pagination = ref({
   sortBy: "desc",
   descending: false,
@@ -109,5 +176,8 @@ const pagination = ref({
   rowsPerPage: 5,
 });
 </script>
-
-<style></style>
+<style lang="sass">
+.my-table
+  .q-table__top
+    background-color: #C3CCCA
+</style>

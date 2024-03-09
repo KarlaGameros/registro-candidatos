@@ -1,6 +1,8 @@
 import { defineStore } from "pinia";
 import { api } from "src/boot/axios";
+import { EncryptStorage } from "storage-encryption";
 
+const encryptStorage = new EncryptStorage("SECRET_KEY", "sessionStorage");
 export const useAuthStore = defineStore("auth", {
   state: () => ({
     modulos: [],
@@ -68,9 +70,10 @@ export const useAuthStore = defineStore("auth", {
         };
       }
     },
+
     async loadModulos() {
       try {
-        const sistema = localStorage.getItem("sistema");
+        const sistema = encryptStorage.decrypt("sistema");
         const resp = await api.get(
           `/PermisosModulosUsuarios/Bysuario/${sistema}`
         );

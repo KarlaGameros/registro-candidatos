@@ -226,7 +226,7 @@
         </q-select> -->
         <q-input
           v-model="candidatoBase.telefono"
-          label="Phone"
+          label="Teléfono"
           mask="### - ### - ####"
           hint="Número telefonico"
         >
@@ -552,15 +552,12 @@ const calcularEdad = (fecha_Nacimiento, tipo) => {
   if (fecha_Nacimiento != null) {
     var fechaNace = new Date(fecha_Nacimiento);
     var fechaActual = new Date();
-
     var mes = fechaActual.getMonth();
     var dia = fechaActual.getDate();
     var año = fechaActual.getFullYear();
-
     fechaActual.setDate(dia);
     fechaActual.setMonth(mes);
     fechaActual.setFullYear(año);
-
     if (tipo == "propietario_1") {
       propietario_1.value.edad = Math.floor(
         (fechaActual - fechaNace) / (1000 * 60 * 60 * 24) / 365

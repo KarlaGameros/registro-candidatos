@@ -1,16 +1,4 @@
 <template>
-  <div class="q-pb-md">
-    <q-banner
-      inline-actions
-      class="text-justify bg-grey-2"
-      style="border-radius: 20px"
-    >
-      <template v-slot:avatar>
-        <q-icon name="info" color="grey" />
-      </template>
-      <slot>Favor de subir los acuse firmados por cada candidatura.</slot>
-    </q-banner>
-  </div>
   <q-card>
     <q-tabs
       v-model="tab_Eleccion"
@@ -35,7 +23,6 @@
         :name="tipo.siglas"
       >
         <q-table
-          :grid="$q.screen.xs"
           flat
           bordered
           :rows="list_Candidatos_By_Eleccion"
@@ -93,23 +80,23 @@
                   ></progress>
                 </div>
                 <div v-else-if="col.name === 'id'">
-                  <q-btn
+                  <!-- <q-btn
                     flat
                     round
                     color="pink-4"
-                    icon="cloud_upload"
+                    icon="upload"
                     @click="subirAcuse(props.row)"
                   >
                     <q-tooltip>Subir acuse</q-tooltip>
-                  </q-btn>
+                  </q-btn> -->
                   <q-btn
                     flat
                     round
                     color="pink-4"
-                    icon="search"
+                    icon="visibility"
                     @click="verAcuse(props.row)"
                   >
-                    <q-tooltip>Subir acuse</q-tooltip>
+                    <q-tooltip>Ver acuse</q-tooltip>
                   </q-btn>
                 </div>
                 <label v-else>{{ col.value }}</label>
@@ -133,7 +120,6 @@
 <script setup>
 import { computed, onBeforeMount, ref, watch } from "vue";
 import { storeToRefs } from "pinia";
-import { useAprobarStore } from "src/stores/aprobar-store";
 import { useQuasar, QSpinnerCube } from "quasar";
 import { useConfiguracionStore } from "src/stores/configuracion-store";
 import { useCandidatosStore } from "src/stores/candidatos-store";
@@ -147,28 +133,30 @@ const candidatosStore = useCandidatosStore();
 const acusesStore = useAcusesStore();
 const { tipo_Elecciones } = storeToRefs(configuracionStore);
 const { list_Candidatos_By_Eleccion } = storeToRefs(candidatosStore);
-const tipo_Eleccion_Id = ref(2);
-const tab_Eleccion = ref("DIP");
+const tipo_Eleccion_Id = ref(null);
+const tab_Eleccion = ref(null);
 const listFiltrado = ref("");
 const visisble_columns = ref([]);
 
 //-----------------------------------------------------------
 
-onBeforeMount(() => {
+onBeforeMount(async () => {
+  await configuracionStore.loadTipoElecciones();
   cargarData();
 });
 
 //-----------------------------------------------------------
 
-watch(list_Candidatos_By_Eleccion, (val) => {
-  if (val != null) {
-    cargarColumnas(tab_Eleccion.value);
-  }
-});
-
 watch(tab_Eleccion, (val) => {
   if (val != null) {
     cargarData();
+  }
+});
+
+watch(tipo_Elecciones, (val) => {
+  if (val.length > 0) {
+    tab_Eleccion.value = val[0].siglas;
+    tipo_Eleccion_Id.value = val[0].id;
   }
 });
 
@@ -181,7 +169,6 @@ const cargarData = async () => {
     message: "Espere un momento porfavor...",
     messageColor: "black",
   });
-  await configuracionStore.loadTipoElecciones();
   await candidatosStore.loadCandidatosByEleccion(tipo_Eleccion_Id.value);
   cargarColumnas(tab_Eleccion.value);
   $q.loading.hide();
@@ -200,6 +187,7 @@ const cargarColumnas = (tab_Eleccion) => {
     case "GUB":
       visisble_columns.value = [
         "nombre_Completo",
+        "candidatura",
         "tipo_Candidato",
         "genero",
         "no_Distrito",
@@ -212,6 +200,7 @@ const cargarColumnas = (tab_Eleccion) => {
     case "DIP":
       visisble_columns.value = [
         "nombre_Completo",
+        "candidatura",
         "tipo_Candidato",
         "genero",
         "no_Distrito",
@@ -224,6 +213,7 @@ const cargarColumnas = (tab_Eleccion) => {
     case "PYS":
       visisble_columns.value = [
         "nombre_Completo",
+        "candidatura",
         "tipo_Candidato",
         "genero",
         "municipio",
@@ -236,6 +226,7 @@ const cargarColumnas = (tab_Eleccion) => {
     case "REG":
       visisble_columns.value = [
         "nombre_Completo",
+        "candidatura",
         "tipo_Candidato",
         "genero",
         "municipio",
@@ -261,6 +252,13 @@ const columns = [
     align: "center",
     label: "Nombre",
     field: "nombre_Completo",
+    sortable: true,
+  },
+  {
+    name: "candidatura",
+    align: "center",
+    label: "Candidatura",
+    field: "candidatura",
     sortable: true,
   },
   {

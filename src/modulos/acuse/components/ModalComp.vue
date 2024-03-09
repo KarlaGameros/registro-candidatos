@@ -7,7 +7,7 @@
   >
     <q-card style="width: 800px; max-width: 80vw">
       <q-card-section class="row">
-        <div class="text-h6">Acuse</div>
+        <div class="text-h6">Acuses</div>
         <q-space />
         <q-btn
           icon="close"
@@ -19,15 +19,26 @@
         />
       </q-card-section>
       <q-form @submit="onSubmit">
-        <q-card-section class="row q-col-gutter-xs flex-center">
+        <q-card-section class="row q-col-gutter-xs">
+          <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+            <q-select
+              v-model="tipo_Eleccion_Id"
+              :options="tipo_Elecciones"
+              label="Tipo de elección"
+              lazy-rules
+              :rules="[(val) => !!val || 'El tipo de elección es requerido']"
+            />
+          </div>
           <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
             <q-file
-              filled
               bottom-slots
-              v-model="acuse_File"
-              label="Acuse"
+              v-model="files"
+              use-chips
+              multiple
+              label="Acuses"
               accept=".jpg, image/*, .pdf"
               color="pink"
+              :rules="[(val) => !!val || 'Favor de subir los acuses']"
             >
               <template v-slot:prepend>
                 <q-icon name="cloud_upload" @click.stop.prevent />
@@ -35,12 +46,12 @@
               <template v-slot:append>
                 <q-icon
                   name="close"
-                  @click.stop.prevent="acuse_File = null"
+                  @click.stop.prevent="files = null"
                   class="cursor-pointer"
                 />
               </template>
 
-              <template v-slot:hint> Subir acuse </template>
+              <template v-slot:hint> Subir acuses </template>
             </q-file>
           </div>
         </q-card-section>
@@ -72,19 +83,64 @@ import { ref } from "vue";
 import { useQuasar } from "quasar";
 import { storeToRefs } from "pinia";
 import { useAcusesStore } from "src/stores/acuses-store";
+import { useConfiguracionStore } from "src/stores/configuracion-store";
 
 //-----------------------------------------------------------
 
 const $q = useQuasar();
 const acusesStore = useAcusesStore();
+const configuracionStore = useConfiguracionStore();
 const { modal } = storeToRefs(acusesStore);
-const acuse_File = ref(null);
+const { tipo_Elecciones } = storeToRefs(configuracionStore);
+const files = ref(null);
+const tipo_Eleccion_Id = ref(null);
 
 //-----------------------------------------------------------
 
 const actualizarModal = (valor) => {
   $q.loading.show();
   acusesStore.actualizarModal(valor);
+  $q.loading.hide();
+};
+
+const onSubmit = async () => {
+  let acusesFormData = new FormData();
+  acusesFormData.append("Archivos", files.value);
+  files.value.forEach((row) => {
+    acusesFormData.append("Archivos", row);
+  });
+  let resp = null;
+  $q.loading.show();
+  resp = await acusesStore.subirAcuses(
+    tipo_Eleccion_Id.value.value,
+    acusesFormData
+  );
+  if (resp.data.length > 0) {
+    $q.dialog({
+      title: "Atención",
+      message: `Los siguientes documentos no coinciden con los candidatos registrados en ${tipo_Eleccion_Id.value.label}. Favor de revisar el nombre del archivo. ${resp.data}`,
+      icon: "Warning",
+      persistent: true,
+      transitionShow: "scale",
+      transitionHide: "scale",
+    });
+    actualizarModal(false);
+  } else {
+    if (resp.success) {
+      $q.notify({
+        position: "top-right",
+        type: "positive",
+        message: resp.data,
+      });
+    } else {
+      $q.notify({
+        position: "top-right",
+        type: "negative",
+        message: resp.data,
+      });
+    }
+  }
+
   $q.loading.hide();
 };
 </script>

@@ -34,11 +34,6 @@ const routes = [
         name: "genero",
         component: () => import("../modulos/genero/pages/IndexPage.vue"),
       },
-      {
-        path: "/observaciones",
-        name: "observaciones",
-        component: () => import("../modulos/observaciones/pages/IndexPage.vue"),
-      },
     ],
   },
 
