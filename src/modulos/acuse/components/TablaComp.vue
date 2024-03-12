@@ -30,7 +30,6 @@
           :visible-columns="visisble_columns"
           row-key="name"
           :filter="filter"
-          class="my-sticky-last-column-table"
           v-model:pagination="pagination"
         >
           <template v-slot:top-right>
@@ -79,17 +78,18 @@
                     max="100"
                   ></progress>
                 </div>
-                <div v-else-if="col.name === 'id'">
-                  <!-- <q-btn
+                <div v-else-if="col.name === 'acuse_URL'">
+                  <q-icon
+                    size="sm"
                     flat
                     round
-                    color="pink-4"
-                    icon="upload"
-                    @click="subirAcuse(props.row)"
-                  >
-                    <q-tooltip>Subir acuse</q-tooltip>
-                  </q-btn> -->
+                    :color="col.value == null ? 'red' : 'green'"
+                    :name="col.value == null ? 'close' : 'done'"
+                  />
+                </div>
+                <div v-else-if="col.name === 'id'">
                   <q-btn
+                    v-if="props.row.acuse_URL != null"
                     flat
                     round
                     color="pink-4"
@@ -123,14 +123,12 @@ import { storeToRefs } from "pinia";
 import { useQuasar, QSpinnerCube } from "quasar";
 import { useConfiguracionStore } from "src/stores/configuracion-store";
 import { useCandidatosStore } from "src/stores/candidatos-store";
-import { useAcusesStore } from "src/stores/acuses-store";
 
 //-----------------------------------------------------------
 
 const $q = useQuasar();
 const configuracionStore = useConfiguracionStore();
 const candidatosStore = useCandidatosStore();
-const acusesStore = useAcusesStore();
 const { tipo_Elecciones } = storeToRefs(configuracionStore);
 const { list_Candidatos_By_Eleccion } = storeToRefs(candidatosStore);
 const tipo_Eleccion_Id = ref(null);
@@ -174,18 +172,26 @@ const cargarData = async () => {
   $q.loading.hide();
 };
 
-const subirAcuse = (id) => {
-  acusesStore.actualizarModal(true);
-};
-
-const verAcuse = (id) => {
-  acusesStore.actualizarModalVerAcuse(true);
+const verAcuse = async (row) => {
+  $q.dialog({
+    title: "Acuse",
+    style: "width: 800px; max-width: 80vw",
+    message: `<iframe
+            src="${row.acuse_URL}"
+            width="100%"
+            height="650"
+          ></iframe>`,
+    html: true,
+    ok: "Cerrar",
+  });
 };
 
 const cargarColumnas = (tab_Eleccion) => {
   switch (tab_Eleccion) {
     case "GUB":
       visisble_columns.value = [
+        "id",
+        "acuse_URL",
         "nombre_Completo",
         "candidatura",
         "tipo_Candidato",
@@ -194,11 +200,12 @@ const cargarColumnas = (tab_Eleccion) => {
         "orden",
         "logo_Coalicion",
         "logo_Partido",
-        "id",
       ];
       break;
     case "DIP":
       visisble_columns.value = [
+        "id",
+        "acuse_URL",
         "nombre_Completo",
         "candidatura",
         "tipo_Candidato",
@@ -207,11 +214,12 @@ const cargarColumnas = (tab_Eleccion) => {
         "orden",
         "logo_Coalicion",
         "logo_Partido",
-        "id",
       ];
       break;
     case "PYS":
       visisble_columns.value = [
+        "id",
+        "acuse_URL",
         "nombre_Completo",
         "candidatura",
         "tipo_Candidato",
@@ -220,11 +228,12 @@ const cargarColumnas = (tab_Eleccion) => {
         "orden",
         "logo_Coalicion",
         "logo_Partido",
-        "id",
       ];
       break;
     case "REG":
       visisble_columns.value = [
+        "id",
+        "acuse_URL",
         "nombre_Completo",
         "candidatura",
         "tipo_Candidato",
@@ -234,7 +243,6 @@ const cargarColumnas = (tab_Eleccion) => {
         "orden",
         "logo_Coalicion",
         "logo_Partido",
-        "id",
       ];
       break;
     default:
@@ -247,6 +255,20 @@ const pagesNumber = computed(() =>
 );
 
 const columns = [
+  {
+    name: "id",
+    align: "center",
+    label: "Acciones",
+    field: "id",
+    sortable: true,
+  },
+  {
+    name: "acuse_URL",
+    align: "center",
+    label: "Acuse",
+    field: "acuse_URL",
+    sortable: true,
+  },
   {
     name: "nombre_Completo",
     align: "center",
@@ -331,13 +353,6 @@ const columns = [
     field: "puntuacion",
     sortable: true,
   },
-  {
-    name: "id",
-    align: "center",
-    label: "Acciones",
-    field: "id",
-    sortable: true,
-  },
 ];
 
 const filter = ref("");
@@ -348,19 +363,3 @@ const pagination = ref({
   rowsPerPage: 5,
 });
 </script>
-
-<style lang="sass">
-.my-sticky-last-column-table
-  thead tr:last-child th:last-child
-    /* bg color is important for th; just specify one */
-    background-color: white
-
-  td:last-child
-    background-color: white
-
-  th:last-child,
-  td:last-child
-    position: sticky
-    right: 0
-    z-index: 1
-</style>

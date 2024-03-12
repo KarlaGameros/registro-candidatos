@@ -337,7 +337,23 @@ const onSubmit = async () => {
   let sustituirPropietario2 = new FormData();
   let sustituirSuplente2 = new FormData();
   if (sustituirPor.value == "Propietario") {
+    console.log(propietario_1.value);
     sustituirFormData.append("Tipo_Sustitucion", "Propietario 1");
+    sustituirFormData.append("Tipo_Candidato", 0);
+    if (propietario_1.value.edad != null)
+      sustituirFormData.append("Edad_Anterior", propietario_1.value.edad);
+    if (propietario_1.value.acuse_URL != null)
+      sustituirFormData.append(
+        "Acuse_Candidato_URL_Anterior",
+        propietario_1.value.acuse_URL
+      );
+    if (propietario_1.value.consentimiento_URL != null)
+      sustituirFormData.append(
+        "Consentimiento_Candidato_URL_Anterior",
+        propietario_1.value.consentimiento_URL
+      );
+    if (propietario_1.value.url_Foto != null)
+      sustituirFormData.append("Foto_Anterior", propietario_1.value.url_Foto);
     if (propietario_1.value.nombres != null)
       sustituirFormData.append("Nombres_Anterior", propietario_1.value.nombres);
     if (propietario_1.value.apellido_Paterno != null)
@@ -380,10 +396,11 @@ const onSubmit = async () => {
       );
     if (propietario_1.value.correo != null)
       sustituirFormData.append("Correo_Anterior", propietario_1.value.correo);
-    sustituirFormData.append(
-      "Pertenece_Grupo_Vulnerable_Anterior",
-      propietario_1.value.pertenece_Grupo_Vulnerable
-    );
+    if (propietario_1.value.pertenece_Grupo_Vulnerable != null)
+      sustituirFormData.append(
+        "Pertenece_Grupo_Vulnerable_Anterior",
+        propietario_1.value.pertenece_Grupo_Vulnerable
+      );
     if (propietario_1.value.grupo_Vulnerable != null)
       sustituirFormData.append(
         "Grupo_Vulnerable_Anterior",
@@ -451,10 +468,11 @@ const onSubmit = async () => {
         "Correo_Nuevo",
         sust_propietario_1.value.Correo_Nuevo
       );
-    sustituirFormData.append(
-      "Pertenece_Grupo_Vulnerable_Nuevo",
-      sust_propietario_1.value.Pertenece_Grupo_Vulnerable_Nuevo
-    );
+    if (sust_propietario_1.value.Grupo_Vulnerable_Nuevo != null)
+      sustituirFormData.append(
+        "Pertenece_Grupo_Vulnerable_Nuevo",
+        sust_propietario_1.value.Pertenece_Grupo_Vulnerable_Nuevo
+      );
     if (sust_propietario_1.value.Grupo_Vulnerable_Nuevo != null)
       sustituirFormData.append(
         "Grupo_Vulnerable_Nuevo",
@@ -473,7 +491,22 @@ const onSubmit = async () => {
     if (sust_propietario_1.value.Edad_Nuevo != null)
       sustituirFormData.append("Edad", sust_propietario_1.value.Edad_Nuevo);
   } else if (sustituirPor.value == "Suplente") {
+    sustituirFormData.append("Tipo_Candidato", 1);
     sustituirFormData.append("Tipo_Sustitucion", "Suplente 1");
+    if (suplente_1.value.edad != null)
+      sustituirFormData.append("Edad_Anterior", suplente_1.value.edad);
+    if (suplente_1.value.acuse_URL != null)
+      sustituirFormData.append(
+        "Acuse_Candidato_URL_Anterior",
+        suplente_1.value.acuse_URL
+      );
+    if (suplente_1.value.acuse_URL != null)
+      sustituirFormData.append(
+        "Consentimiento_Candidato_URL_Anterior",
+        suplente_1.value.consentimiento_URL
+      );
+    if (suplente_1.value.url_Foto != null)
+      sustituirFormData.append("Foto_Anterior", suplente_1.value.url_Foto);
     if (suplente_1.value.nombres != null)
       sustituirFormData.append("Nombres_Anterior", suplente_1.value.nombres);
     if (suplente_1.value.apellido_Paterno != null)
@@ -513,10 +546,11 @@ const onSubmit = async () => {
       sustituirFormData.append("Telefono_Anterior", suplente_1.value.telefono);
     if (suplente_1.value.correo != null)
       sustituirFormData.append("Correo_Anterior", suplente_1.value.correo);
-    sustituirFormData.append(
-      "Pertenece_Grupo_Vulnerable_Anterior",
-      suplente_1.value.pertenece_Grupo_Vulnerable
-    );
+    if (suplente_1.value.pertenece_Grupo_Vulnerable != null)
+      sustituirFormData.append(
+        "Pertenece_Grupo_Vulnerable_Anterior",
+        suplente_1.value.pertenece_Grupo_Vulnerable
+      );
     if (suplente_1.value.grupo_Vulnerable != null)
       sustituirFormData.append(
         "Grupo_Vulnerable_Anterior",
@@ -575,10 +609,11 @@ const onSubmit = async () => {
         "Correo_Nuevo",
         sust_suplente_1.value.Correo_Nuevo
       );
-    sustituirFormData.append(
-      "Pertenece_Grupo_Vulnerable_Nuevo",
-      sust_suplente_1.value.Pertenece_Grupo_Vulnerable_Nuevo
-    );
+    if (sust_suplente_1.value.Pertenece_Grupo_Vulnerable_Nuevo != null)
+      sustituirFormData.append(
+        "Pertenece_Grupo_Vulnerable_Nuevo",
+        sust_suplente_1.value.Pertenece_Grupo_Vulnerable_Nuevo
+      );
     if (sust_suplente_1.value.Grupo_Vulnerable_Nuevo != null)
       sustituirFormData.append(
         "Grupo_Vulnerable_Nuevo",
@@ -594,7 +629,22 @@ const onSubmit = async () => {
     if (sust_suplente_1.value.Edad_Nuevo != null)
       sustituirFormData.append("Edad", sust_suplente_1.value.Edad_Nuevo);
   } else if (sustituirPor.value == "Propietario sindico") {
+    sustituirFormData.append("Tipo_Candidato", 2);
     sustituirFormData.append("Tipo_Sustitucion", "Propietario 2");
+    if (propietario_2.value.edad != null)
+      sustituirFormData.append("Edad_Anterior", propietario_2.value.edad);
+    if (propietario_2.value.acuse_URL != null)
+      sustituirFormData.append(
+        "Acuse_Candidato_URL_Anterior",
+        propietario_2.value.acuse_URL
+      );
+    if (propietario_2.value.acuse_URL != null)
+      sustituirFormData.append(
+        "Consentimiento_Candidato_URL_Anterior",
+        propietario_2.value.consentimiento_URL
+      );
+    if (propietario_2.value.url_Foto != null)
+      sustituirFormData.append("Foto_Anterior", propietario_2.value.url_Foto);
     if (propietario_2.value.nombres != null)
       sustituirFormData.append("Nombres_Anterior", propietario_2.value.nombres);
     if (propietario_2.value.apellido_Paterno != null)
@@ -637,10 +687,11 @@ const onSubmit = async () => {
       );
     if (propietario_2.value.correo != null)
       sustituirFormData.append("Correo_Anterior", propietario_2.value.correo);
-    sustituirFormData.append(
-      "Pertenece_Grupo_Vulnerable_Anterior",
-      propietario_2.value.pertenece_Grupo_Vulnerable
-    );
+    if (propietario_2.value.pertenece_Grupo_Vulnerable != null)
+      sustituirFormData.append(
+        "Pertenece_Grupo_Vulnerable_Anterior",
+        propietario_2.value.pertenece_Grupo_Vulnerable
+      );
     if (propietario_2.value.grupo_Vulnerable != null)
       sustituirFormData.append(
         "Grupo_Vulnerable_Anterior",
@@ -708,10 +759,11 @@ const onSubmit = async () => {
         "Correo_Nuevo",
         sust_propietario_2.value.Correo_Nuevo
       );
-    sustituirFormData.append(
-      "Pertenece_Grupo_Vulnerable_Nuevo",
-      sust_propietario_2.value.Pertenece_Grupo_Vulnerable_Nuevo
-    );
+    if (sust_propietario_2.value.Pertenece_Grupo_Vulnerable_Nuevo != null)
+      sustituirFormData.append(
+        "Pertenece_Grupo_Vulnerable_Nuevo",
+        sust_propietario_2.value.Pertenece_Grupo_Vulnerable_Nuevo
+      );
     if (sust_propietario_2.value.Grupo_Vulnerable_Nuevo != null)
       sustituirFormData.append(
         "Grupo_Vulnerable_Nuevo",
@@ -730,7 +782,22 @@ const onSubmit = async () => {
     if (sust_propietario_2.value.Edad_Nuevo != null)
       sustituirFormData.append("Edad", sust_propietario_2.value.Edad_Nuevo);
   } else if (sustituirPor.value == "Suplente sindico") {
+    sustituirFormData.append("Tipo_Candidato", 3);
     sustituirFormData.append("Tipo_Sustitucion", "Suplente 2");
+    if (suplente_2.value.acuse_URL != null)
+      sustituirFormData.append(
+        "Acuse_Candidato_URL_Anterior",
+        suplente_2.value.acuse_URL
+      );
+    if (suplente_2.value.acuse_URL != null)
+      sustituirFormData.append(
+        "Consentimiento_Candidato_URL_Anterior",
+        suplente_2.value.consentimiento_URL
+      );
+    if (suplente_2.value.edad != null)
+      sustituirFormData.append("Edad_Anterior", suplente_2.value.edad);
+    if (suplente_2.value.url_Foto != null)
+      sustituirFormData.append("Foto_Anterior", suplente_2.value.url_Foto);
     if (suplente_2.value.nombres != null)
       sustituirFormData.append("Nombres_Anterior", suplente_2.value.nombres);
     if (suplente_2.value.apellido_Paterno != null)
@@ -770,10 +837,11 @@ const onSubmit = async () => {
       sustituirFormData.append("Telefono_Anterior", suplente_2.value.telefono);
     if (suplente_2.value.correo != null)
       sustituirFormData.append("Correo_Anterior", suplente_2.value.correo);
-    sustituirFormData.append(
-      "Pertenece_Grupo_Vulnerable_Anterior",
-      suplente_2.value.pertenece_Grupo_Vulnerable
-    );
+    if (suplente_2.value.pertenece_Grupo_Vulnerable != null)
+      sustituirFormData.append(
+        "Pertenece_Grupo_Vulnerable_Anterior",
+        suplente_2.value.pertenece_Grupo_Vulnerable
+      );
     if (suplente_2.value.grupo_Vulnerable != null)
       sustituirFormData.append(
         "Grupo_Vulnerable_Anterior",
@@ -832,10 +900,11 @@ const onSubmit = async () => {
         "Correo_Nuevo",
         sust_suplente_2.value.Correo_Nuevo
       );
-    sustituirFormData.append(
-      "Pertenece_Grupo_Vulnerable_Nuevo",
-      sust_suplente_2.value.Pertenece_Grupo_Vulnerable_Nuevo
-    );
+    if (sust_suplente_2.value.Pertenece_Grupo_Vulnerable_Nuevo != null)
+      sustituirFormData.append(
+        "Pertenece_Grupo_Vulnerable_Nuevo",
+        sust_suplente_2.value.Pertenece_Grupo_Vulnerable_Nuevo
+      );
     if (sust_suplente_2.value.Grupo_Vulnerable_Nuevo != null)
       sustituirFormData.append(
         "Grupo_Vulnerable_Nuevo",
@@ -851,9 +920,27 @@ const onSubmit = async () => {
     if (sust_suplente_2.value.Edad_Nuevo != null)
       sustituirFormData.append("Edad", sust_suplente_2.value.Edad_Nuevo);
   } else if (sustituirPor.value == "Fórmula") {
+    sustituirPropietario1.append("Tipo_Candidato", 0);
     sustituirPropietario1.append("Fecha_Sustitucion", date.value);
     sustituirPropietario1.append("Fecha_Registro", date.value);
     sustituirPropietario1.append("Tipo_Sustitucion", "Propietario 1");
+    if (propietario_1.value.acuse_URL != null)
+      sustituirPropietario1.append(
+        "Acuse_Candidato_URL_Anterior",
+        propietario_1.value.acuse_URL
+      );
+    if (propietario_1.value.acuse_URL != null)
+      sustituirPropietario1.append(
+        "Consentimiento_Candidato_URL_Anterior",
+        propietario_1.value.consentimiento_URL
+      );
+    if (propietario_1.value.url_Foto != null)
+      sustituirPropietario1.append(
+        "Foto_Anterior",
+        propietario_1.value.url_Foto
+      );
+    if (propietario_1.value.edad != null)
+      sustituirPropietario1.append("Edad_Anterior", propietario_1.value.edad);
     if (propietario_1.value.nombres != null)
       sustituirPropietario1.append(
         "Nombres_Anterior",
@@ -902,10 +989,11 @@ const onSubmit = async () => {
         "Correo_Anterior",
         propietario_1.value.correo
       );
-    sustituirPropietario1.append(
-      "Pertenece_Grupo_Vulnerable_Anterior",
-      propietario_1.value.pertenece_Grupo_Vulnerable
-    );
+    if (propietario_1.value.pertenece_Grupo_Vulnerable != null)
+      sustituirPropietario1.append(
+        "Pertenece_Grupo_Vulnerable_Anterior",
+        propietario_1.value.pertenece_Grupo_Vulnerable
+      );
     if (propietario_1.value.grupo_Vulnerable != null)
       sustituirPropietario1.append(
         "Grupo_Vulnerable_Anterior",
@@ -976,10 +1064,11 @@ const onSubmit = async () => {
         "Correo_Nuevo",
         sust_propietario_1.value.Correo_Nuevo
       );
-    sustituirPropietario1.append(
-      "Pertenece_Grupo_Vulnerable_Nuevo",
-      sust_propietario_1.value.Pertenece_Grupo_Vulnerable_Nuevo
-    );
+    if (sust_propietario_1.value.Pertenece_Grupo_Vulnerable_Nuevo != null)
+      sustituirPropietario1.append(
+        "Pertenece_Grupo_Vulnerable_Nuevo",
+        sust_propietario_1.value.Pertenece_Grupo_Vulnerable_Nuevo
+      );
     if (sust_propietario_1.value.Grupo_Vulnerable_Nuevo != null)
       sustituirPropietario1.append(
         "Grupo_Vulnerable_Nuevo",
@@ -998,9 +1087,24 @@ const onSubmit = async () => {
     if (sust_propietario_1.value.Edad_Nuevo != null)
       sustituirPropietario1.append("Edad", sust_propietario_1.value.Edad_Nuevo);
     //-----------------------------------------------------------------
+    sustituirSuplente1.append("Tipo_Candidato", 1);
     sustituirSuplente1.append("Fecha_Sustitucion", date.value);
     sustituirSuplente1.append("Fecha_Registro", date.value);
     sustituirSuplente1.append("Tipo_Sustitucion", "Suplente 1");
+    if (suplente_1.value.acuse_URL != null)
+      sustituirSuplente1.append(
+        "Acuse_Candidato_URL_Anterior",
+        suplente_1.value.acuse_URL
+      );
+    if (suplente_1.value.acuse_URL != null)
+      sustituirSuplente1.append(
+        "Consentimiento_Candidato_URL_Anterior",
+        suplente_1.value.consentimiento_URL
+      );
+    if (suplente_1.value.edad != null)
+      sustituirSuplente1.append("Edad_Anterior", suplente_1.value.edad);
+    if (suplente_1.value.url_Foto != null)
+      sustituirSuplente1.append("Foto_Anterior", suplente_1.value.url_Foto);
     if (suplente_1.value.nombres != null)
       sustituirSuplente1.append("Nombres_Anterior", suplente_1.value.nombres);
     if (suplente_1.value.apellido_Paterno != null)
@@ -1040,10 +1144,11 @@ const onSubmit = async () => {
       sustituirSuplente1.append("Telefono_Anterior", suplente_1.value.telefono);
     if (suplente_1.value.correo != null)
       sustituirSuplente1.append("Correo_Anterior", suplente_1.value.correo);
-    sustituirSuplente1.append(
-      "Pertenece_Grupo_Vulnerable_Anterior",
-      suplente_1.value.pertenece_Grupo_Vulnerable
-    );
+    if (suplente_1.value.pertenece_Grupo_Vulnerable != null)
+      sustituirSuplente1.append(
+        "Pertenece_Grupo_Vulnerable_Anterior",
+        suplente_1.value.pertenece_Grupo_Vulnerable
+      );
     if (suplente_1.value.grupo_Vulnerable != null)
       sustituirSuplente1.append(
         "Grupo_Vulnerable_Anterior",
@@ -1102,10 +1207,11 @@ const onSubmit = async () => {
         "Correo_Nuevo",
         sust_suplente_1.value.Correo_Nuevo
       );
-    sustituirSuplente1.append(
-      "Pertenece_Grupo_Vulnerable_Nuevo",
-      sust_suplente_1.value.Pertenece_Grupo_Vulnerable_Nuevo
-    );
+    if (sust_suplente_1.value.Pertenece_Grupo_Vulnerable_Nuevo != null)
+      sustituirSuplente1.append(
+        "Pertenece_Grupo_Vulnerable_Nuevo",
+        sust_suplente_1.value.Pertenece_Grupo_Vulnerable_Nuevo
+      );
     if (sust_suplente_1.value.Grupo_Vulnerable_Nuevo != null)
       sustituirSuplente1.append(
         "Grupo_Vulnerable_Nuevo",
@@ -1123,9 +1229,27 @@ const onSubmit = async () => {
     if (sust_suplente_1.value.Edad_Nuevo != null)
       sustituirSuplente1.append("Edad", sust_suplente_1.value.Edad_Nuevo);
     //-----------------------------------------------------------------
+    sustituirPropietario2.append("Tipo_Candidato", 2);
     sustituirPropietario2.append("Fecha_Sustitucion", date.value);
     sustituirPropietario2.append("Fecha_Registro", date.value);
     sustituirPropietario2.append("Tipo_Sustitucion", "Propietario 2");
+    if (propietario_2.value.acuse_URL != null)
+      sustituirPropietario2.append(
+        "Acuse_Candidato_URL_Anterior",
+        propietario_2.value.acuse_URL
+      );
+    if (propietario_2.value.acuse_URL != null)
+      sustituirPropietario2.append(
+        "Consentimiento_Candidato_URL_Anterior",
+        propietario_2.value.consentimiento_URL
+      );
+    if (propietario_2.value.edad != null)
+      sustituirPropietario2.append("Edad_Anterior", propietario_2.value.edad);
+    if (propietario_2.value.url_Foto != null)
+      sustituirPropietario2.append(
+        "Foto_Anterior",
+        propietario_2.value.url_Foto
+      );
     if (propietario_2.value.nombres != null)
       sustituirPropietario2.append(
         "Nombres_Anterior",
@@ -1174,10 +1298,11 @@ const onSubmit = async () => {
         "Correo_Anterior",
         propietario_2.value.correo
       );
-    sustituirPropietario2.append(
-      "Pertenece_Grupo_Vulnerable_Anterior",
-      propietario_2.value.pertenece_Grupo_Vulnerable
-    );
+    if (propietario_2.value.pertenece_Grupo_Vulnerable != null)
+      sustituirPropietario2.append(
+        "Pertenece_Grupo_Vulnerable_Anterior",
+        propietario_2.value.pertenece_Grupo_Vulnerable
+      );
     if (propietario_2.value.grupo_Vulnerable != null)
       sustituirPropietario2.append(
         "Grupo_Vulnerable_Anterior",
@@ -1248,10 +1373,11 @@ const onSubmit = async () => {
         "Correo_Nuevo",
         sust_propietario_2.value.Correo_Nuevo
       );
-    sustituirPropietario2.append(
-      "Pertenece_Grupo_Vulnerable_Nuevo",
-      sust_propietario_2.value.Pertenece_Grupo_Vulnerable_Nuevo
-    );
+    if (sust_propietario_2.value.Pertenece_Grupo_Vulnerable_Nuevo != null)
+      sustituirPropietario2.append(
+        "Pertenece_Grupo_Vulnerable_Nuevo",
+        sust_propietario_2.value.Pertenece_Grupo_Vulnerable_Nuevo
+      );
     if (sust_propietario_2.value.Grupo_Vulnerable_Nuevo != null)
       sustituirPropietario2.append(
         "Grupo_Vulnerable_Nuevo",
@@ -1270,9 +1396,24 @@ const onSubmit = async () => {
     if (sust_propietario_2.value.Edad_Nuevo != null)
       sustituirPropietario2.append("Edad", sust_propietario_2.value.Edad_Nuevo);
     //-----------------------------------------------------------------
+    sustituirSuplente2.append("Tipo_Candidato", 3);
     sustituirSuplente2.append("Fecha_Sustitucion", date.value);
     sustituirSuplente2.append("Fecha_Registro", date.value);
     sustituirSuplente2.append("Tipo_Sustitucion", "Suplente 2");
+    if (suplente_2.value.acuse_URL != null)
+      sustituirSuplente2.append(
+        "Acuse_Candidato_URL_Anterior",
+        suplente_2.value.acuse_URL
+      );
+    if (suplente_2.value.acuse_URL != null)
+      sustituirSuplente2.append(
+        "Consentimiento_Candidato_URL_Anterior",
+        suplente_2.value.consentimiento_URL
+      );
+    if (suplente_2.value.url_Foto != null)
+      sustituirSuplente2.append("Foto_Anterior", suplente_2.value.url_Foto);
+    if (suplente_2.value.edad != null)
+      sustituirSuplente2.append("Edad_Anterior", suplente_2.value.edad);
     if (suplente_2.value.nombres != null)
       sustituirSuplente2.append("Nombres_Anterior", suplente_2.value.nombres);
     if (suplente_2.value.apellido_Paterno != null)
@@ -1312,10 +1453,11 @@ const onSubmit = async () => {
       sustituirSuplente2.append("Telefono_Anterior", suplente_2.value.telefono);
     if (suplente_2.value.correo != null)
       sustituirSuplente2.append("Correo_Anterior", suplente_2.value.correo);
-    sustituirSuplente2.append(
-      "Pertenece_Grupo_Vulnerable_Anterior",
-      suplente_2.value.pertenece_Grupo_Vulnerable
-    );
+    if (suplente_2.value.pertenece_Grupo_Vulnerable != null)
+      sustituirSuplente2.append(
+        "Pertenece_Grupo_Vulnerable_Anterior",
+        suplente_2.value.pertenece_Grupo_Vulnerable
+      );
     if (suplente_2.value.grupo_Vulnerable != null)
       sustituirSuplente2.append(
         "Grupo_Vulnerable_Anterior",
@@ -1374,10 +1516,11 @@ const onSubmit = async () => {
         "Correo_Nuevo",
         sust_suplente_2.value.Correo_Nuevo
       );
-    sustituirSuplente2.append(
-      "Pertenece_Grupo_Vulnerable_Nuevo",
-      sust_suplente_2.value.Pertenece_Grupo_Vulnerable_Nuevo
-    );
+    if (sust_suplente_2.value.Pertenece_Grupo_Vulnerable_Nuevo != null)
+      sustituirSuplente2.append(
+        "Pertenece_Grupo_Vulnerable_Nuevo",
+        sust_suplente_2.value.Pertenece_Grupo_Vulnerable_Nuevo
+      );
     if (sust_suplente_2.value.Grupo_Vulnerable_Nuevo != null)
       sustituirSuplente2.append(
         "Grupo_Vulnerable_Nuevo",
@@ -1410,42 +1553,52 @@ const onSubmit = async () => {
       candidato.value.id,
       sustituirFormData
     );
-  } else {
+  } else if (sustituirPor.value == "Fórmula") {
     if (props.tab == "DIP") {
-      resp = await sustituirStore.sustituirCandidato(
+      let resp1 = await sustituirStore.sustituirCandidato(
         candidato.value.id,
         sustituirPropietario1
       );
-      resp = await sustituirStore.sustituirCandidato(
-        candidato.value.id,
-        sustituirSuplente1
-      );
+      if (resp1.success == true) {
+        resp = await sustituirStore.sustituirCandidato(
+          candidato.value.id,
+          sustituirSuplente1
+        );
+      }
     } else if (props.tab == "PYS") {
-      resp = await sustituirStore.sustituirCandidato(
+      let resp1 = await sustituirStore.sustituirCandidato(
         candidato.value.id,
         sustituirPropietario1
       );
-      resp = await sustituirStore.sustituirCandidato(
-        candidato.value.id,
-        sustituirSuplente1
-      );
-      resp = await sustituirStore.sustituirCandidato(
-        candidato.value.id,
-        sustituirPropietario2
-      );
-      resp = await sustituirStore.sustituirCandidato(
-        candidato.value.id,
-        sustituirSuplente2
-      );
+      if (resp1.success == true) {
+        let resp2 = await sustituirStore.sustituirCandidato(
+          candidato.value.id,
+          sustituirSuplente1
+        );
+        if (resp2.success == true) {
+          let resp3 = await sustituirStore.sustituirCandidato(
+            candidato.value.id,
+            sustituirPropietario2
+          );
+          if (resp3.success == true) {
+            resp = await sustituirStore.sustituirCandidato(
+              candidato.value.id,
+              sustituirSuplente2
+            );
+          }
+        }
+      }
     } else if (props.tab == "REG") {
-      resp = await sustituirStore.sustituirCandidato(
+      let resp1 = await sustituirStore.sustituirCandidato(
         candidato.value.id,
         sustituirPropietario1
       );
-      resp = await sustituirStore.sustituirCandidato(
-        candidato.value.id,
-        sustituirSuplente1
-      );
+      if (resp1.success == true) {
+        resp = await sustituirStore.sustituirCandidato(
+          candidato.value.id,
+          sustituirSuplente1
+        );
+      }
     } else if (props.tab == "GUB") {
       resp = await sustituirStore.sustituirCandidato(
         candidato.value.id,
@@ -1453,7 +1606,7 @@ const onSubmit = async () => {
       );
     }
   }
-  if (resp.success) {
+  if (resp.success == true) {
     $q.notify({
       position: "top-right",
       type: "positive",

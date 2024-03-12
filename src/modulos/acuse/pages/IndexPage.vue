@@ -19,7 +19,10 @@
         <template v-slot:avatar>
           <q-icon name="info" color="grey" />
         </template>
-        <slot>Favor de subir los acuse firmados por cada candidatura.</slot>
+        <slot
+          >Favor de subir los acuse firmados por cada candidatura en el botón
+          "Subir acuse".</slot
+        >
       </q-banner>
     </div>
     <div class="row q-pb-sm">
@@ -37,15 +40,15 @@
       </div>
     </div>
     <TablaComp />
-    <ModalComo />
-    <ModalVerAcuse />
+    <ModalComp />
+    <ModalAcuse />
   </q-page>
 </template>
 <script setup>
-import TablaComp from "../components/TablaComp.vue";
-import ModalComo from "../components/ModalComp.vue";
-import ModalVerAcuse from "../components/ModalVerAcuse.vue";
 import { useAcusesStore } from "src/stores/acuses-store";
+import TablaComp from "../components/TablaComp.vue";
+import ModalComp from "../components/ModalComp.vue";
+import ModalAcuse from "../components/ModalAcuse.vue";
 
 const acusesStore = useAcusesStore();
 

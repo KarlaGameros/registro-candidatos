@@ -4,16 +4,20 @@ import { api } from "src/boot/axios";
 export const useAcusesStore = defineStore("useAcusesStore", {
   state: () => ({
     modal: false,
-    modalVerAcuse: false,
+    modalAcuse: false,
+    list_Acuses: [],
   }),
   actions: {
     actualizarModal(valor) {
       this.modal = valor;
     },
-    actualizarModalVerAcuse(valor) {
-      this.modalVerAcuse = valor;
+    actualizarModalAcuse(valor) {
+      this.modalAcuse = valor;
     },
 
+    initAcuse() {
+      this.list_Acuses = [];
+    },
     //----------------------------------------------------------------------
     //SUBIR ACUSES
     async subirAcuses(id, acuse) {
@@ -26,6 +30,7 @@ export const useAcusesStore = defineStore("useAcusesStore", {
         if (resp.status == 200) {
           const { success, data } = resp.data;
           if (success === true) {
+            this.list_Acuses = data;
             return { success, data };
           } else {
             return { success, data };

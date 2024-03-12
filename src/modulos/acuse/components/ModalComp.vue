@@ -84,12 +84,14 @@ import { useQuasar } from "quasar";
 import { storeToRefs } from "pinia";
 import { useAcusesStore } from "src/stores/acuses-store";
 import { useConfiguracionStore } from "src/stores/configuracion-store";
+import { useCandidatosStore } from "src/stores/candidatos-store";
 
 //-----------------------------------------------------------
 
 const $q = useQuasar();
 const acusesStore = useAcusesStore();
 const configuracionStore = useConfiguracionStore();
+const candidatosStore = useCandidatosStore();
 const { modal } = storeToRefs(acusesStore);
 const { tipo_Elecciones } = storeToRefs(configuracionStore);
 const files = ref(null);
@@ -100,6 +102,8 @@ const tipo_Eleccion_Id = ref(null);
 const actualizarModal = (valor) => {
   $q.loading.show();
   acusesStore.actualizarModal(valor);
+  files.value = null;
+  tipo_Eleccion_Id.value = null;
   $q.loading.hide();
 };
 
@@ -116,15 +120,7 @@ const onSubmit = async () => {
     acusesFormData
   );
   if (resp.data.length > 0) {
-    $q.dialog({
-      title: "Atención",
-      message: `Los siguientes documentos no coinciden con los candidatos registrados en ${tipo_Eleccion_Id.value.label}. Favor de revisar el nombre del archivo. ${resp.data}`,
-      icon: "Warning",
-      persistent: true,
-      transitionShow: "scale",
-      transitionHide: "scale",
-    });
-    actualizarModal(false);
+    acusesStore.actualizarModalAcuse(true);
   } else {
     if (resp.success) {
       $q.notify({
@@ -140,6 +136,8 @@ const onSubmit = async () => {
       });
     }
   }
+  await candidatosStore.loadCandidatosByEleccion(tipo_Eleccion_Id.value.value);
+  actualizarModal(false);
 
   $q.loading.hide();
 };

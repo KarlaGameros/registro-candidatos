@@ -20,8 +20,7 @@
           <q-icon name="info" color="grey" />
         </template>
         En este apartado se podrá visualizar la documentación de las
-        candidaturas <q-icon name="folder" color="pink" size="xs" /> y se podrá
-        ver si la candidatura indicó que pertenece a un grupo vulnerable.
+        candidaturas <q-icon name="folder" color="pink" size="xs" />.
       </q-banner>
     </div>
     <div class="row">

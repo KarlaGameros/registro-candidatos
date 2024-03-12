@@ -19,7 +19,7 @@
         />
       </q-card-section>
       <q-card-section>
-        <q-list>
+        <q-list bordered separator>
           <q-item
             class="q-pa-sm"
             v-for="item in list_Documentacion_Genero"
