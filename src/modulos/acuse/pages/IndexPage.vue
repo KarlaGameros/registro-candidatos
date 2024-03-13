@@ -21,7 +21,7 @@
         </template>
         <slot
           >Favor de subir los acuse firmados por cada candidatura en el botón
-          "Subir acuse".</slot
+          "Subir acuse <q-icon name="upload" size="sm" color="pink" />".</slot
         >
       </q-banner>
     </div>

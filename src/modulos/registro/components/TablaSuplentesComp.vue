@@ -48,8 +48,22 @@
               <div v-if="col.name === 'nombre_Completo'">
                 <q-item>
                   <q-item-section avatar>
-                    <q-avatar>
+                    <q-avatar v-if="props.row.url_Foto != null">
                       <img :src="props.row.url_Foto" />
+                    </q-avatar>
+                    <q-avatar v-else>
+                      <q-img
+                        v-if="props.row.sexo == 'Mujer'"
+                        src="../../../assets/avatarmujer.jpg"
+                      />
+                      <q-img
+                        v-if="props.row.sexo == 'Hombre'"
+                        src="../../../assets/avatarHombre.jpg"
+                      />
+                      <q-img
+                        v-if="props.row.sexo == 'No binario'"
+                        src="../../../assets/noBinario.png"
+                      />
                     </q-avatar>
                   </q-item-section>
 

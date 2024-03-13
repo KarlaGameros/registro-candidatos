@@ -337,7 +337,6 @@ const onSubmit = async () => {
   let sustituirPropietario2 = new FormData();
   let sustituirSuplente2 = new FormData();
   if (sustituirPor.value == "Propietario") {
-    console.log(propietario_1.value);
     sustituirFormData.append("Tipo_Sustitucion", "Propietario 1");
     sustituirFormData.append("Tipo_Candidato", 0);
     if (propietario_1.value.edad != null)

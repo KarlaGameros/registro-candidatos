@@ -7,7 +7,6 @@
   >
     <q-card style="width: 800px; max-width: 80vw">
       <q-card-section class="row">
-        <div class="text-h6">Acuses</div>
         <q-space />
         <q-btn
           icon="close"
@@ -19,6 +18,19 @@
         />
       </q-card-section>
       <q-form @submit="onSubmit">
+        <q-card-section class="col-12">
+          <q-card class="my-card">
+            <q-card-section>
+              Aquí podrá subir los acuses de las candidaturas, el nombre debe
+              ser exactamente igual al que fue registrado para poder guardar el
+              acuse, en caso contrario no se podrá subir. Es necesario que el
+              nombre del archivo siga el siguiente formato:
+              <div class="text-red text-center">
+                Nombres_ApellidoPaterno_ApellidoMaterno.pdf
+              </div>
+            </q-card-section>
+          </q-card>
+        </q-card-section>
         <q-card-section class="row q-col-gutter-xs">
           <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
             <q-select

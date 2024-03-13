@@ -129,8 +129,25 @@
                     </div>
                     <q-item>
                       <q-item-section avatar>
-                        <q-avatar size="60px" class="shadow-10">
+                        <q-avatar
+                          size="50px"
+                          v-if="props.row.url_Foto_Propietario != null"
+                        >
                           <img :src="props.row.url_Foto_Propietario" />
+                        </q-avatar>
+                        <q-avatar size="50px" v-else>
+                          <q-img
+                            v-if="props.row.genero_Propietario == 'Mujer'"
+                            src="../../../assets/avatarmujer.jpg"
+                          />
+                          <q-img
+                            v-if="props.row.genero_Propietario == 'Hombre'"
+                            src="../../../assets/avatarHombre.jpg"
+                          />
+                          <q-img
+                            v-if="props.row.genero_Propietario == 'No binario'"
+                            src="../../../assets/noBinario.png"
+                          />
                         </q-avatar>
                       </q-item-section>
 
@@ -259,8 +276,26 @@
                     <div v-else-if="col.name === 'nombre_Completo_Propietario'">
                       <q-item>
                         <q-item-section avatar>
-                          <q-avatar>
+                          <q-avatar
+                            v-if="props.row.url_Foto_Propietario != null"
+                          >
                             <img :src="props.row.url_Foto_Propietario" />
+                          </q-avatar>
+                          <q-avatar v-else>
+                            <q-img
+                              v-if="props.row.genero_Propietario == 'Mujer'"
+                              src="../../../assets/avatarmujer.jpg"
+                            />
+                            <q-img
+                              v-if="props.row.genero_Propietario == 'Hombre'"
+                              src="../../../assets/avatarHombre.jpg"
+                            />
+                            <q-img
+                              v-if="
+                                props.row.genero_Propietario == 'No binario'
+                              "
+                              src="../../../assets/noBinario.png"
+                            />
                           </q-avatar>
                         </q-item-section>
 
