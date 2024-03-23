@@ -3,6 +3,7 @@
     <q-card-section class="row">
       <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 q-pr-md">
         <q-file
+          :disable="visualizar"
           bottom-slots
           v-model="fotoBase.url_Foto"
           label="Fotografía"
@@ -12,10 +13,16 @@
           @rejected="onRejected"
         >
           <template v-slot:prepend>
-            <q-avatar v-if="isEditar">
+            <!-- <q-avatar v-if="isEditar">
               <img :src="candidatoBase.url_Foto" />
-            </q-avatar>
-            <q-icon v-else name="cloud_upload" @click.stop.prevent />
+            </q-avatar> -->
+            <q-btn
+              icon="help"
+              flat
+              round
+              color="orange"
+              @click="especificacionesFoto"
+            />
           </template>
           <template v-slot:append>
             <q-icon
@@ -24,15 +31,12 @@
               class="cursor-pointer"
             />
           </template>
-          <q-tooltip
-            >La fotografía no deberá tener una antigüedad mayor a 3
-            meses</q-tooltip
-          >
           <template v-slot:hint> Agregar fotografía </template>
         </q-file>
       </div>
       <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12 q-pr-md">
         <q-input
+          :disable="visualizar"
           v-model="candidatoBase.nombres"
           label="Nombre(s)"
           hint="Ingrese su nombre"
@@ -44,6 +48,7 @@
       </div>
       <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12 q-pr-md">
         <q-input
+          :disable="visualizar"
           v-model="candidatoBase.apellido_Paterno"
           label="Apellido paterno"
           hint="Ingrese su apellido paterno"
@@ -55,6 +60,7 @@
       </div>
       <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
         <q-input
+          :disable="visualizar"
           v-model="candidatoBase.apellido_Materno"
           label="Apellido Materno"
           hint="Ingrese su apellido materno"
@@ -64,6 +70,7 @@
       </div>
       <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12 q-pr-md">
         <q-input
+          :disable="visualizar"
           v-model="candidatoBase.mote"
           label="Mote"
           hint="Ingrese su sobrenombre"
@@ -73,6 +80,7 @@
       </div>
       <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12 q-pr-md">
         <q-input
+          :disable="visualizar"
           class="text-uppercase"
           v-model.trim="candidatoBase.clave_Elector"
           label="Clave de elector"
@@ -91,6 +99,7 @@
       </div>
       <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12 q-pr-md">
         <q-input
+          :disable="visualizar"
           class="text-uppercase"
           v-model.trim="candidatoBase.curp"
           label="CURP"
@@ -108,6 +117,7 @@
       </div>
       <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
         <q-input
+          :disable="visualizar"
           class="text-uppercase"
           v-model.trim="candidatoBase.rfc"
           label="RFC"
@@ -125,6 +135,7 @@
       </div>
       <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12 q-pr-md">
         <q-input
+          :disable="visualizar"
           v-model="candidatoBase.fecha_Nacimiento"
           label="Fecha de nacimiento"
         >
@@ -154,6 +165,7 @@
       </div>
       <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12 q-pr-md">
         <q-input
+          :disable="visualizar"
           readonly
           v-model.number="candidatoBase.edad"
           type="number"
@@ -166,6 +178,7 @@
       </div>
       <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12 q-pr-md">
         <q-select
+          :disable="visualizar"
           v-model="candidatoBase.sexo"
           :options="optionsGenero"
           label="Género"
@@ -175,6 +188,7 @@
       </div>
       <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
         <q-input
+          :disable="visualizar"
           v-model="candidatoBase.ocupacion"
           label="Ocupación"
           hint="Ingrese su ocupación"
@@ -183,6 +197,7 @@
       </div>
       <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 q-pr-md">
         <q-input
+          :disable="visualizar"
           v-model.trim="candidatoBase.correo"
           type="email"
           label="Correo electrónico"
@@ -208,7 +223,8 @@
             : 'col-lg-6 col-md-6 col-sm-6 col-xs-12'
         "
       >
-        <!-- <q-select
+        <q-select
+          :disable="visualizar"
           label="Teléfono"
           hint="Da enter para agregar teléfono"
           v-model="candidatoBase.telefono"
@@ -223,8 +239,10 @@
           <template v-slot:prepend>
             <q-icon name="phone" color="pink" />
           </template>
-        </q-select> -->
-        <q-input
+        </q-select>
+
+        <!-- <q-input
+          :disable="visualizar"
           v-model="candidatoBase.telefono"
           label="Teléfono"
           mask="### - ### - ####"
@@ -233,7 +251,7 @@
           <template v-slot:prepend>
             <q-icon name="phone" color="pink" />
           </template>
-        </q-input>
+        </q-input> -->
       </div>
       <div v-if="isExtension" class="col-lg-1 col-md-1 col-sm-1 col-xs-12">
         <q-input
@@ -248,6 +266,7 @@
       <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
         <br />
         <q-checkbox
+          :disable="visualizar"
           left-label
           label="¿Pertenece a un grupo en situación de vulnerabilidad?"
           checked-icon="task_alt"
@@ -262,11 +281,13 @@
         class="col-lg-6 col-md-6 col-sm-12 col-xs-12 q-pr-md"
       >
         <q-input
+          :disable="visualizar"
           v-model="candidatoBase.grupo_Vulnerable_1"
           label="Personas de pueblos y comunidades indígenas"
         >
         </q-input>
         <q-input
+          :disable="visualizar"
           v-model="candidatoBase.grupo_Vulnerable_2"
           label="Diversidad sexual"
         >
@@ -277,11 +298,16 @@
         class="col-lg-6 col-md-6 col-sm-12 col-xs-12 q-pr-md"
       >
         <q-input
+          :disable="visualizar"
           v-model="candidatoBase.grupo_Vulnerable_3"
           label="Personas con discapacidad"
         >
         </q-input>
-        <q-input v-model="candidatoBase.grupo_Vulnerable_4" label="Otro">
+        <q-input
+          :disable="visualizar"
+          v-model="candidatoBase.grupo_Vulnerable_4"
+          label="Otro"
+        >
         </q-input>
       </div>
     </q-card-section>
@@ -308,6 +334,7 @@ const {
   foto_2,
   foto_3,
   foto_4,
+  visualizar,
 } = storeToRefs(candidatoStore);
 const optionsGenero = ref(["Hombre", "Mujer", "No binario"]);
 const telefonos = ref();
@@ -540,6 +567,33 @@ watch(telefonos, (val) => {
 });
 
 //--------------------------------------------------------------------
+
+const especificacionesFoto = () => {
+  $q.dialog({
+    title: `Especificaciones para la fotografía`,
+    style: "width: 800px; max-width: 80vw",
+    message: `
+    <div class="text-bold text-grey-8">La fotografía que se divulgada en el Sistema no deberá tener una antiguedad mayor a 3 meses previos a su publicación.</div>
+
+    <ol>
+      <div class="text-bold text-pink-7">Sólo se podrá publicar la imagen de la candidatura que cumpla con las especificaciones técnicas siguientes.</div>
+      <li>El formato de la imagen debe ser .jpg, .jpeg, o .png.</li>
+      <li>El tamaño de la imagen debe ser menor a 700Kb.</li>
+    </ol>
+    <ol>
+      <div class="text-bold text-pink-7">No se podrá publicar lo siguiente:</div>
+      <li>Imágenes de los logotipos de los partidos políticos, coaliciones o candidatura común.</li>
+      <li>Imágenes provenientes de documentos oficiales y/o académicos.</li>
+      <li>Imágenes con lemas de campaña.</li>
+      <li>Imágenes de otras candidaturas o personajes políticos.</li>
+      <li>Imágenes religiosas o alguna otra que se encuentre restringida por la normativa electoral.</li>
+      <li>Imágenes que integren expresiones de denostación o de discriminación de cualquier índole.</li>
+      <li>Imágenes que contengan lenguaje sexista, ofensivo o discriminatorio</li>
+    </ol>`,
+    html: true,
+    ok: "Cerrar",
+  });
+};
 
 const onRejected = () => {
   $q.notify({

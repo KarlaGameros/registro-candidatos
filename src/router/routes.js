@@ -34,6 +34,11 @@ const routes = [
         name: "genero",
         component: () => import("../modulos/genero/pages/IndexPage.vue"),
       },
+      {
+        path: "/documentacion",
+        name: "documentacion",
+        component: () => import("../modulos/documentacion/pages/IndexPage.vue"),
+      },
     ],
   },
 

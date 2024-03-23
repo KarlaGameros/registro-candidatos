@@ -220,7 +220,7 @@ const cargarData = async () => {
 
 const verDocumentos = async (row) => {
   $q.loading.show();
-  await generoStore.getDocumentos(row.id, row.puesto);
+  await generoStore.getDocumentos(row.id, row.puesto, null, true);
   generoStore.actualizarModal(true);
   $q.loading.hide();
 };

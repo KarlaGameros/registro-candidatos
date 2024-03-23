@@ -28,9 +28,14 @@
           <div class="row">
             <div
               v-if="props.tab != 'PYS' && props.tab != 'GUB'"
-              class="col-lg-2 col-md-2 col-sm-2 col-xs-12 q-pr-xs"
+              :class="
+                props.tab == 'DIP'
+                  ? 'col-lg-3 col-md-3 col-sm-3 col-xs-12 q-pr-xs'
+                  : 'col-lg-2 col-md-2 col-sm-2 col-xs-12 q-pr-xs'
+              "
             >
               <q-select
+                :disable="visualizar"
                 v-model="cargo_Id"
                 :options="tipos_Cargos"
                 label="Tipo"
@@ -39,9 +44,10 @@
             </div>
             <div
               v-if="cargo_Id == 'MR' && props.tab == 'DIP'"
-              class="col-lg-3 col-md-3 col-sm-3 col-xs-12"
+              class="col-lg-3 col-md-3 col-sm-3 col-xs-12 q-pr-xs"
             >
               <q-select
+                :disable="visualizar"
                 v-model="distrito_Id"
                 :options="list_Distritos"
                 label="Distrito"
@@ -57,10 +63,11 @@
               :class="
                 props.tab == 'PYS'
                   ? 'col-lg-5 col-md-5 col-sm-5 col-xs-12 q-pr-xs'
-                  : 'col-lg-3 col-md-3 col-sm-3 col-xs-12 q-pr-xs'
+                  : 'col-lg-2 col-md-2 col-sm-2 col-xs-12 q-pr-xs'
               "
             >
               <q-select
+                :disable="visualizar"
                 v-model="municipio_Id"
                 :options="list_Municipios"
                 label="Municipio"
@@ -72,9 +79,10 @@
             <div
               div
               v-if="cargo_Id == 'MR' && props.tab == 'REG'"
-              class="col-lg-3 col-md-3 col-sm-3 col-xs-12"
+              class="col-lg-2 col-md-2 col-sm-2 col-xs-12 q-pr-sm"
             >
               <q-select
+                :disable="visualizar"
                 v-model="demarcacion_Id"
                 :options="list_Demarcaciones"
                 label="Demarcación"
@@ -87,21 +95,34 @@
               v-if="cargo_Id != 'RP'"
               :class="
                 props.tab == 'PYS'
-                  ? 'col-lg-2 col-md-2 col-sm-2 col-xs-2 text-center'
-                  : 'col-lg-1 col-md-1 col-sm-1 col-xs-1 q-pr-xs text-center'
+                  ? 'col-lg-2 col-md-2 col-sm-2 col-xs-2 q-pr-xs text-center'
+                  : 'col-lg-3 col-md-3 col-sm-3 col-xs-12 q-pr-xs text-center'
               "
             >
-              <div class="text-subtitle2 text-grey-8">¿Coalición?</div>
-              <q-checkbox
+              <!-- <div class="text-subtitle2 text-grey-8">Postulación por:</div> -->
+              <!-- <q-checkbox
+                :disable="visualizar"
                 checked-icon="task_alt"
                 unchecked-icon="highlight_off"
                 size="lg"
                 v-model="candidato.is_Coalicion"
                 color="pink"
+              /> -->
+              <q-select
+                :disable="visualizar"
+                v-model="candidato.postulacion"
+                :options="list_Postulacion"
+                label="Postulación por"
+                hint="Seleccione postulación"
+                lazy-rules
+                :rules="[(val) => !!val || 'La postulación es requerida']"
               />
             </div>
             <div
-              v-if="candidato.is_Coalicion == true"
+              v-if="
+                candidato.postulacion != 'Partido político' &&
+                candidato.postulacion != null
+              "
               :class="
                 props.tab == 'PYS'
                   ? 'col-lg-5 col-md-5 col-sm-5 col-xs-12 q-pr-xs'
@@ -109,16 +130,23 @@
               "
             >
               <q-select
+                :disable="visualizar"
                 v-model="coalicion_Id"
                 :options="list_Coaliciones"
-                label="Coalición"
-                hint="Seleccione una coalición"
+                :label="candidato.postulacion"
+                :hint="
+                  candidato.postulacion == 'Coalición'
+                    ? 'Seleccione una coalición'
+                    : 'Seleccione candidatura común'
+                "
                 lazy-rules
                 :rules="[(val) => !!val || 'La coalición es requerida']"
               />
             </div>
             <div
-              v-else
+              v-else-if="
+                candidato.postulacion == 'Partido político' || cargo_Id == 'RP'
+              "
               :class="
                 props.tab == 'PYS'
                   ? 'col-lg-5 col-md-5 col-sm-5 col-xs-12 q-pr-xs'
@@ -126,6 +154,7 @@
               "
             >
               <q-select
+                :disable="visualizar"
                 v-model="partido_Id"
                 :options="list_Partidos_Politicos"
                 label="Partido postulante"
@@ -134,7 +163,18 @@
                 :rules="[
                   (val) => !!val || 'El partiddo postulante es requerido',
                 ]"
-              />
+              >
+                <template v-slot:option="scope">
+                  <q-item v-bind="scope.itemProps">
+                    <q-item-section avatar v-if="scope.opt.logo_URL != null">
+                      <q-img :src="scope.opt.logo_URL" />
+                    </q-item-section>
+                    <q-item-section>
+                      <q-item-label>{{ scope.opt.label }}</q-item-label>
+                    </q-item-section>
+                  </q-item>
+                </template>
+              </q-select>
             </div>
             <div
               v-if="cargo_Id == 'RP'"
@@ -189,8 +229,10 @@
             >
               <!--PROPIETARIO-->
               <q-tab-panel name="propietario">
-                <q-list bordered class="rounded-borders col-12">
+                <q-list bordered class="col-12">
                   <q-expansion-item
+                    expand-icon-class="text-white"
+                    header-class="bg-blue-grey-4 text-white text-subtitle1 text-bold"
                     v-model="expansion"
                     @show="expansion2 = false"
                     @hide="expansion2 = true"
@@ -199,11 +241,15 @@
                     label="Datos generales"
                   >
                     <div
-                      v-if="candidato.is_Coalicion == true"
+                      v-if="
+                        candidato.postulacion != 'Partido político' &&
+                        cargo_Id != 'RP'
+                      "
                       class="row q-pl-md"
                     >
                       <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
                         <q-select
+                          :disable="visualizar"
                           v-model="partido_Id_prop"
                           :options="list_Filtro_Partidos"
                           label="Partido postulante"
@@ -221,6 +267,8 @@
                     expand-separator
                     icon="folder_open"
                     label="Documentación Requerida"
+                    expand-icon-class="text-white"
+                    header-class="bg-blue-grey-4 text-white text-subtitle1 text-bold"
                   >
                     <FormularioDocumentacion :puesto="0" :tipo_Id="tipo_Id" />
                   </q-expansion-item>
@@ -236,13 +284,19 @@
                     expand-separator
                     icon="person"
                     label="Datos generales"
+                    expand-icon-class="text-white"
+                    header-class="bg-blue-grey-4 text-white text-subtitle1 text-bold"
                   >
                     <div
-                      v-if="candidato.is_Coalicion == true"
+                      v-if="
+                        candidato.postulacion != 'Partido político' &&
+                        cargo_Id != 'RP'
+                      "
                       class="row q-pl-md"
                     >
                       <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
                         <q-select
+                          :disable="visualizar"
                           v-model="partido_Id_sup"
                           :options="list_Filtro_Partidos"
                           label="Partido postulante"
@@ -253,6 +307,8 @@
                     <FormularioDatosGenerales :tabTipo="tabTab" />
                   </q-expansion-item>
                   <q-expansion-item
+                    expand-icon-class="text-white"
+                    header-class="bg-blue-grey-4 text-white text-subtitle1 text-bold"
                     v-if="candidato.id != null"
                     v-model="expansion2"
                     @show="expansion = false"
@@ -269,6 +325,8 @@
               <q-tab-panel name="sindico_propietario" class="row">
                 <q-list bordered class="rounded-borders col-12">
                   <q-expansion-item
+                    expand-icon-class="text-white"
+                    header-class="bg-blue-grey-4 text-white text-subtitle1 text-bold"
                     v-model="expansion"
                     @show="expansion2 = false"
                     @hide="expansion2 = true"
@@ -277,11 +335,15 @@
                     label="Datos generales"
                   >
                     <div
-                      v-if="candidato.is_Coalicion == true"
+                      v-if="
+                        candidato.postulacion != 'Partido político' &&
+                        cargo_Id != 'RP'
+                      "
                       class="row q-pl-md"
                     >
                       <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
                         <q-select
+                          :disable="visualizar"
                           v-model="partido_Id_prop2"
                           :options="list_Filtro_Partidos"
                           label="Partido postulante"
@@ -292,6 +354,8 @@
                     <FormularioDatosGenerales :tabTipo="tabTab" />
                   </q-expansion-item>
                   <q-expansion-item
+                    expand-icon-class="text-white"
+                    header-class="bg-blue-grey-4 text-white text-subtitle1 text-bold"
                     v-if="candidato.id != null"
                     v-model="expansion2"
                     @show="expansion = false"
@@ -308,6 +372,8 @@
               <q-tab-panel name="sindico_suplente" class="row">
                 <q-list bordered class="rounded-borders col-12">
                   <q-expansion-item
+                    expand-icon-class="text-white"
+                    header-class="bg-blue-grey-4 text-white text-subtitle1 text-bold"
                     v-model="expansion"
                     @show="expansion2 = false"
                     @hide="expansion2 = true"
@@ -316,11 +382,15 @@
                     label="Datos generales"
                   >
                     <div
-                      v-if="candidato.is_Coalicion == true"
+                      v-if="
+                        candidato.postulacion != 'Partido político' &&
+                        cargo_Id != 'RP'
+                      "
                       class="row q-pl-md"
                     >
                       <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
                         <q-select
+                          :disable="visualizar"
                           v-model="partido_Id_sup2"
                           :options="list_Filtro_Partidos"
                           label="Partido postulante"
@@ -331,6 +401,8 @@
                     <FormularioDatosGenerales :tabTipo="tabTab" />
                   </q-expansion-item>
                   <q-expansion-item
+                    expand-icon-class="text-white"
+                    header-class="bg-blue-grey-4 text-white text-subtitle1 text-bold"
                     v-if="candidato.id != null"
                     v-model="expansion2"
                     @show="expansion = false"
@@ -346,6 +418,7 @@
             </q-tab-panels>
             <div class="q-pt-md" v-if="cargo_Id == 'RP' && partido_Id != null">
               <TablaRP
+                :tipo_Id="props.tipo_Id"
                 :partido_Id="partido_Id.value"
                 :tab="props.tab"
                 :municipio_Id="municipio_Id != null ? municipio_Id.value : 0"
@@ -353,7 +426,7 @@
             </div>
           </div>
           <q-space />
-          <div class="col-12 justify-end">
+          <div v-if="!visualizar" class="col-12 justify-end">
             <div class="text-right q-gutter-xs">
               <q-btn
                 label="Cancelar"
@@ -380,7 +453,7 @@ import { useQuasar } from "quasar";
 import { storeToRefs } from "pinia";
 import { useCandidatosStore } from "src/stores/candidatos-store";
 import { useConfiguracionStore } from "src/stores/configuracion-store";
-import { ref, defineProps, watch, onMounted } from "vue";
+import { ref, defineProps, watch } from "vue";
 import FormularioDatosGenerales from "./FormularioDatosGenerales.vue";
 import FormularioDocumentacion from "./FormularioDocumentacion.vue";
 import TablaRP from "./TablaRP.vue";
@@ -403,6 +476,8 @@ const {
   foto_3,
   foto_4,
   list_RP,
+  visualizar,
+  isDocumentacion,
 } = storeToRefs(candidatoStore);
 const {
   list_Municipios,
@@ -411,6 +486,7 @@ const {
   list_Partidos_Politicos,
   list_Partidos_Politicos_Coalcion,
   list_Coaliciones,
+  list_Integracion,
 } = storeToRefs(configuracionStore);
 const coalicion_Id = ref(null);
 const cargo_Id = ref(null);
@@ -432,8 +508,20 @@ const props = defineProps({
   tab: { type: String, required: true },
   tipo_Id: { type: Number, required: true },
 });
-
+const list_Postulacion = ref([
+  "Partido político",
+  "Coalición",
+  "Candidatura común",
+]);
 //--------------------------------------------------------------------
+
+watch(isDocumentacion, (val) => {
+  if (val == true) {
+    expansion2.value = true;
+    expansion.value = false;
+    candidatoStore.actualizarIsDocumentacion(false);
+  }
+});
 
 watch(coalicion_Id, async (val) => {
   if (val != null) {
@@ -441,30 +529,31 @@ watch(coalicion_Id, async (val) => {
     partido_Id_prop2.value = null;
     partido_Id_sup.value = null;
     partido_Id_sup2.value = null;
-    await configuracionStore.loadPartidosPoliticosCoalicion();
-    list_Filtro_Partidos.value = list_Partidos_Politicos_Coalcion.value.filter(
-      (x) => x.coalicion_Id == val.value
-    );
+    await configuracionStore.loadIntegracionesByCoalicion(val.value);
+    list_Filtro_Partidos.value = list_Integracion.value;
   }
 });
 
-watch(candidato.value, (val) => {
-  if (val != null) {
-    if (isEditar.value == true) {
-      cargarDistrito(val);
-      cargarTipoCandidato(val);
-      cargarPartidoPolitico(val);
-      cargarCoalicion(val);
-      cargarMunicipio(val);
-    }
+watch(candidato.value, async (val) => {
+  if (val.id != null) {
+    await configuracionStore.loadCoaliciones(val.postulacion);
+    await configuracionStore.loadDistritos();
+    cargarDistrito(val);
+    cargarTipoCandidato(val);
+    cargarPartidoPolitico(val);
+    cargarCoalicion(val);
+    cargarMunicipio(val);
     orden.value = val.orden;
-    if (val.is_Coalicion == false) {
+    if (val.postulacion == "Partido político") {
       partido_Id_prop.value = null;
       partido_Id_prop2.value = null;
       partido_Id_sup.value = null;
       partido_Id_sup2.value = null;
       coalicion_Id.value = null;
     }
+  }
+  if (val.postulacion != null) {
+    await configuracionStore.loadCoaliciones(val.postulacion);
   }
 });
 
@@ -499,6 +588,8 @@ watch(list_RP, (val) => {
       next = 1;
     }
     orden.value = next;
+  } else if (val.length == 0) {
+    orden.value = 1;
   }
 });
 
@@ -507,7 +598,7 @@ watch(cargo_Id, async (val) => {
     if (val == "RP") {
       candidatoStore.initIsCoalicion();
     }
-    await configuracionStore.loadCoaliciones();
+    //await configuracionStore.loadCoaliciones();
     await configuracionStore.loadPartidosPoliticosRP();
   }
 });
@@ -534,7 +625,7 @@ const cargarTipoCandidato = (val) => {
 
 const cargarPartidoPolitico = async (val) => {
   await configuracionStore.loadPartidosPoliticosRP();
-  if (val.is_Coalicion == true) {
+  if (val.postulacion != "Partido político") {
     await configuracionStore.loadPartidosPoliticosCoalicion();
     list_Partidos_Politicos_Coalcion.value.filter(
       (x) => x.coalicion_Id == val.value
@@ -618,11 +709,13 @@ const actualizarModal = (valor) => {
   $q.loading.show();
   limpiar();
   candidatoStore.initCandidato();
+  candidatoStore.actualizarVisualizar(false);
   candidatoStore.actualizarModal(valor);
   $q.loading.hide();
 };
 
 const limpiar = () => {
+  tabTab.value = "propietario";
   cargo_Id.value = null;
   distrito_Id.value = null;
   municipio_Id.value = null;
@@ -633,11 +726,19 @@ const limpiar = () => {
   partido_Id_sup.value = null;
   partido_Id_sup2.value = null;
   coalicion_Id.value = null;
+  orden.value = null;
 };
 
 const onSubmit = async () => {
   let candidatoFormData = new FormData();
-  candidatoFormData.append("Is_Coalicion", candidato.value.is_Coalicion);
+  candidatoFormData.append(
+    "Is_Coalicion",
+    candidato.value.postulacion == "Coalición" ? true : false
+  );
+  candidatoFormData.append(
+    "Is_Comun",
+    candidato.value.postulacion == "Candidatura común" ? true : false
+  );
   candidatoFormData.append("Tipo_Eleccion_Id", props.tipo_Id);
 
   if (props.tab == "PYS" || props.tab == "GUB") {
@@ -964,35 +1065,47 @@ const onSubmit = async () => {
   if (suplente_2.value.edad != null) {
     candidatoFormData.append("Edad_Suplente_2", suplente_2.value.edad);
   }
-
-  if (candidato.value.is_Coalicion == true) {
-    if (partido_Id_prop.value != null)
-      candidatoFormData.append("Partido_Id", partido_Id_prop.value.value);
-    if (partido_Id_sup.value != null)
-      candidatoFormData.append(
-        "Partido_Suplente_Id",
-        partido_Id_sup.value.value
-      );
-    if (partido_Id_prop2.value != null)
-      candidatoFormData.append(
-        "Partido_Propietario_2_Id",
-        partido_Id_prop2.value.value
-      );
-    if (partido_Id_sup2.value != null)
-      candidatoFormData.append(
-        "Partido_Suplente_2_Id",
-        partido_Id_sup2.value.value
-      );
-  } else {
-    if (partido_Id.value != null) {
-      candidatoFormData.append("Partido_Id", partido_Id.value.value);
-      candidatoFormData.append("Partido_Suplente_Id", partido_Id.value.value);
-      candidatoFormData.append(
-        "Partido_Propietario_2_Id",
-        partido_Id.value.value
-      );
-      candidatoFormData.append("Partido_Suplente_2_Id", partido_Id.value.value);
+  if (cargo_Id.value == "MR") {
+    if (candidato.value.postulacion != "Partido político") {
+      if (partido_Id_prop.value != null)
+        candidatoFormData.append("Partido_Id", partido_Id_prop.value.value);
+      if (partido_Id_sup.value != null)
+        candidatoFormData.append(
+          "Partido_Suplente_Id",
+          partido_Id_sup.value.value
+        );
+      if (partido_Id_prop2.value != null)
+        candidatoFormData.append(
+          "Partido_Propietario_2_Id",
+          partido_Id_prop2.value.value
+        );
+      if (partido_Id_sup2.value != null)
+        candidatoFormData.append(
+          "Partido_Suplente_2_Id",
+          partido_Id_sup2.value.value
+        );
+    } else {
+      if (partido_Id.value != null) {
+        candidatoFormData.append("Partido_Id", partido_Id.value.value);
+        candidatoFormData.append("Partido_Suplente_Id", partido_Id.value.value);
+        candidatoFormData.append(
+          "Partido_Propietario_2_Id",
+          partido_Id.value.value
+        );
+        candidatoFormData.append(
+          "Partido_Suplente_2_Id",
+          partido_Id.value.value
+        );
+      }
     }
+  } else if (cargo_Id.value == "RP") {
+    candidatoFormData.append("Partido_Id", partido_Id.value.value);
+    candidatoFormData.append("Partido_Suplente_Id", partido_Id.value.value);
+    candidatoFormData.append(
+      "Partido_Propietario_2_Id",
+      partido_Id.value.value
+    );
+    candidatoFormData.append("Partido_Suplente_2_Id", partido_Id.value.value);
   }
 
   let resp = null;

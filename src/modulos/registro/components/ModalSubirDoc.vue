@@ -7,7 +7,9 @@
   >
     <q-card style="width: 700px; max-width: 70vw">
       <q-card-section class="row">
-        <div class="text-h6">Subir documento</div>
+        <div class="text-h6">
+          {{ visualizar ? "Ver documento" : "Subir documento" }}
+        </div>
         <q-space />
         <q-btn
           icon="close"
@@ -20,7 +22,7 @@
       </q-card-section>
       <q-card-section>
         <q-form class="q-col-gutter-xs" @submit="onSubmit">
-          <div class="row">
+          <div class="row" v-if="documento.url == ''">
             <q-file
               class="col-6"
               filled
@@ -59,7 +61,7 @@
               v-else
               class="text-subtitle2 text-bold text-center text-red q-pa-lg"
             >
-              Favor de subir el documento
+              Sin documento
             </div>
           </div>
           <q-space />
@@ -72,6 +74,7 @@
                 @click="actualizarModal(false)"
               />
               <q-btn
+                v-if="documento.url == ''"
                 label="Guardar"
                 type="submit"
                 color="secondary"
@@ -97,14 +100,13 @@ import { useGeneroStore } from "src/stores/genero-store";
 const $q = useQuasar();
 const candidatoStore = useCandidatosStore();
 const generoStore = useGeneroStore();
-const { modalDocumento } = storeToRefs(candidatoStore);
+const { modalDocumento, visualizar } = storeToRefs(candidatoStore);
 const { requisito, documento } = storeToRefs(generoStore);
 const requisito_File = ref(null);
 const props = defineProps({
   puesto: { type: Number, required: true },
   candidato_Id: { type: Number, required: true },
 });
-
 //-----------------------------------------------------------
 
 const actualizarModal = (valor) => {
@@ -136,6 +138,7 @@ const onSubmit = async () => {
     });
     requisito_File.value = null;
     actualizarModal(false);
+    candidatoStore.actualizarDocs(true);
   } else {
     $q.notify({
       position: "top-right",

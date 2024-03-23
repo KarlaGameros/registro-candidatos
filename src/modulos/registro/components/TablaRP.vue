@@ -68,6 +68,7 @@ import { ref, defineProps, watchEffect } from "vue";
 const candidatosStore = useCandidatosStore();
 const { list_Candidatos, list_RP } = storeToRefs(candidatosStore);
 const props = defineProps({
+  tipo_Id: { type: Number, required: true },
   tab: { type: String, required: true },
   partido_Id: { type: Number, required: true },
   municipio_Id: { type: Number, required: true },
@@ -82,7 +83,7 @@ watchEffect(() => {
         (x) =>
           x.tipo_Candidato == "RP" &&
           x.partido_Id == props.partido_Id &&
-          x.tipo_Eleccion_Id == 2
+          x.tipo_Eleccion_Id == props.tipo_Id
       );
       list_RP.value.sort(function (a, b) {
         return a.orden - b.orden;
@@ -94,7 +95,7 @@ watchEffect(() => {
           x.tipo_Candidato == "RP" &&
           x.municipio_Id == props.municipio_Id &&
           x.partido_Id == props.partido_Id &&
-          x.tipo_Eleccion_Id == 4
+          x.tipo_Eleccion_Id == props.tipo_Id
       );
       list_RP.value.sort(function (a, b) {
         return a.orden - b.orden;

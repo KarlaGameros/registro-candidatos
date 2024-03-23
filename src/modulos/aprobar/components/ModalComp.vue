@@ -190,6 +190,7 @@ const date = ref(`${year}/${month}/${day} ${hours}:${minutes}:${seconds}`);
 
 const actualizarModal = (valor) => {
   $q.loading.show();
+  list_Detalle.value = [];
   acuerdoArchivo.value = null;
   aprobarStore.actualizarModal(valor);
   aprobarStore.updateEditar(false);
@@ -199,7 +200,8 @@ const actualizarModal = (valor) => {
 
 const onSubmit = async () => {
   let aprobarFormData = new FormData();
-
+  let resp = null;
+  let respUpdate = null;
   if (list_Detalle.value.length == 0 && isEditar.value == false) {
     $q.dialog({
       title: "Atención",
@@ -261,29 +263,51 @@ const onSubmit = async () => {
       aprobarFormData.append("Consentimiento", acuerdoArchivo.value);
     }
   }
-  let resp = null;
-  let respUpdate = null;
   $q.loading.show();
   if (isEditar.value == true) {
-    resp = await aprobarStore.subirAcuerdo(
-      aprobacion.value.id,
-      aprobarFormData
-    );
-    respUpdate = await aprobarStore.updateAprobacion(aprobacion.value);
-    if (resp.success) {
-      $q.notify({
-        position: "top-right",
-        type: "positive",
-        message: resp.data,
-      });
-      await candidatosStore.loadCandidatos();
-      aprobarStore.initAprobacion();
-      actualizarModal(false);
-    } else {
-      $q.notify({
-        position: "top-right",
-        type: "negative",
-        message: resp.data,
+    if (
+      acuerdoArchivo.value != null &&
+      aprobacion.value.archivo_Acuerdo != null
+    ) {
+      $q.dialog({
+        title: "Atención",
+        message: "Ya existe un archivo, si acepta se remplazará.",
+        icon: "Warning",
+        persistent: true,
+        transitionShow: "scale",
+        transitionHide: "scale",
+        ok: {
+          color: "positive",
+          label: "¡Sí!, aceptar",
+        },
+        cancel: {
+          color: "negative",
+          label: " No Cancelar",
+        },
+      }).onOk(async () => {
+        $q.loading.show();
+        resp = await aprobarStore.subirAcuerdo(
+          aprobacion.value.id,
+          aprobarFormData
+        );
+        respUpdate = await aprobarStore.updateAprobacion(aprobacion.value);
+        if (resp.success) {
+          $q.notify({
+            position: "top-right",
+            type: "positive",
+            message: resp.data,
+          });
+          await candidatosStore.loadCandidatos();
+          aprobarStore.initAprobacion();
+          candidatosStore.actualizarTabla(true);
+          actualizarModal(false);
+        } else {
+          $q.notify({
+            position: "top-right",
+            type: "negative",
+            message: resp.data,
+          });
+        }
       });
     }
   }

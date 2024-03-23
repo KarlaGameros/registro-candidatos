@@ -3,8 +3,12 @@ import { api } from "src/boot/axios";
 
 export const useCandidatosStore = defineStore("useCandidatosStore", {
   state: () => ({
+    isDocumentacion: false,
     modal: false,
     modalDocumento: false,
+    visualizar: false,
+    actualizar: false,
+    loadDocs: false,
     isEditar: false,
     modalSustituir: false,
     loading: false,
@@ -12,15 +16,17 @@ export const useCandidatosStore = defineStore("useCandidatosStore", {
     list_Candidatos_By_Eleccion: [],
     list_RP: [],
     list_Suplentes: [],
+    list_Documentacion_Completa: [],
     candidato: {
       id: null,
       tipo_Eleccion_Id: null,
       tipo_Eleccion: null,
+      siglas: null,
       municipio_Id: null,
       distrito_Id: null,
       demarcacion_Id: null,
       coalicion_Id: null,
-      is_Coalicion: false,
+      is_Coalicion: null,
       tipo_Candidato: null,
       orden: null,
       activo: null,
@@ -32,6 +38,7 @@ export const useCandidatosStore = defineStore("useCandidatosStore", {
       grupo_Vulnerable_3: null,
       grupo_Vulnerable_4: null,
       acuse_URL: null,
+      postulacion: null,
     },
     candidato2: {
       tipo: null,
@@ -183,6 +190,18 @@ export const useCandidatosStore = defineStore("useCandidatosStore", {
     },
   }),
   actions: {
+    actualizarIsDocumentacion(valor) {
+      this.isDocumentacion = valor;
+    },
+    actualizarTabla(valor) {
+      this.actualizar = valor;
+    },
+    actualizarDocs(valor) {
+      this.loadDocs = valor;
+    },
+    actualizarVisualizar(valor) {
+      this.visualizar = valor;
+    },
     actualizarModal(valor) {
       this.modal = valor;
     },
@@ -197,7 +216,7 @@ export const useCandidatosStore = defineStore("useCandidatosStore", {
     },
     //-----------------------------------------------------------
     initIsCoalicion() {
-      this.candidato.is_Coalicion = false;
+      this.candidato.is_Coalicion = null;
       this.candidato.coalicion_Id = null;
     },
 
@@ -208,7 +227,7 @@ export const useCandidatosStore = defineStore("useCandidatosStore", {
       this.candidato.distrito_Id = null;
       this.candidato.demarcacion_Id = null;
       this.candidato.coalicion_Id = null;
-      this.candidato.is_Coalicion = false;
+      this.candidato.is_Coalicion = null;
       this.candidato.tipo_Candidato = null;
       this.candidato.orden = null;
       this.candidato.activo = null;
@@ -223,6 +242,7 @@ export const useCandidatosStore = defineStore("useCandidatosStore", {
       this.foto_2.url_Foto = null;
       this.foto_3.url_Foto = null;
       this.foto_4.url_Foto = null;
+      this.candidato.postulacion = null;
       //---------------------------------
       //PROPIETARIO 1
       this.propietario_1.nombre_Completo = null;
@@ -405,6 +425,7 @@ export const useCandidatosStore = defineStore("useCandidatosStore", {
             demarcacion: candidato.demarcacion,
             coalicion_Id: candidato.coalicion_Id,
             is_Coalicion: candidato.is_Coalicion,
+            is_Comun: candidato.is_Comun,
             coalicion: candidato.coalicion,
             tipo_Candidato: candidato.tipo_Candidato,
             orden: candidato.orden,
@@ -413,6 +434,12 @@ export const useCandidatosStore = defineStore("useCandidatosStore", {
             estatus: candidato.estatus,
             fecha_registro: candidato.fecha_Registro,
             logo_Coalicion: candidato.url_Logo_Coalicion,
+            postulacion:
+              candidato.is_Comun == true
+                ? "Candidatura común"
+                : candidato.is_Coalicion == true
+                ? "Coalición"
+                : "Partido político",
             //----------------------------------------------------
             //PROPIETARIO 1
             nombre_Completo_Propietario: `${candidato.nombres_Propietario} ${
@@ -618,16 +645,28 @@ export const useCandidatosStore = defineStore("useCandidatosStore", {
             this.candidato.id = data.id;
             this.candidato.tipo_Eleccion_Id = data.tipo_Eleccion_Id;
             this.candidato.tipo_Eleccion = data.tipo_Eleccion;
+            this.candidato.siglas =
+              data.tipo_Eleccion == "Diputaciones"
+                ? "DIP"
+                : data.tipo_Eleccion == "Presidencias y Sindicaturas"
+                ? "PYS"
+                : "REG";
             this.candidato.municipio_Id = data.municipio_Id;
             this.candidato.distrito_Id = data.distrito_Id;
             this.candidato.distrito = data.distrito;
             this.candidato.demarcacion_Id = data.demarcacion_Id;
             this.candidato.coalicion_Id = data.coalicion_Id;
-            this.candidato.is_Coalicion = data.is_Coalicion;
+            this.candidato.postulacion =
+              data.is_Comun == true
+                ? "Candidatura común"
+                : data.is_Coalicion == true
+                ? "Coalición"
+                : "Partido político";
             this.candidato.tipo_Candidato = data.tipo_Candidato;
             this.candidato.orden = data.orden;
             this.candidato.partido_Id = data.partido_Id;
             this.candidato.fecha_Registro = data.fecha_Registro;
+            this.candidato.estatus = data.estatus;
             //-----------------------------------------------------
             //PROPIETARIO 1
             this.propietario_1.nombre_Completo = `${data.nombres_Propietario} ${data.apellido_Paterno_Propietario} ${data.apellido_Materno_Propietario}`;
@@ -1179,6 +1218,45 @@ export const useCandidatosStore = defineStore("useCandidatosStore", {
             data: "Ocurrió un error, inténtelo de nuevo. Si el error persiste, contacte a soporte",
           };
         }
+      } catch (error) {
+        return {
+          success: false,
+          data: "Ocurrió un error, inténtelo de nuevo. Si el error persiste, contacte a soporte",
+        };
+      }
+    },
+
+    //----------------------------------------------------------------------
+    async loadDocumentacionCompleta() {
+      try {
+        let resp = await api.get(
+          "/Tipos_Eleccion_Cumplimiento/Progreso_Documentos"
+        );
+        let { data } = resp.data;
+        this.list_Documentacion_Completa = data.map((item) => {
+          return {
+            candidato_Id: item.candidato_Id,
+            no_Formula: item.no_Formula,
+            puesto: item.puesto,
+            completo: item.completo,
+            documentos: item.documentos,
+            tipo_Candidato: item.tipo_Candidato,
+            tipo_Eleccion_Id: item.tipo_Eleccion_Id,
+            tipo_Eleccion: item.tipo_Eleccion,
+            aprobado: item.aprobado,
+            nombre_Completo: `${item.nombres} ${item.apellido_Paterno} ${item.apellido_Materno}`,
+            nombres: item.nombres,
+            apellido_Paterno: item.apellido_Paterno,
+            apellido_Materno: item.apellido_Materno,
+            partido_Id: item.partido_Id,
+            partido: item.partido,
+            logo_Partido: item.logo_Partido,
+            is_Coalicion: item.is_Coalicion,
+            coalicion_Id: item.coalicion_Id,
+            coalicion: item.coalicion,
+            logo_Coalicion: item.logo_Coalicion,
+          };
+        });
       } catch (error) {
         return {
           success: false,

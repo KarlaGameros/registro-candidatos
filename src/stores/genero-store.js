@@ -87,16 +87,21 @@ export const useGeneroStore = defineStore("useGeneroStore", {
     },
 
     //-----------------------------------------------------------
-    async getDocumentos(candidato_Id, puesto, requisito_Id) {
+    async getDocumentos(candidato_Id, puesto, requisito_Id, genero) {
       try {
         let resp = await api.get(
           `/Tipos_Eleccion_Cumplimiento/GetDocumentos/${candidato_Id}/${puesto}`
         );
         let { data } = resp.data;
         let requisitos_Genero = [];
-        requisitos_Genero = data.filter(
-          (x) => x.genero == true && x.activo == true
-        );
+        if (genero == true) {
+          requisitos_Genero = data.filter(
+            (x) => x.genero == true && x.activo == true
+          );
+        } else {
+          requisitos_Genero = data.filter((x) => x.activo == true);
+        }
+
         this.list_Documentacion_Genero = requisitos_Genero.map((requisito) => {
           return {
             id: requisito.id,

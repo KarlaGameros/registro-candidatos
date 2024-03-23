@@ -24,6 +24,7 @@ export const useConfiguracionStore = defineStore("useConfiguracionStore", {
     list_Coaliciones: [],
     list_Coaliciones_Filtro: [],
     list_Requisitos: [],
+    list_Integracion: [],
   }),
   actions: {
     //----------------------------------------------------------------------
@@ -233,7 +234,9 @@ export const useConfiguracionStore = defineStore("useConfiguracionStore", {
         let resp = await api.get("/Partidos_Politicos");
         let { data } = resp.data;
         let listPartidosFiltro = [];
-        listPartidosFiltro = data.filter((x) => x.is_Coalicion == true);
+        listPartidosFiltro = data.filter(
+          (x) => x.is_Coalicion == true || x.isComun == true
+        );
         let listPartidos = listPartidosFiltro.map((partido) => {
           return {
             value: partido.id,
@@ -284,11 +287,17 @@ export const useConfiguracionStore = defineStore("useConfiguracionStore", {
 
     //----------------------------------------------------------------------
     //COALICIONES
-    async loadCoaliciones() {
+    async loadCoaliciones(tipo) {
       try {
         let resp = await api.get("/Coaliciones");
         let { data } = resp.data;
-        let listCoaliciones = data.map((coalicion) => {
+        let filtrarCoaliciones = [];
+        if (tipo == "Coalición") {
+          filtrarCoaliciones = data.filter((x) => x.comun == false);
+        } else {
+          filtrarCoaliciones = data.filter((x) => x.comun == true);
+        }
+        let listCoaliciones = filtrarCoaliciones.map((coalicion) => {
           return {
             value: coalicion.id,
             label: coalicion.nombre,
@@ -348,6 +357,33 @@ export const useConfiguracionStore = defineStore("useConfiguracionStore", {
           };
         });
         this.list_Requisitos = listRequisitos;
+      } catch (error) {
+        return {
+          success: false,
+          data: "Ocurrió un error, inténtelo de nuevo. Si el error persiste, contacte a soporte",
+        };
+      }
+    },
+
+    //----------------------------------------------------------------------
+    //GET INTEGRACIONES BY CALICION
+    async loadIntegracionesByCoalicion(id) {
+      try {
+        let resp = await api.get(`/Integracion_Coaliciones/ByCoalicion/${id}`);
+        let { data } = resp.data;
+        let listIntegracion = data.map((partido) => {
+          return {
+            id: partido.id,
+            coalicion_Id: partido.coalicion_Id,
+            coalicion: partido.coalicion,
+            partido: partido.partido,
+            partido_Id: partido.partido_Id,
+            porcentaje: partido.porcentaje,
+            value: partido.partido_Id,
+            label: partido.partido,
+          };
+        });
+        this.list_Integracion = listIntegracion;
       } catch (error) {
         return {
           success: false,

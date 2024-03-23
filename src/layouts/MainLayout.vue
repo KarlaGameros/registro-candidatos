@@ -101,6 +101,20 @@
 
           <q-item-section> Acuses </q-item-section>
         </q-item>
+        <q-item
+          v-if="CatalogosConList.some((element) => element == 'SRC-CON-DOC')"
+          clickable
+          v-ripple
+          class="text-grey-8"
+          :to="{ name: 'documentacion' }"
+          active-class="text-pink-ieen-1"
+        >
+          <q-item-section avatar>
+            <q-icon name="folder" />
+          </q-item-section>
+
+          <q-item-section> Documentación </q-item-section>
+        </q-item>
       </q-list>
     </q-drawer>
 
@@ -207,6 +221,9 @@ export default defineComponent({
             break;
           case "SRC-ACU-CU":
             CatalogosConList.value.push("SRC-ACU-CU");
+            break;
+          case "SRC-CON-DOC":
+            CatalogosConList.value.push("SRC-CON-DOC");
             break;
         }
       });

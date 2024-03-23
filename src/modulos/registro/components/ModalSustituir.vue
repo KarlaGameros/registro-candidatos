@@ -153,6 +153,8 @@
               <q-tab-panel name="Propietario">
                 <q-list bordered class="rounded-borders col-12">
                   <q-expansion-item
+                    expand-icon-class="text-white"
+                    header-class="bg-blue-grey-4 text-white text-subtitle1 text-bold"
                     v-model="expansion"
                     @show="expansion2 = false"
                     @hide="expansion2 = true"
@@ -168,6 +170,8 @@
               <q-tab-panel name="Suplente" class="row">
                 <q-list bordered class="rounded-borders col-12">
                   <q-expansion-item
+                    expand-icon-class="text-white"
+                    header-class="bg-blue-grey-4 text-white text-subtitle1 text-bold"
                     v-model="expansion"
                     @show="expansion2 = false"
                     @hide="expansion2 = true"
@@ -183,6 +187,8 @@
               <q-tab-panel name="Propietario sindico" class="row">
                 <q-list bordered class="rounded-borders col-12">
                   <q-expansion-item
+                    expand-icon-class="text-white"
+                    header-class="bg-blue-grey-4 text-white text-subtitle1 text-bold"
                     v-model="expansion"
                     @show="expansion2 = false"
                     @hide="expansion2 = true"
@@ -198,6 +204,8 @@
               <q-tab-panel name="Suplente sindico" class="row">
                 <q-list bordered class="rounded-borders col-12">
                   <q-expansion-item
+                    expand-icon-class="text-white"
+                    header-class="bg-blue-grey-4 text-white text-subtitle1 text-bold"
                     v-model="expansion"
                     @show="expansion2 = false"
                     @hide="expansion2 = true"
@@ -211,7 +219,7 @@
               </q-tab-panel>
             </q-tab-panels>
           </div>
-          <div
+          <q-card
             v-if="
               sustituirPor == 'Propietario' ||
               sustituirPor == 'Suplente' ||
@@ -233,8 +241,19 @@
                 :label="sustituirPor"
               />
             </q-tabs>
-            <SustituirCandidato :tabTipo="sustituirPor" />
-          </div>
+            <q-expansion-item
+              expand-icon-class="text-white"
+              header-class="bg-blue-grey-4 text-white text-subtitle1 text-bold"
+              v-model="expansion"
+              @show="expansion2 = false"
+              @hide="expansion2 = true"
+              expand-separator
+              icon="person"
+              label="Datos generales"
+            >
+              <SustituirCandidato :tabTipo="sustituirPor" />
+            </q-expansion-item>
+          </q-card>
           <q-space />
           <div class="col-12 justify-end">
             <div class="text-right q-gutter-xs">
@@ -267,7 +286,7 @@ import { useCandidatosStore } from "src/stores/candidatos-store";
 import { useQuasar } from "quasar";
 import { useSustituirStore } from "src/stores/sustituir-store";
 import SustituirCandidato from "../../sustituciones/components/SustituirCandidato.vue";
-
+import SustituirDocumentacion from "../../sustituciones/components/SustituirDocumentacion.vue";
 //--------------------------------------------------------------------
 
 const $q = useQuasar();
@@ -306,6 +325,7 @@ const seconds = String(dateActual.getSeconds());
 const date = ref(`${year}/${month}/${day} ${hours}:${minutes}:${seconds}`);
 const props = defineProps({
   tab: { type: String, required: true },
+  tipo_Id: { type: Number, required: true },
 });
 
 //--------------------------------------------------------------------
@@ -1545,6 +1565,9 @@ const onSubmit = async () => {
   sustituirFormData.append("Fecha_Registro", date.value);
 
   let resp = null;
+  let resp1 = null;
+  let resp2 = null;
+  let resp3 = null;
   $q.loading.show();
 
   if (sustituirPor.value != "Fórmula") {
@@ -1565,17 +1588,17 @@ const onSubmit = async () => {
         );
       }
     } else if (props.tab == "PYS") {
-      let resp1 = await sustituirStore.sustituirCandidato(
+      resp1 = await sustituirStore.sustituirCandidato(
         candidato.value.id,
         sustituirPropietario1
       );
       if (resp1.success == true) {
-        let resp2 = await sustituirStore.sustituirCandidato(
+        resp2 = await sustituirStore.sustituirCandidato(
           candidato.value.id,
           sustituirSuplente1
         );
         if (resp2.success == true) {
-          let resp3 = await sustituirStore.sustituirCandidato(
+          resp3 = await sustituirStore.sustituirCandidato(
             candidato.value.id,
             sustituirPropietario2
           );

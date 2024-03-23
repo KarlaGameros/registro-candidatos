@@ -73,6 +73,7 @@
       </div>
       <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 q-pr-xs">
         <q-input
+          class="text-uppercase"
           v-model.trim="candidatoBase.Clave_Elector_Nuevo"
           label="Clave de elector"
           hint="Ingrese su clave de elector"
@@ -90,6 +91,7 @@
       </div>
       <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 q-pr-xs">
         <q-input
+          class="text-uppercase"
           v-model.trim="candidatoBase.CURP_Nuevo"
           label="CURP"
           hint="Ingrese su CURP"
@@ -106,6 +108,7 @@
       </div>
       <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 q-pr-xs">
         <q-input
+          class="text-uppercase"
           v-model.trim="candidatoBase.RFC_Nuevo"
           label="RFC"
           hint="Ingrese su RFC"
@@ -182,7 +185,12 @@
           hint="Correo electrónico para recibir avisos y comuniados "
           autogrow
           lazy-rules
-          :rules="[(val) => !!val || 'El correo electronico es requerida']"
+          :rules="[
+            (val) => !!val || 'El correo electrónico es requerido',
+            (val) =>
+              /\w+([.-_+]?\w+)*@\w+([.-]?\w+)*(\.\w{2,10})+$/.test(val) ||
+              'Formato de correo electrónico no válido',
+          ]"
         >
           <template v-slot:prepend>
             <q-icon name="email" color="pink" />
@@ -196,7 +204,7 @@
             : 'col-lg-6 col-md-6 col-sm-6 col-xs-12'
         "
       >
-        <!-- <q-select
+        <q-select
           label="Teléfono"
           hint="Da enter para agregar teléfono"
           v-model="telefonos"
@@ -211,17 +219,7 @@
           <template v-slot:prepend>
             <q-icon name="phone" color="pink" />
           </template>
-        </q-select> -->
-        <q-input
-          v-model="candidatoBase.telefono"
-          label="Teléfono"
-          mask="### - ### - ####"
-          hint="Número telefonico"
-        >
-          <template v-slot:prepend>
-            <q-icon name="phone" color="pink" />
-          </template>
-        </q-input>
+        </q-select>
       </div>
       <!-- <div v-if="isExtension" class="col-lg-1 col-md-1 col-sm-1 col-xs-12">
         <q-input
@@ -234,7 +232,7 @@
         </q-input>
       </div> -->
 
-      <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+      <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 text-black">
         <br />
         <q-checkbox
           left-label
