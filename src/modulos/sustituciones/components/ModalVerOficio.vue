@@ -1,13 +1,13 @@
 <template>
   <q-dialog
-    v-model="modalOficio"
+    v-model="modalEscrito"
     persistent
     transition-show="scale"
     transition-hide="scale"
   >
     <q-card style="width: 800px; max-width: 80vw">
       <q-card-section class="row">
-        <div class="text-h6">Oficio - A4512</div>
+        <div class="text-h6">Escrito de sustitución</div>
         <q-space />
         <q-btn
           icon="close"
@@ -20,7 +20,7 @@
       </q-card-section>
       <q-card-section>
         <iframe
-          src="https://www.igp.minem.cu/sites/default/files/publicacion/prueba_5.pdf?current=/boletin-geomundo"
+          :src="sustitucion.Escrito_Sustitucion"
           width="100%"
           height="500"
         ></iframe>
@@ -46,12 +46,12 @@ import { useSustituirStore } from "src/stores/sustituir-store";
 //--------------------------------------------------------------------
 
 const sustituirStore = useSustituirStore();
-const { modalOficio } = storeToRefs(sustituirStore);
+const { modalEscrito, sustitucion } = storeToRefs(sustituirStore);
 
 //--------------------------------------------------------------------
 
 const actualizarModal = (valor) => {
-  sustituirStore.actualizarModalOficio(valor);
+  sustituirStore.actualizarModalEscrito(valor);
 };
 </script>
 

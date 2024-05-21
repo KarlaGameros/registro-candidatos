@@ -9,7 +9,7 @@
       align="justify"
     >
       <q-tab
-        v-for="tipo in tipo_Elecciones"
+        v-for="tipo in filtradoElecciones"
         :key="tipo"
         :name="tipo.siglas"
         :label="tipo.nombre"
@@ -18,7 +18,7 @@
     </q-tabs>
     <q-tab-panels v-model="tab_Eleccion" animated>
       <q-tab-panel
-        v-for="tipo in tipo_Elecciones"
+        v-for="tipo in filtradoElecciones"
         :key="tipo"
         :name="tipo.siglas"
       >
@@ -46,22 +46,44 @@
             </q-input>
           </template>
           <template v-slot:body="props">
-            <q-tr :props="props">
+            <q-tr :props="props" :class="props.row.color ? '' : 'bg-grey-3'">
               <q-td v-for="col in props.cols" :key="col.name" :props="props">
                 <div v-if="col.name === 'logo_Coalicion'">
                   <q-avatar
                     style="width: auto; height: 35px"
                     square
-                    v-if="props.row.is_Coalicion == true"
+                    v-if="
+                      props.row.is_Coalicion == true ||
+                      props.row.is_Comun == true
+                    "
                   >
-                    <img :src="props.row.logo_Coalicion" alt="" />
-                    <q-tooltip>{{ props.row.coalicion }}</q-tooltip>
+                    <img
+                      :src="
+                        props.row.is_Coalicion
+                          ? col.value
+                          : props.row.logo_Comun
+                      "
+                      alt=""
+                    />
                   </q-avatar>
                 </div>
                 <div v-else-if="col.name === 'logo_Partido'">
                   <q-avatar square>
-                    <img :src="col.value" alt="" />
+                    <img
+                      v-if="props.row.partido_Id != null"
+                      :src="col.value"
+                      alt=""
+                    />
                   </q-avatar>
+                </div>
+                <div v-else-if="col.name === 'nombre_Completo'">
+                  <label
+                    class="text-left"
+                    v-if="col.value != 'Pendiente de Registrar  '"
+                  >
+                    {{ col.value }}
+                  </label>
+                  <q-badge color="red" v-else>{{ col.value }}</q-badge>
                 </div>
                 <div v-else-if="col.name === 'validado_IEEN'">
                   <q-badge :color="props.row.validado_IEEN ? 'green' : 'red'"
@@ -98,6 +120,12 @@
                   >
                     <q-tooltip>Ver acuse</q-tooltip>
                   </q-btn>
+                  <q-badge v-else color="red"
+                    >Subir acuse<q-icon
+                      name="warning"
+                      color="white"
+                      class="q-ml-xs"
+                  /></q-badge>
                 </div>
                 <label v-else>{{ col.value }}</label>
               </q-td>
@@ -123,18 +151,22 @@ import { storeToRefs } from "pinia";
 import { useQuasar, QSpinnerCube } from "quasar";
 import { useConfiguracionStore } from "src/stores/configuracion-store";
 import { useCandidatosStore } from "src/stores/candidatos-store";
+import { useAcusesStore } from "src/stores/acuses-store";
 
 //-----------------------------------------------------------
 
 const $q = useQuasar();
 const configuracionStore = useConfiguracionStore();
 const candidatosStore = useCandidatosStore();
+const acusesStore = useAcusesStore();
 const { tipo_Elecciones } = storeToRefs(configuracionStore);
 const { list_Candidatos_By_Eleccion } = storeToRefs(candidatosStore);
+const { loadTabla } = storeToRefs(acusesStore);
 const tipo_Eleccion_Id = ref(null);
 const tab_Eleccion = ref(null);
 const listFiltrado = ref("");
 const visisble_columns = ref([]);
+const filtradoElecciones = ref([]);
 
 //-----------------------------------------------------------
 
@@ -144,6 +176,13 @@ onBeforeMount(async () => {
 });
 
 //-----------------------------------------------------------
+
+watch(loadTabla, (val) => {
+  if (val == true) {
+    cargarData();
+    acusesStore.actualizarTabla(false);
+  }
+});
 
 watch(tab_Eleccion, (val) => {
   if (val != null) {
@@ -155,6 +194,11 @@ watch(tipo_Elecciones, (val) => {
   if (val.length > 0) {
     tab_Eleccion.value = val[0].siglas;
     tipo_Eleccion_Id.value = val[0].id;
+    if (localStorage.getItem("perfil_Letra") == "Capturista DIP") {
+      filtradoElecciones.value = val.filter((x) => x.siglas == "DIP");
+    } else {
+      filtradoElecciones.value = val;
+    }
   }
 });
 
@@ -260,98 +304,98 @@ const columns = [
     align: "center",
     label: "Acciones",
     field: "id",
-    sortable: true,
+    sortable: false,
   },
   {
     name: "acuse_URL",
     align: "center",
     label: "Acuse",
     field: "acuse_URL",
-    sortable: true,
+    sortable: false,
   },
   {
     name: "nombre_Completo",
     align: "center",
     label: "Nombre",
     field: "nombre_Completo",
-    sortable: true,
+    sortable: false,
   },
   {
     name: "candidatura",
     align: "center",
     label: "Candidatura",
     field: "candidatura",
-    sortable: true,
+    sortable: false,
   },
   {
     name: "tipo_Candidato",
     align: "center",
     label: "Tipo",
     field: "tipo_Candidato",
-    sortable: true,
+    sortable: false,
   },
   {
     name: "no_Distrito",
     align: "center",
     label: "Distrito",
     field: "no_Distrito",
-    sortable: true,
+    sortable: false,
   },
   {
     name: "orden",
     align: "center",
     label: "Orden de prelación",
     field: "orden",
-    sortable: true,
+    sortable: false,
   },
   {
     name: "logo_Partido",
     align: "center",
     label: "Partido",
     field: "logo_Partido",
-    sortable: true,
+    sortable: false,
   },
   {
     name: "logo_Coalicion",
     align: "center",
-    label: "Coalición",
+    label: "Coalición/Común",
     field: "logo_Coalicion",
-    sortable: true,
+    sortable: false,
   },
   {
     name: "municipio",
     align: "center",
     label: "Municipio",
     field: "municipio",
-    sortable: true,
+    sortable: false,
   },
   {
     name: "demarcacion",
     align: "center",
     label: "Demarcación",
     field: "demarcacion",
-    sortable: true,
+    sortable: false,
   },
   {
     name: "validado_IEEN",
     align: "center",
     label: "Validado",
     field: "validado_IEEN",
-    sortable: true,
+    sortable: false,
   },
   {
     name: "progreso",
     align: "center",
     label: "Progeso",
     field: "progreso",
-    sortable: true,
+    sortable: false,
   },
   {
     name: "puntuacion",
     align: "center",
     label: "Puntuación",
     field: "puntuacion",
-    sortable: true,
+    sortable: false,
   },
 ];
 
@@ -360,6 +404,6 @@ const pagination = ref({
   sortBy: "desc",
   descending: false,
   page: 1,
-  rowsPerPage: 5,
+  rowsPerPage: 8,
 });
 </script>

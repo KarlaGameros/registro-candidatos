@@ -10,15 +10,16 @@
         align="justify"
       >
         <q-tab
-          v-for="tipo in tipo_Elecciones"
+          v-for="tipo in filtradoElecciones"
           :key="tipo"
           :name="tipo.siglas"
           :label="tipo.nombre"
+          @click="eleccion_Id = tipo.id"
         />
       </q-tabs>
       <q-tab-panels v-model="tab" animated class="text-white">
         <q-tab-panel
-          v-for="tipo in tipo_Elecciones"
+          v-for="tipo in filtradoElecciones"
           :key="tipo"
           :name="tipo.siglas"
         >
@@ -36,10 +37,14 @@
             color="green"
           >
             <template v-slot:top-left>
-              <div class="text-center">
+              <div
+                v-if="modulo == null ? false : modulo.registrar && fechaAprobar"
+                class="text-center"
+              >
                 <q-checkbox color="green" v-model="selected" />
               </div>
               <q-btn
+                v-if="modulo == null ? false : modulo.registrar && fechaAprobar"
                 type="button"
                 color="pink-1"
                 icon-right="gavel"
@@ -50,10 +55,54 @@
                 filled
                 color="pink"
                 class="q-pl-md"
+                v-model="estatus_Id"
+                :options="list_Estatus"
+                label="Selecciona estatus"
+                hint="Filtrar por estatus"
+                style="width: 260px"
+              />
+              <q-select
+                v-if="tab == 'DIP' || tab == 'REG'"
+                filled
+                color="pink"
+                class="q-pl-md"
                 v-model="cargo_Id"
                 :options="list_Cargo"
                 label="Selecciona cargo"
                 hint="Filtrar por cargo"
+                style="width: 260px"
+              />
+              <q-select
+                v-if="tab == 'DIP' && cargo_Id != 'RP'"
+                filled
+                color="pink"
+                class="q-pl-md"
+                v-model="distrito_Id"
+                :options="list_Distritos_Todos"
+                label="Selecciona distrito"
+                hint="Filtrar por distrito"
+                style="width: 260px"
+              />
+              <q-select
+                v-if="tab != 'DIP'"
+                filled
+                color="pink"
+                class="q-pl-md"
+                v-model="municipio_Id"
+                :options="list_Municipios_Filtro"
+                label="Selecciona municipio"
+                hint="Filtrar por municipio"
+                style="width: 260px"
+              />
+              <q-select
+                v-if="tab == 'REG' && cargo_Id == 'MR'"
+                filled
+                color="pink"
+                class="q-pl-md"
+                v-model="demarcacion_Id"
+                :options="list_Demarcaciones_Todos"
+                label="Selecciona demarcación"
+                hint="Filtrar por demarcación"
                 style="width: 260px"
               />
               <q-select
@@ -73,10 +122,20 @@
                 class="q-pl-md"
                 v-model="partido_Id"
                 :options="list_Filtro_Partidos"
-                label="Selecciona partido"
-                hint="Filtrar por partidos"
+                label="Selecciona partido o candidatura común"
+                hint="Filtrar por partidos o candidatura común"
                 style="width: 260px"
               >
+                <template v-slot:option="scope">
+                  <q-item v-bind="scope.itemProps">
+                    <q-item-section avatar v-if="scope.opt.logo_URL != null">
+                      <q-img :src="scope.opt.logo_URL" />
+                    </q-item-section>
+                    <q-item-section>
+                      <q-item-label>{{ scope.opt.label }}</q-item-label>
+                    </q-item-section>
+                  </q-item>
+                </template>
               </q-select>
             </template>
             <template v-slot:top-right>
@@ -98,52 +157,83 @@
                 class="q-pa-xs col-xs-12 col-sm-6 col-md-4 col-lg-3 grid-style-transition"
               >
                 <q-card bordered class="no-shadow">
-                  <div class="q-pa-sm">
+                  <div class="q-pa-sm row">
                     <q-checkbox
-                      v-if="props.row.estatus == null"
+                      v-if="
+                        (props.row.estatus_Aprobado == false ||
+                          props.row.estatus_Aprobado == null) &&
+                        props.row.nombres != 'Pendiente de Registrar' &&
+                        fechaAprobar
+                      "
                       color="green"
                       v-model="props.row.aprobar"
                       @click="updateSelection(props.row)"
                     />
-                    <q-btn
+                    <q-icon
                       size="sm"
-                      color="pink-8"
+                      flat
                       round
-                      dense
-                      @click="toggleRowExpand(props.row)"
-                      :icon="isRowExpanded(props.row) ? 'remove' : 'add'"
+                      :color="
+                        props.row.estatus_Aprobado == null ||
+                        props.row.estatus_Aprobado == false
+                          ? 'red'
+                          : 'green'
+                      "
+                      :name="
+                        props.row.estatus_Aprobado == null ||
+                        props.row.estatus_Aprobado == false
+                          ? 'close'
+                          : 'done'
+                      "
                     />
+                    <div
+                      :class="
+                        props.row.estatus_Aprobado == null ||
+                        props.row.estatus_Aprobado == false
+                          ? 'text-red'
+                          : 'text-green'
+                      "
+                    >
+                      {{
+                        props.row.estatus_Aprobado == null ||
+                        props.row.estatus_Aprobado == false
+                          ? "Sin aprobar"
+                          : "Aprobado"
+                      }}
+                    </div>
                   </div>
                   <q-item>
                     <q-item-section avatar>
-                      <q-avatar
-                        size="50px"
-                        v-if="props.row.url_Foto_Propietario != null"
-                      >
-                        <img :src="props.row.url_Foto_Propietario" />
+                      <q-avatar size="50px" v-if="props.row.url_Foto != null">
+                        <img :src="props.row.url_Foto" />
                       </q-avatar>
                       <q-avatar size="50px" v-else>
                         <q-img
-                          v-if="props.row.genero_Propietario == 'Mujer'"
+                          v-if="props.row.genero == 'Mujer'"
                           src="../../../assets/avatarmujer.jpg"
                         />
                         <q-img
-                          v-if="props.row.genero_Propietario == 'Hombre'"
+                          v-if="props.row.genero == 'Hombre'"
                           src="../../../assets/avatarHombre.jpg"
                         />
                         <q-img
-                          v-if="props.row.genero_Propietario == 'No binario'"
+                          v-if="props.row.genero == 'No binario'"
                           src="../../../assets/noBinario.png"
                         />
                       </q-avatar>
                     </q-item-section>
-
                     <q-item-section>
-                      <q-item-label class="text-grey-8 text-weight-bold">
-                        {{ props.row.nombre_Completo_Propietario }}
+                      <q-badge
+                        color="red"
+                        v-if="props.row.nombres == 'Pendiente de Registrar'"
+                      >
+                        {{ props.row.nombres }}
+                      </q-badge>
+                      <q-item-label v-else class="text-grey-8 text-weight-bold">
+                        {{ props.row.nombre_Completo }}
                       </q-item-label>
                       <q-item-label caption>
-                        Fecha de registro: {{ props.row.fecha_registro }}
+                        Fecha de registro: {{ props.row.fecha_Registro }}
                       </q-item-label>
                       <q-item-label class="text-center">
                         <q-avatar style="width: auto; height: 28px" square>
@@ -151,7 +241,7 @@
                             :src="
                               props.row.is_Coalicion == true
                                 ? props.row.logo_Coalicion
-                                : props.row.url_Logo_Partido_Propietario
+                                : props.row.logo_Partido
                             "
                             alt=""
                           />
@@ -169,13 +259,12 @@
                       >
                       <q-item-label
                         class="text-caption text-weight-bold text-grey-8"
-                        >Correo:
-                        {{ props.row.correo_Propietario }}</q-item-label
+                        >Correo: {{ props.row.correo }}</q-item-label
                       >
                       <q-item-label
                         class="text-caption text-weight-bold text-grey-8"
                       >
-                        Género: {{ props.row.genero_Propietario }}
+                        Género: {{ props.row.genero }}
                       </q-item-label>
                       <q-item-label
                         class="text-caption text-weight-bold text-grey-8"
@@ -197,26 +286,49 @@
                       </q-item-label>
                       <q-item-label
                         class="text-grey-8"
-                        v-if="props.row.nombre_Coalicion != null"
+                        v-if="props.row.coalicion != null"
                       >
-                        Nombre coalición: {{ props.row.nombre_Coalicion }}
+                        Nombre coalición: {{ props.row.coalicion }}
                       </q-item-label>
                     </q-item-section>
-
                     <q-item-section side>
                       <q-item-label>
                         <q-btn
-                          v-if="props.row.estatus == null"
+                          v-if="
+                            modulo == null
+                              ? false
+                              : modulo.actualizar &&
+                                (perfil == 'Captura Prerrogativas'
+                                  ? tab == 'DIP'
+                                  : tab != 'GUB')
+                          "
                           flat
                           round
                           color="pink-5"
                           icon="edit_square"
-                          @click="editar(props.row.id)"
+                          @click="editar(props.row)"
                         >
                           <q-tooltip>Editar información </q-tooltip>
                         </q-btn>
                         <q-btn
-                          v-if="props.row.estatus != null"
+                          v-if="modulo == null ? false : modulo.leer"
+                          flat
+                          round
+                          color="pink-5"
+                          icon="visibility"
+                          @click="verInformacion(props.row)"
+                        >
+                          <q-tooltip>Ver información</q-tooltip>
+                        </q-btn>
+                        <q-btn
+                          v-if="
+                            modulo == null
+                              ? false
+                              : modulo.registrar &&
+                                (perfil == 'Captura Prerrogativas'
+                                  ? tab == 'DIP'
+                                  : tab != 'GUB')
+                          "
                           flat
                           round
                           color="pink-5"
@@ -228,98 +340,55 @@
                       </q-item-label>
                     </q-item-section>
                   </q-item>
-                  <q-tr v-show="isRowExpanded(props.row)" :props="props">
-                    <q-td>
-                      <TablaSuplentesComp />
-                    </q-td>
-                  </q-tr>
                 </q-card>
               </div>
             </template>
             <!--TEMPLATE SCREEN DESKTOP-->
             <template v-else v-slot:body="props">
-              <q-tr :props="props">
+              <q-tr :props="props" :class="props.row.color ? '' : 'bg-grey-3'">
                 <q-td v-for="col in props.cols" :key="col.name" :props="props">
-                  <div v-if="col.name === 'id_Expand'">
-                    <q-checkbox
-                      v-if="props.row.estatus == null"
-                      color="green"
-                      v-model="props.row.aprobar"
-                      @click="updateSelection(props.row)"
-                    />
-                    <q-btn
-                      size="sm"
-                      color="pink-8"
-                      round
-                      dense
-                      @click="toggleRowExpand(props.row)"
-                      :icon="isRowExpanded(props.row) ? 'remove' : 'add'"
-                    />
-                  </div>
-                  <div v-else-if="col.name === 'nombre_Completo_Propietario'">
+                  <div v-if="col.name === 'nombre_Completo'">
                     <q-item>
                       <q-item-section avatar>
-                        <q-avatar v-if="props.row.url_Foto_Propietario != null">
-                          <img :src="props.row.url_Foto_Propietario" />
+                        <q-avatar v-if="props.row.url_Foto != null">
+                          <img :src="props.row.url_Foto" />
                         </q-avatar>
                         <q-avatar v-else>
                           <q-img
-                            v-if="props.row.genero_Propietario == 'Mujer'"
+                            v-if="props.row.genero == 'Mujer'"
                             src="../../../assets/avatarmujer.jpg"
                           />
                           <q-img
-                            v-if="props.row.genero_Propietario == 'Hombre'"
+                            v-if="props.row.genero == 'Hombre'"
                             src="../../../assets/avatarHombre.jpg"
                           />
                           <q-img
-                            v-if="props.row.genero_Propietario == 'No binario'"
+                            v-if="props.row.genero == 'No binario'"
                             src="../../../assets/noBinario.png"
                           />
                         </q-avatar>
                       </q-item-section>
 
-                      <q-item-section class="text-left">
-                        <q-item-label>{{
-                          props.row.nombre_Completo_Propietario
-                        }}</q-item-label>
+                      <q-item-section>
+                        <q-item-label
+                          class="text-left"
+                          v-if="props.row.nombres != 'Pendiente de Registrar'"
+                          >{{ col.value }}</q-item-label
+                        >
+                        <q-badge color="red" v-else>{{ col.value }}</q-badge>
                         <q-item-label caption class="">{{
-                          props.row.correo_Propietario
+                          props.row.correo
                         }}</q-item-label>
                       </q-item-section>
                     </q-item>
                   </div>
-                  <div v-else-if="col.name === 'estatus'">
+                  <div v-else-if="col.name === 'estatus_Aprobado'">
                     <q-icon
                       size="sm"
                       flat
                       round
-                      :color="
-                        props.row.estatus != 'Registro Aprobado'
-                          ? 'red'
-                          : 'green'
-                      "
-                      :name="
-                        props.row.estatus != 'Registro Aprobado'
-                          ? 'close'
-                          : 'done'
-                      "
-                    />
-                  </div>
-                  <div v-else-if="col.name === 'is_Comun'">
-                    <q-icon
-                      size="sm"
-                      flat
-                      round
-                      :color="
-                        col.value == null || col.value == false
-                          ? 'red'
-                          : 'green'
-                      "
-                      :name="
-                        col.value == null || col.value == false
-                          ? 'close'
-                          : 'done'
-                      "
+                      :color="col.value == false ? 'red' : 'green'"
+                      :name="col.value == false ? 'close' : 'done'"
                     />
                   </div>
                   <div v-else-if="col.name === 'logo_Coalicion'">
@@ -331,16 +400,19 @@
                         props.row.is_Comun == true
                       "
                     >
-                      <img :src="props.row.logo_Coalicion" alt="" />
-                      <q-tooltip>{{ props.row.coalicion }}</q-tooltip>
+                      <img
+                        :src="
+                          props.row.is_Coalicion
+                            ? col.value
+                            : props.row.logo_Comun
+                        "
+                        alt=""
+                      />
                     </q-avatar>
                   </div>
                   <div v-else-if="col.name === 'partido'">
-                    <q-avatar square>
-                      <img
-                        :src="props.row.url_Logo_Partido_Propietario"
-                        alt=""
-                      />
+                    <q-avatar v-if="props.row.partido_Id != null" square>
+                      <img :src="props.row.logo_Partido" alt="" />
                       <q-tooltip>{{ props.row.partido }}</q-tooltip>
                     </q-avatar>
                   </div>
@@ -348,43 +420,68 @@
                     <label>{{ props.row.fecha_registro }}</label>
                   </div>
                   <div v-else-if="col.name === 'id'">
+                    <q-checkbox
+                      v-if="
+                        (props.row.estatus_Aprobado == false ||
+                          props.row.estatus_Aprobado == null) &&
+                        props.row.nombres != 'Pendiente de Registrar' &&
+                        fechaAprobar &&
+                        (perfil == 'Captura Prerrogativas'
+                          ? tab == 'DIP'
+                          : tab != 'GUB')
+                      "
+                      color="green"
+                      v-model="props.row.aprobar"
+                    />
+                    <!-- (props.row.tipo_Candidato == 'RP'
+                              ? !fechaSustitucionesMR
+                              : !fechaSustitucionesRP) && -->
                     <q-btn
-                      v-if="props.row.estatus == null"
+                      v-if="
+                        modulo == null
+                          ? false
+                          : modulo.actualizar &&
+                            (perfil == 'Captura Prerrogativas'
+                              ? tab == 'DIP'
+                              : tab != 'GUB')
+                      "
                       flat
                       round
                       color="pink-5"
                       icon="edit_square"
-                      @click="editar(col.value)"
+                      @click="editar(props.row)"
                     >
                       <q-tooltip>Editar información</q-tooltip>
                     </q-btn>
                     <q-btn
-                      v-if="props.row.estatus != null"
+                      v-if="modulo == null ? false : modulo.leer"
                       flat
                       round
                       color="pink-5"
                       icon="visibility"
-                      @click="verInformacion(col.value)"
+                      @click="verInformacion(props.row)"
                     >
                       <q-tooltip>Ver información</q-tooltip>
                     </q-btn>
                     <q-btn
-                      v-if="props.row.estatus != null"
+                      v-if="
+                        modulo == null
+                          ? false
+                          : modulo.registrar &&
+                            (perfil == 'Captura Prerrogativas'
+                              ? tab == 'DIP'
+                              : tab != 'GUB')
+                      "
                       flat
                       round
                       color="pink-5"
                       icon="sync_alt"
-                      @click="modalSustituir(col.value)"
+                      @click="modalSustituir(props.row)"
                     >
                       <q-tooltip>Sustituir</q-tooltip>
                     </q-btn>
                   </div>
                   <label v-else>{{ col.value }}</label>
-                </q-td>
-              </q-tr>
-              <q-tr v-show="isRowExpanded(props.row)" :props="props">
-                <q-td colspan="15%">
-                  <TablaSuplentesComp />
                 </q-td>
               </q-tr>
             </template>
@@ -400,7 +497,8 @@
 
 <script setup>
 import { storeToRefs } from "pinia";
-import { useQuasar, QSpinnerCube } from "quasar";
+import { useAuthStore } from "src/stores/auth-store";
+import { useQuasar, QSpinnerCube, date } from "quasar";
 import { useCandidatosStore } from "src/stores/candidatos-store";
 import { useAprobarStore } from "src/stores/aprobar-store";
 import { ref, onBeforeMount, watch, watchEffect } from "vue";
@@ -416,12 +514,19 @@ const $q = useQuasar();
 const candidatoStore = useCandidatosStore();
 const configuracionStore = useConfiguracionStore();
 const aprobarStore = useAprobarStore();
+const authStore = useAuthStore();
+const { modulo } = storeToRefs(authStore);
+const siglas = "SRC-REG-CL";
 const {
   tipo_Elecciones,
   list_Partidos_Politicos_Todos,
   list_Coaliciones_Filtro,
+  list_Distritos_Todos,
+  list_Municipios_Todos,
+  list_Demarcaciones_Todos,
+  list_Municipios_Filtro,
 } = storeToRefs(configuracionStore);
-const { list_Candidatos, actualizar } = storeToRefs(candidatoStore);
+const { list_Candidatos, actualizar, puesto } = storeToRefs(candidatoStore);
 const { list_Detalle } = storeToRefs(aprobarStore);
 const visisble_columns = ref([]);
 const expandedRow = ref(null);
@@ -429,24 +534,50 @@ const tab = ref(null);
 const list_Candidatos_Filtro = ref([]);
 const list_Candidatos_Filtrados = ref([]);
 const listCandidatos = ref([]);
+const municipio_Id = ref(null);
+const demarcacion_Id = ref(null);
+const distrito_Id = ref(null);
 const partido_Id = ref(null);
 const coalicion_Id = ref(null);
 const list_Filtro_Partidos = ref([]);
 const list_Cargo = ref(["Todos", "MR", "RP"]);
 const cargo_Id = ref(null);
 const selected = ref(false);
+const transparent = ref("transparent");
+const eleccion_Id = ref(null);
+const timeStamp = Date.now();
+const dateActual = ref(date.formatDate(timeStamp, "YYYY-MM-DD"));
+const fechaSustitucionesMR = ref(
+  dateActual.value >= "2024-04-24" ? true : false
+);
+const fechaSustitucionesRP = ref(
+  dateActual.value >= "2024-04-25" ? true : false
+);
+const filtradoElecciones = ref([]);
+const fechaAprobar = ref(dateActual.value < "2024-04-29" ? false : true);
+const perfil = localStorage.getItem("perfil_Letra");
+const estatus_Id = ref(null);
+const list_Estatus = ref(["Todos", "Aprobado", "Sin aprobar"]);
 
 //--------------------------------------------------------------------
 
 onBeforeMount(() => {
   cargarData();
+  leerPermisos();
 });
 
 //--------------------------------------------------------------------
 
+watch(eleccion_Id, (val) => {
+  if (val != null) {
+    cargarCandidatos();
+  }
+});
+
 watch(actualizar, (val) => {
   if (val == true) {
-    cargarData();
+    cargarCandidatos();
+    selected.value = false;
     actualizar.value = false;
   }
 });
@@ -470,19 +601,20 @@ watch(tab, (val) => {
 watch(selected, (val) => {
   if (val == true) {
     list_Candidatos_Filtrados.value.forEach((element) => {
-      if (element.estatus != "Registro Aprobado" && element.aprobar == false) {
+      if (
+        element.estatus_Aprobado == false &&
+        element.aprobar == false &&
+        element.nombres != "Pendiente de Registrar"
+      ) {
         element.aprobar = true;
-        list_Detalle.value.push({
-          candidato_Id: element.id,
-          candidato: element.nombre_Completo_Propietario,
-          partido_Logo: element.url_Logo_Partido_Propietario,
-          coalicion_Logo: element.url_Logo_Coalicion,
-        });
       }
     });
   } else {
     list_Candidatos_Filtrados.value.forEach((element) => {
-      if (element.estatus != "Registro Aprobado") {
+      if (
+        element.estatus_Aprobado == false &&
+        element.nombres != "Pendiente de Registrar"
+      ) {
         element.aprobar = false;
       }
     });
@@ -493,41 +625,79 @@ watch(selected, (val) => {
 watch(tipo_Elecciones, (val) => {
   if (val.length > 0) {
     tab.value = val[0].siglas;
+    eleccion_Id.value = val[0].id;
+    if (localStorage.getItem("perfil_Letra") == "Capturista DIP") {
+      filtradoElecciones.value = val.filter((x) => x.siglas == "DIP");
+    } else {
+      filtradoElecciones.value = val;
+    }
+  }
+});
+
+watch(municipio_Id, (val) => {
+  if (val != null && tab.value == "REG") {
+    configuracionStore.loadDemarcaciones(val.value, true);
   }
 });
 
 const filtrar = (list_Candidatos, filtro) => {
-  list_Candidatos_Filtro.value = list_Candidatos.filter(
-    (x) => x.tipo_Eleccion == filtro.eleccion
-  );
-  list_Candidatos_Filtrados.value = list_Candidatos_Filtro.value.filter(
-    (item) => {
-      let cumple = true;
-
-      if (filtro.cargo !== undefined) {
-        if (filtro.cargo == "Todos") {
-          cumple = cumple && item.tipo_Candidato === item.tipo_Candidato;
-        } else {
-          cumple = cumple && item.tipo_Candidato === filtro.cargo;
-        }
+  list_Candidatos_Filtrados.value = list_Candidatos.filter((item) => {
+    let cumple = true;
+    if (filtro.estatus !== undefined) {
+      if (filtro.estatus == "Todos" || filtro.estatus.label == "Todos") {
+        cumple = true;
+      } else {
+        cumple = cumple && item.estatus_Aprobado === filtro.estatus;
       }
-      if (filtro.partido !== undefined) {
-        if (filtro.partido == 0) {
-          cumple = cumple && item.partido_Id === item.partido_Id;
-        } else {
-          cumple = cumple && item.partido_Id === filtro.partido;
-        }
-      }
-      if (filtro.coalicion !== undefined) {
-        if (filtro.coalicion == 0) {
-          cumple = cumple && item.coalicion_Id === item.coalicion_Id;
-        } else {
-          cumple = cumple && item.coalicion_Id === filtro.coalicion;
-        }
-      }
-      return cumple;
     }
-  );
+    if (filtro.distrito !== undefined) {
+      if (filtro.distrito == 0) {
+        cumple = cumple && item.distrito_Id === item.distrito_Id;
+      } else {
+        cumple = cumple && item.distrito_Id === filtro.distrito;
+      }
+    }
+    if (filtro.municipio !== undefined) {
+      if (filtro.municipio == 0) {
+        cumple = cumple && item.municipio_Id === item.municipio_Id;
+      } else {
+        cumple = cumple && item.municipio_Id === filtro.municipio;
+      }
+    }
+    if (filtro.demarcacion !== undefined) {
+      if (filtro.demarcacion == 0) {
+        cumple = cumple && item.demarcacion_Id === item.demarcacion_Id;
+      } else {
+        cumple = cumple && item.demarcacion_Id === filtro.demarcacion;
+      }
+    }
+    if (filtro.cargo !== undefined) {
+      if (filtro.cargo == "Todos") {
+        cumple = cumple && item.tipo_Candidato === item.tipo_Candidato;
+      } else {
+        cumple = cumple && item.tipo_Candidato === filtro.cargo;
+      }
+    }
+    if (filtro.partido !== undefined) {
+      if (filtro.partido.value == 0) {
+        cumple = cumple && item.partido_Id === item.partido_Id;
+      } else {
+        if (filtro.partido.is_Comun == true) {
+          cumple = cumple && item.comun_Id === filtro.partido.value;
+        } else {
+          cumple = cumple && item.partido_Id === filtro.partido.value;
+        }
+      }
+    }
+    if (filtro.coalicion !== undefined) {
+      if (filtro.coalicion == 0) {
+        cumple = cumple && item.coalicion_Id === item.coalicion_Id;
+      } else {
+        cumple = cumple && item.coalicion_Id === filtro.coalicion;
+      }
+    }
+    return cumple;
+  });
 };
 
 watchEffect(() => {
@@ -539,25 +709,49 @@ watchEffect(() => {
         : tab.value == "REG"
         ? "Regidurías"
         : "Diputaciones";
+  if (estatus_Id.value != null)
+    filtro.estatus =
+      estatus_Id.value == "Aprobado"
+        ? true
+        : estatus_Id.value == "Sin aprobar"
+        ? false
+        : estatus_Id.value;
+  if (distrito_Id.value != null) filtro.distrito = distrito_Id.value.value;
+  if (municipio_Id.value != null) filtro.municipio = municipio_Id.value.value;
+  if (demarcacion_Id.value != null)
+    filtro.demarcacion = demarcacion_Id.value.value;
   if (cargo_Id.value != null) filtro.cargo = cargo_Id.value;
-  if (partido_Id.value != null) filtro.partido = partido_Id.value.value;
+  if (partido_Id.value != null) filtro.partido = partido_Id.value;
   if (coalicion_Id.value != null) {
     filtro.coalicion = coalicion_Id.value.value;
     if (coalicion_Id.value.value != 0) {
       list_Filtro_Partidos.value = list_Partidos_Politicos_Todos.value.filter(
         (x) => x.coalicion_Id == coalicion_Id.value.value
       );
+      list_Filtro_Partidos.value.splice(0, 0, {
+        value: 0,
+        label: "Todos",
+      });
     } else {
       list_Filtro_Partidos.value = list_Partidos_Politicos_Todos.value;
     }
   }
-
   filtrar(list_Candidatos.value, filtro);
 });
 
 //--------------------------------------------------------------------
 
+const leerPermisos = async () => {
+  $q.loading.show();
+  await authStore.loadModulo(siglas);
+  $q.loading.hide();
+};
+
 const limpiarFiltros = () => {
+  estatus_Id.value = { value: 0, label: "Todos" };
+  distrito_Id.value = { value: 0, label: "Todos" };
+  municipio_Id.value = { value: 0, label: "Todos" };
+  demarcacion_Id.value = { value: 0, label: "Todos" };
   coalicion_Id.value = { value: 0, label: "Todos" };
   partido_Id.value = { value: 0, label: "Todos" };
   cargo_Id.value = "Todos";
@@ -572,50 +766,48 @@ const cargarData = async () => {
     message: "Espere un momento porfavor...",
     messageColor: "black",
   });
-  await candidatoStore.loadCandidatos();
+  await configuracionStore.loadMunicipiosFiltro();
+  await configuracionStore.loadMunicipios();
+  await configuracionStore.loadDistritos(true);
   await configuracionStore.loadPartidosPoliticosTodos();
   await configuracionStore.loadTipoElecciones();
-  await configuracionStore.loadDistritos();
   await configuracionStore.loadPartidosPoliticos();
   await configuracionStore.loadCoaliciones();
   await configuracionStore.loadCoalicionesFiltro();
-  await configuracionStore.loadMunicipios();
-  cargarColumnas(tab.value);
+  cargarCandidatos();
   limpiarFiltros();
   $q.loading.hide();
 };
 
-const updateSelection = (row) => {
-  const isSelected = list_Detalle.value.find((x) => x.candidato_Id == row.id);
-  if (isSelected == undefined) {
-    list_Detalle.value.push({
-      candidato_Id: row.id,
-      candidato: row.nombre_Completo_Propietario,
-      partido_Logo: row.url_Logo_Partido_Propietario,
-      coalicion_Logo: row.url_Logo_Coalicion,
-    });
-  } else {
-    var index = list_Detalle.value
-      .map((producto) => producto.candidato_Id)
-      .indexOf(row.id);
-    list_Detalle.value.splice(index, 1);
-  }
+const cargarCandidatos = async () => {
+  $q.loading.show({
+    spinner: QSpinnerCube,
+    spinnerColor: "pink",
+    spinnerSize: 140,
+    backgroundColor: "purple-2",
+    message: "Espere un momento porfavor...",
+    messageColor: "black",
+  });
+  filter.value = "";
+  await candidatoStore.loadCandidatosIndividual(eleccion_Id.value);
+  cargarColumnas(tab.value);
+  $q.loading.hide();
 };
 
 const cargarColumnas = (tab) => {
   switch (tab) {
     case "GUB": {
       visisble_columns.value = [
-        "id_Expand",
-        "nombre_Completo_Propietario",
-        "edad_Propietario",
-        "estatus",
-        "genero_Propietario",
+        "nombre_Completo",
+        "candidatura",
+        "edad",
+        "genero",
+        "estatus_Aprobado",
         "tipo_Candidato",
         "postulacion",
         "logo_Coalicion",
         "partido",
-        "fecha_registro",
+        "fecha_Registro",
         "orden",
         "id",
       ];
@@ -623,17 +815,17 @@ const cargarColumnas = (tab) => {
     }
     case "DIP": {
       visisble_columns.value = [
-        "id_Expand",
-        "nombre_Completo_Propietario",
-        "edad_Propietario",
-        "estatus",
-        "genero_Propietario",
+        "nombre_Completo",
+        "candidatura",
+        "edad",
+        "genero",
+        "estatus_Aprobado",
         "tipo_Candidato",
         "postulacion",
         "logo_Coalicion",
         "partido",
         "no_Distrito",
-        "fecha_registro",
+        "fecha_Registro",
         "orden",
         "id",
       ];
@@ -641,34 +833,35 @@ const cargarColumnas = (tab) => {
     }
     case "PYS": {
       visisble_columns.value = [
-        "id_Expand",
-        "nombre_Completo_Propietario",
-        "edad_Propietario",
-        "estatus",
-        "genero_Propietario",
+        "nombre_Completo",
+        "candidatura",
+        "edad",
+        "genero",
+        "estatus_Aprobado",
+        "tipo_Candidato",
         "postulacion",
         "logo_Coalicion",
         "partido",
         "municipio",
-        "fecha_registro",
+        "fecha_Registro",
         "id",
       ];
       break;
     }
     case "REG": {
       visisble_columns.value = [
-        "id_Expand",
-        "nombre_Completo_Propietario",
-        "edad_Propietario",
-        "estatus",
-        "genero_Propietario",
+        "nombre_Completo",
+        "candidatura",
+        "edad",
+        "genero",
+        "estatus_Aprobado",
         "tipo_Candidato",
         "postulacion",
         "logo_Coalicion",
         "partido",
         "municipio",
         "demarcacion",
-        "fecha_registro",
+        "fecha_Registro",
         "orden",
         "id",
       ];
@@ -679,44 +872,94 @@ const cargarColumnas = (tab) => {
     sortBy: "desc",
     descending: false,
     page: 1,
-    rowsPerPage: 5,
+    rowsPerPage: 8,
   };
 };
 
-const editar = async (id) => {
+const editar = async (row) => {
   $q.loading.show();
   candidatoStore.actualizarModal(true);
   candidatoStore.updateEditar(true);
-  await candidatoStore.loadCandidato(id);
+  puesto.value =
+    row.puesto == 0
+      ? "propietario"
+      : row.puesto == 1
+      ? "suplente"
+      : row.puesto == 2
+      ? "sindico_propietario"
+      : "sindico_suplente";
+  await candidatoStore.loadCandidato(row.id);
   $q.loading.hide();
 };
-const verInformacion = async (id) => {
+
+const verInformacion = async (row) => {
   $q.loading.show();
   candidatoStore.actualizarModal(true);
   candidatoStore.actualizarVisualizar(true);
-  await candidatoStore.loadCandidato(id);
+  puesto.value =
+    row.puesto == 0
+      ? "propietario"
+      : row.puesto == 1
+      ? "suplente"
+      : row.puesto == 2
+      ? "sindico_propietario"
+      : "sindico_suplente";
+  await candidatoStore.loadCandidato(row.id);
   $q.loading.hide();
 };
 
 const aprobar = async () => {
   $q.loading.show();
-  aprobarStore.actualizarModal(true);
-  if (listCandidatos.value.length != 0) {
-    listCandidatos.value.forEach((element) => {
-      list_Detalle.value.push({
-        candidato_Id: element.id,
-        candidato: element.nombre_Completo_Propietario,
-        partido_Logo: element.url_Logo_Partido_Propietario,
-        coalicion_Logo: element.url_Logo_Coalicion,
-      });
+  list_Detalle.value = [];
+  if (list_Candidatos_Filtrados.value.length != 0) {
+    list_Candidatos_Filtrados.value.forEach((element) => {
+      if (element.aprobar == true) {
+        list_Detalle.value.push({
+          candidato_Id: element.id,
+          candidato: `${element.nombres} ${element.apellido_Paterno} ${element.apellido_Materno}`,
+          logo_Partido: element.logo_Partido,
+          logo_Coalicion: element.logo_Coalicion,
+          puesto: element.puesto,
+          tipo_Candidato: element.tipo_Candidato,
+          puesto_Letra:
+            element.puesto == 0
+              ? "Propietario"
+              : element.puesto == 1
+              ? "Suplente"
+              : element.puesto == 2
+              ? "Propietaria sindica"
+              : "Suplente sindica",
+          distrito: element.distrito,
+          distrito_Id: element.distrito_Id,
+          municipio: element.municipio,
+          municipio_Id: element.municipio_Id,
+          demarcacion: element.demarcacion,
+          demarcacion_Id: element.demarcacion_Id,
+        });
+      }
     });
   }
+  aprobarStore.actualizarModal(true);
   $q.loading.hide();
 };
 
-const modalSustituir = async (id) => {
+const modalSustituir = async (row) => {
   candidatoStore.actualizarModalSustituir(true);
-  await candidatoStore.loadCandidato(id);
+  puesto.value =
+    row.puesto == 0
+      ? "propietario"
+      : row.puesto == 1
+      ? "suplente"
+      : row.puesto == 2
+      ? "sindico_propietario"
+      : "sindico_suplente";
+  await candidatoStore.loadCandidato(row.id);
+  if (row.postulacion != "Partido político") {
+    await configuracionStore.loadPartidosPoliticosCoalicionComun(
+      row.is_Comun == true ? row.comun_Id : row.coalicion_Id,
+      row.is_Coalicion == true ? true : false
+    );
+  }
 };
 
 const toggleRowExpand = (row) => {
@@ -737,109 +980,116 @@ const isRowExpanded = (row) => {
 
 const columns = [
   {
-    name: "id_Expand",
-    align: "center",
-    label: "Ver más",
-    field: "id_Expand",
-    sortable: true,
-  },
-  {
-    name: "nombre_Completo_Propietario",
+    name: "nombre_Completo",
     align: "center",
     label: "Nombre",
-    field: "nombre_Completo_Propietario",
-    sortable: true,
+    field: "nombre_Completo",
+    sortable: false,
   },
   {
-    name: "edad_Propietario",
+    name: "candidatura",
+    align: "center",
+    label: "Candidatura",
+    field: "candidatura",
+    sortable: false,
+  },
+  {
+    name: "edad",
     align: "center",
     label: "Edad",
-    field: "edad_Propietario",
-    sortable: true,
+    field: "edad",
+    sortable: false,
   },
   {
-    name: "estatus",
-    align: "center",
-    label: "Aprobado",
-    field: "estatus",
-    sortable: true,
-  },
-  {
-    name: "genero_Propietario",
+    name: "genero",
     align: "center",
     label: "Género",
-    field: "genero_Propietario",
-    sortable: true,
+    field: "genero",
+    sortable: false,
+  },
+  {
+    name: "estatus_Aprobado",
+    align: "center",
+    label: "Aprobado",
+    field: "estatus_Aprobado",
+    sortable: false,
   },
   {
     name: "tipo_Candidato",
     align: "center",
     label: "Cargo",
     field: "tipo_Candidato",
-    sortable: true,
+    sortable: false,
   },
   {
     name: "municipio",
     align: "center",
     label: "Municipio",
     field: "municipio",
-    sortable: true,
+    sortable: false,
   },
   {
     name: "demarcacion",
     align: "center",
     label: "Demarcación",
     field: "demarcacion",
-    sortable: true,
+    sortable: false,
   },
   {
     name: "no_Distrito",
     align: "center",
     label: "Distrito",
     field: "no_Distrito",
-    sortable: true,
+    sortable: false,
   },
   {
     name: "orden",
     align: "center",
     label: "Orden de prelación",
     field: "orden",
-    sortable: true,
+    sortable: false,
   },
   {
     name: "postulacion",
     align: "center",
     label: "Tipo",
     field: "postulacion",
-    sortable: true,
+    sortable: false,
   },
   {
     name: "logo_Coalicion",
     align: "center",
     label: "Coalición/Común",
     field: "logo_Coalicion",
-    sortable: true,
+    sortable: false,
   },
   {
     name: "partido",
     align: "center",
     label: "Partido",
     field: "partido",
-    sortable: true,
+    sortable: false,
   },
   {
-    name: "fecha_registro",
+    name: "fecha_Registro",
     align: "center",
     label: "Fecha de registro",
-    field: "fecha_registro",
-    sortable: true,
+    field: "fecha_Registro",
+    sortable: false,
+  },
+  {
+    name: "color",
+    align: "center",
+    label: "color",
+    field: "color",
+    sortable: false,
   },
   {
     name: "id",
     align: "center",
     label: "Acciones",
     field: "id",
-    sortable: true,
+    sortable: false,
   },
 ];
 const filter = ref("");
@@ -847,7 +1097,7 @@ const pagination = ref({
   sortBy: "desc",
   descending: false,
   page: 1,
-  rowsPerPage: 5,
+  rowsPerPage: 8,
 });
 </script>
 <style lang="sass">

@@ -1,21 +1,34 @@
 <template>
   <q-card>
     <q-card-section class="row">
-      <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 q-pr-md">
+      <div
+        v-if="!visualizar"
+        class="col-lg-3 col-md-3 col-sm-3 col-xs-12 q-pr-md"
+      >
         <q-file
-          :disable="visualizar"
+          class="text-uppercase"
           bottom-slots
           v-model="fotoBase.url_Foto"
           label="Fotografía"
           counter
           accept=".jpg, image/*"
-          max-file-size="716800"
+          max-file-size="10485760"
+          lazy-rules
           @rejected="onRejected"
         >
           <template v-slot:prepend>
-            <!-- <q-avatar v-if="isEditar">
-              <img :src="candidatoBase.url_Foto" />
-            </q-avatar> -->
+            <q-btn
+              @click="verFoto()"
+              round
+              flat
+              dense
+              color="pink"
+              icon="image_search"
+            >
+              <q-tooltip>Ver foto</q-tooltip>
+            </q-btn>
+          </template>
+          <template v-slot:append>
             <q-btn
               icon="help"
               flat
@@ -23,8 +36,6 @@
               color="orange"
               @click="especificacionesFoto"
             />
-          </template>
-          <template v-slot:append>
             <q-icon
               name="close"
               @click.stop.prevent="fotoBase.url_Foto = null"
@@ -34,10 +45,27 @@
           <template v-slot:hint> Agregar fotografía </template>
         </q-file>
       </div>
+      <div
+        v-else
+        class="col-lg-3 col-md-3 col-sm-3 col-xs-12 q-pr-md text-center"
+      >
+        <q-btn
+          size="lg"
+          @click="verFoto()"
+          round
+          flat
+          dense
+          color="pink"
+          icon="image_search"
+        >
+        </q-btn>
+        <div class="text-bold">Ver fotografía</div>
+      </div>
       <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12 q-pr-md">
         <q-input
+          class="text-uppercase"
           :disable="visualizar"
-          v-model="candidatoBase.nombres"
+          v-model.trim="candidatoBase.nombres"
           label="Nombre(s)"
           hint="Ingrese su nombre"
           autogrow
@@ -48,8 +76,9 @@
       </div>
       <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12 q-pr-md">
         <q-input
+          class="text-uppercase"
           :disable="visualizar"
-          v-model="candidatoBase.apellido_Paterno"
+          v-model.trim="candidatoBase.apellido_Paterno"
           label="Apellido paterno"
           hint="Ingrese su apellido paterno"
           autogrow
@@ -60,8 +89,9 @@
       </div>
       <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
         <q-input
+          class="text-uppercase"
           :disable="visualizar"
-          v-model="candidatoBase.apellido_Materno"
+          v-model.trim="candidatoBase.apellido_Materno"
           label="Apellido Materno"
           hint="Ingrese su apellido materno"
           autogrow
@@ -70,8 +100,9 @@
       </div>
       <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12 q-pr-md">
         <q-input
+          class="text-uppercase"
           :disable="visualizar"
-          v-model="candidatoBase.mote"
+          v-model.trim="candidatoBase.mote"
           label="Mote"
           hint="Ingrese su sobrenombre"
           autogrow
@@ -88,6 +119,7 @@
           counter
           maxlength="18"
           autogrow
+          mask="AAAAAA########A###"
           lazy-rules
           :rules="[
             (val) => !!val || 'La clave de elector es requerida',
@@ -108,6 +140,7 @@
           lazy-rules
           counter
           maxlength="18"
+          mask="AAAA######AAAAAAN#"
           :rules="[
             (val) => !!val || 'La CURP es requerida',
             (val) => val.length >= 18 || 'Ingrese los 18 caracteres de la CURP',
@@ -117,6 +150,7 @@
       </div>
       <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
         <q-input
+          @focus="obtenerRfc"
           :disable="visualizar"
           class="text-uppercase"
           v-model.trim="candidatoBase.rfc"
@@ -125,19 +159,25 @@
           counter
           maxlength="13"
           autogrow
+          mask="AAAA######NNN"
           lazy-rules
           :rules="[
             (val) => !!val || 'El RFC es requerido',
-            (val) => val.length >= 13 || 'Ingrese los 13 caracteres deL RFC',
+            (val) =>
+              val.length >= 10 || 'Ingrese de 10 a 13 caracteres deL RFC',
           ]"
         >
         </q-input>
       </div>
       <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12 q-pr-md">
         <q-input
+          mask="####/##/##"
+          fill-mask
+          :rules="['date']"
           :disable="visualizar"
           v-model="candidatoBase.fecha_Nacimiento"
-          label="Fecha de nacimiento"
+          label="FECHA DE NACIMIENTO"
+          hint="AAAA/MM/DD"
         >
           <template v-slot:append>
             <q-icon name="event" color="pink" class="cursor-pointer">
@@ -151,7 +191,6 @@
                   color="pink-4"
                   :options="optionsDate"
                   lazy-rules
-                  mask="YYYY/MM/DD"
                   :rules="[(val) => !!val || 'La fecha es requerida']"
                 >
                   <div class="row items-center justify-end">
@@ -165,6 +204,7 @@
       </div>
       <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12 q-pr-md">
         <q-input
+          class="text-uppercase"
           :disable="visualizar"
           readonly
           v-model.number="candidatoBase.edad"
@@ -174,22 +214,36 @@
           lazy-rules
           :rules="[(val) => !!val || 'Ingrese fecha de nacimiento']"
         >
+          <template v-slot:append>
+            <q-icon
+              flat
+              round
+              color="orange"
+              name="help"
+              @click.stop.prevent="fotoBase.url_Foto = null"
+              class="cursor-pointer"
+            >
+              <q-tooltip>Edad calculada al 2 de junio del 2024</q-tooltip>
+            </q-icon>
+          </template>
         </q-input>
       </div>
       <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12 q-pr-md">
         <q-select
+          hint="SELECCIONE SU GÉNERO"
           :disable="visualizar"
           v-model="candidatoBase.sexo"
           :options="optionsGenero"
-          label="Género"
+          label="GÉNERO"
           lazy-rules
-          :rules="[(val) => !!val || 'El género es requerido']"
+          :rules="[(val) => !!val || 'EL GÉNERO ES REQUERIDO']"
         />
       </div>
       <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
         <q-input
+          class="text-uppercase"
           :disable="visualizar"
-          v-model="candidatoBase.ocupacion"
+          v-model.trim="candidatoBase.ocupacion"
           label="Ocupación"
           hint="Ingrese su ocupación"
         >
@@ -197,75 +251,52 @@
       </div>
       <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 q-pr-md">
         <q-input
+          class="text-lowercase"
           :disable="visualizar"
           v-model.trim="candidatoBase.correo"
           type="email"
-          label="Correo electrónico"
-          hint="Correo electrónico para recibir avisos y comuniados "
-          autogrow
+          label="CORREO ELECTRÓNICO"
+          hint="CORREO ELECTRÓNICO PARA RECIBIR AVISOS Y COMUNICADOS"
           lazy-rules
-          :rules="[
-            (val) => !!val || 'El correo electrónico es requerido',
-            (val) =>
-              /\w+([.-_+]?\w+)*@\w+([.-]?\w+)*(\.\w{2,10})+$/.test(val) ||
-              'Formato de correo electrónico no válido',
-          ]"
+          :rules="[(val) => !!val || 'EL CORREO ELECTRÓNICO ES REQUERIDO']"
         >
           <template v-slot:prepend>
             <q-icon name="email" color="pink" />
           </template>
         </q-input>
       </div>
-      <div
-        :class="
-          isExtension
-            ? 'col-lg-5 col-md-5 col-sm-5 col-xs-12'
-            : 'col-lg-6 col-md-6 col-sm-6 col-xs-12'
-        "
-      >
-        <q-select
-          :disable="visualizar"
-          label="Teléfono"
-          hint="Da enter para agregar teléfono"
-          v-model="candidatoBase.telefono"
-          use-input
-          use-chips
-          hide-dropdown-icon
-          multiple
-          input-debounce="0"
-          max-values="3"
-          new-value-mode="add"
-        >
-          <template v-slot:prepend>
-            <q-icon name="phone" color="pink" />
-          </template>
-        </q-select>
-
-        <!-- <q-input
-          :disable="visualizar"
-          v-model="candidatoBase.telefono"
-          label="Teléfono"
-          mask="### - ### - ####"
-          hint="Número telefonico"
-        >
-          <template v-slot:prepend>
-            <q-icon name="phone" color="pink" />
-          </template>
-        </q-input> -->
-      </div>
-      <div v-if="isExtension" class="col-lg-1 col-md-1 col-sm-1 col-xs-12">
+      <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
         <q-input
-          v-model.number="num_Extension"
-          type="number"
-          label="Extensión"
-          hint="Extensión"
-          autogrow
+          :disable="visualizar"
+          class="text-uppercase"
+          mask="##########"
+          v-model="candidatoBase.telefono"
+          label="Teléfono"
+          hint="Da enter para agregar hasta 3 teléfonos"
+          @keydown.enter.prevent="addTelefonos"
+          max-values="3"
         >
+          <template v-slot:prepend>
+            <q-icon name="phone" color="pink" />
+          </template>
+          <q-chip
+            class="q-mt-md"
+            v-for="tel in candidatoBase.telefonos"
+            :key="tel"
+            removable
+            @remove="removeTelefono(tel)"
+            v-model="candidatoBase.telefono"
+            color="grey"
+            text-color="white"
+            :label="tel"
+            :title="tel"
+          />
         </q-input>
       </div>
-      <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+      <div class="col-12">
         <br />
         <q-checkbox
+          class="text-uppercase"
           :disable="visualizar"
           left-label
           label="¿Pertenece a un grupo en situación de vulnerabilidad?"
@@ -276,42 +307,113 @@
           color="pink"
         />
       </div>
-      <div
-        v-if="candidatoBase.pertenece_Grupo_Vulnerable == true"
-        class="col-lg-6 col-md-6 col-sm-12 col-xs-12 q-pr-md"
-      >
-        <q-input
+      <div v-if="candidatoBase.pertenece_Grupo_Vulnerable == true" class="row">
+        <q-checkbox
           :disable="visualizar"
+          class="text-uppercase"
+          left-label
+          color="pink"
           v-model="candidatoBase.grupo_Vulnerable_1"
-          label="Personas de pueblos y comunidades indígenas"
-        >
-        </q-input>
+          label="Pueblos originarios"
+          checked-icon="task_alt"
+          unchecked-icon="highlight_off"
+        />
         <q-input
           :disable="visualizar"
+          v-if="candidatoBase.grupo_Vulnerable_1 == true"
+          v-model="candidatoBase.describir_Pueblos"
+          label="Describir"
+        />
+        <q-checkbox
+          :disable="visualizar"
+          class="text-uppercase"
+          left-label
+          color="pink"
           v-model="candidatoBase.grupo_Vulnerable_2"
           label="Diversidad sexual"
-        >
-        </q-input>
-      </div>
-      <div
-        v-if="candidatoBase.pertenece_Grupo_Vulnerable == true"
-        class="col-lg-6 col-md-6 col-sm-12 col-xs-12 q-pr-md"
-      >
+          checked-icon="task_alt"
+          unchecked-icon="highlight_off"
+        />
         <q-input
+          :disable="visualizar"
+          v-if="candidatoBase.grupo_Vulnerable_2 == true"
+          v-model="candidatoBase.describir_Diversidad"
+          label="Describir"
+        />
+        <q-checkbox
+          class="text-uppercase"
+          v-if="props.tipo_Eleccion == 'DIP'"
+          left-label
+          color="pink"
           :disable="visualizar"
           v-model="candidatoBase.grupo_Vulnerable_3"
-          label="Personas con discapacidad"
-        >
-        </q-input>
+          label="Con discapacidad"
+          checked-icon="task_alt"
+          unchecked-icon="highlight_off"
+        />
         <q-input
           :disable="visualizar"
+          v-if="candidatoBase.grupo_Vulnerable_3 == true"
+          v-model="candidatoBase.describir_Discapacidad"
+          label="Describir"
+        />
+        <q-checkbox
+          class="text-uppercase"
+          v-if="props.rp == true && props.tipo_Eleccion == 'DIP'"
+          left-label
+          :disable="visualizar"
+          color="pink"
           v-model="candidatoBase.grupo_Vulnerable_4"
-          label="Otro"
-        >
-        </q-input>
+          label="Migrante"
+          checked-icon="task_alt"
+          unchecked-icon="highlight_off"
+        />
+        <q-input
+          :disable="visualizar"
+          v-if="candidatoBase.grupo_Vulnerable_4 == true"
+          v-model="candidatoBase.describir_Migrante"
+          label="Describir"
+        />
+      </div>
+      <div class="col-12">
+        <br />
+        <q-separator color="pink" />
+      </div>
+      <div
+        v-if="
+          props.tabTipo == 'propietario' ||
+          props.tabTipo == 'sindico_propietario'
+        "
+        class="col-12"
+      >
+        <br />
+        <q-checkbox
+          :disable="visualizar"
+          class="text-uppercase"
+          left-label
+          color="pink"
+          size="lg"
+          v-model="candidatoBase.consecutivo"
+          label="Postulación bajo la figura de elección consecutiva"
+          checked-icon="task_alt"
+          unchecked-icon="highlight_off"
+        />
       </div>
     </q-card-section>
   </q-card>
+  <ModalFotografia
+    :id="candidato.id"
+    :puesto="
+      props.tabTipo == 'propietario'
+        ? 0
+        : props.tabTipo == 'suplente'
+        ? 1
+        : props.tabTipo == 'sindico_propietario'
+        ? 2
+        : 3
+    "
+    :foto="candidatoBase.url_Foto == null ? '' : candidatoBase.url_Foto"
+  />
 </template>
 
 <script setup>
@@ -319,6 +421,8 @@ import { storeToRefs } from "pinia";
 import { useQuasar } from "quasar";
 import { useCandidatosStore } from "src/stores/candidatos-store";
 import { ref, defineProps, watch, watchEffect } from "vue";
+import { useAuthStore } from "src/stores/auth-store";
+import ModalFotografia from "../components/ModalFotografia.vue";
 
 //--------------------------------------------------------------------
 
@@ -329,22 +433,29 @@ const {
   propietario_2,
   suplente_1,
   suplente_2,
-  isEditar,
   foto_1,
   foto_2,
   foto_3,
   foto_4,
   visualizar,
+  candidato,
 } = storeToRefs(candidatoStore);
 const optionsGenero = ref(["Hombre", "Mujer", "No binario"]);
 const telefonos = ref();
 const props = defineProps({
   tabTipo: { type: String, required: true },
+  tipo_Eleccion: { type: String, required: true },
+  rp: { type: Boolean, required: true },
 });
-const isExtension = ref(false);
-const num_Extension = ref(null);
 const candidatoBase = ref(null);
 const fotoBase = ref(null);
+const pueblo_Originario = ref(false);
+const diversidad_Sexual = ref(false);
+const con_Discapacidad = ref(false);
+const migrante = ref(false);
+const authStore = useAuthStore();
+const { modulo } = storeToRefs(authStore);
+const siglas = "SRC-REG-CL";
 
 //--------------------------------------------------------------------
 
@@ -366,6 +477,29 @@ switch (props.tabTipo) {
     fotoBase.value = foto_4.value;
     break;
 }
+
+const removeTelefono = (tel) => {
+  const index = candidatoBase.value.telefonos.indexOf(tel);
+  if (index !== -1) {
+    candidatoBase.value.telefonos.splice(index, 1);
+  }
+};
+const addTelefonos = (e) => {
+  if (candidatoBase.value.telefonos.length < 3) {
+    candidatoBase.value.telefonos.push(e.target.value);
+  }
+  candidatoBase.value.telefono = null;
+};
+
+const obtenerRfc = (e) => {
+  if (candidatoBase.value.curp == null) {
+    candidatoBase.value.rfc = `${candidatoBase.value.curp.slice(0, 10)}`;
+  }
+};
+
+const verFoto = () => {
+  candidatoStore.actualizarModalFoto(true);
+};
 
 //--------------------------------------------------------------------
 
@@ -403,6 +537,16 @@ watchEffect(() => {
         candidatoBase.value.grupo_Vulnerable_4;
       propietario_1.value.url_Foto = candidatoBase.value.url_Foto;
       propietario_1.value.edad = candidatoBase.value.edad;
+      propietario_1.value.consecutivo = candidatoBase.value.consecutivo;
+      propietario_1.value.describir_Pueblos =
+        candidatoBase.value.describir_Pueblos;
+      propietario_1.value.describir_Diversidad =
+        candidatoBase.value.describir_Diversidad;
+      propietario_1.value.describir_Discapacidad =
+        candidatoBase.value.describir_Discapacidad;
+      propietario_1.value.describir_Migrante =
+        candidatoBase.value.describir_Migrante;
+      propietario_1.value.telefonos = candidatoBase.value.telefonos;
       break;
     case "suplente":
       suplente_1.value.nombres = candidatoBase.value.nombres;
@@ -432,6 +576,15 @@ watchEffect(() => {
         candidatoBase.value.grupo_Vulnerable_4;
       suplente_1.value.url_Foto = candidatoBase.value.url_Foto;
       suplente_1.value.edad = candidatoBase.value.edad;
+      suplente_1.value.describir_Pueblos =
+        candidatoBase.value.describir_Pueblos;
+      suplente_1.value.describir_Diversidad =
+        candidatoBase.value.describir_Diversidad;
+      suplente_1.value.describir_Discapacidad =
+        candidatoBase.value.describir_Discapacidad;
+      suplente_1.value.describir_Migrante =
+        candidatoBase.value.describir_Migrante;
+      suplente_1.value.telefonos = candidatoBase.value.telefonos;
       break;
     case "sindico_propietario":
       propietario_2.value.nombres = candidatoBase.value.nombres;
@@ -465,6 +618,16 @@ watchEffect(() => {
         candidatoBase.value.grupo_Vulnerable_4;
       propietario_2.value.url_Foto = candidatoBase.value.url_Foto;
       propietario_2.value.edad = candidatoBase.value.edad;
+      propietario_2.value.consecutivo = candidatoBase.value.consecutivo;
+      propietario_2.value.describir_Pueblos =
+        candidatoBase.value.describir_Pueblos;
+      propietario_2.value.describir_Diversidad =
+        candidatoBase.value.describir_Diversidad;
+      propietario_2.value.describir_Discapacidad =
+        candidatoBase.value.describir_Discapacidad;
+      propietario_2.value.describir_Migrante =
+        candidatoBase.value.describir_Migrante;
+      propietario_2.value.telefonos = candidatoBase.value.telefonos;
       break;
     case "sindico_suplente":
       suplente_2.value.nombres = candidatoBase.value.nombres;
@@ -494,6 +657,15 @@ watchEffect(() => {
         candidatoBase.value.grupo_Vulnerable_4;
       suplente_2.value.url_Foto = candidatoBase.value.url_Foto;
       suplente_2.value.edad = candidatoBase.value.edad;
+      suplente_2.value.describir_Pueblos =
+        candidatoBase.value.describir_Pueblos;
+      suplente_2.value.describir_Diversidad =
+        candidatoBase.value.describir_Diversidad;
+      suplente_2.value.describir_Discapacidad =
+        candidatoBase.value.describir_Discapacidad;
+      suplente_2.value.describir_Migrante =
+        candidatoBase.value.describir_Migrante;
+      suplente_2.value.telefonos = candidatoBase.value.telefonos;
       break;
     default:
       break;
@@ -524,48 +696,6 @@ watch(suplente_2.value, (val) => {
   }
 });
 
-watch(telefonos, (val) => {
-  // if (val != null) {
-  //   if (val[2] != null) {
-  //     isExtension.value = true;
-  //   } else {
-  //     isExtension.value = false;
-  //   }
-  //   switch (props.tabTipo) {
-  //     case "propietario":
-  //       propietario_1.value.telefono = `${val[0] != undefined ? val[0] : ""},${
-  //         val[1] != undefined ? val[1] : ""
-  //       },${val[2] != undefined ? val[2] : ""}, ${
-  //         num_Extension.value != null ? num_Extension.value : ""
-  //       }`;
-  //       break;
-  //     case "suplente":
-  //       suplente_1.value.telefono = `${val[0] != undefined ? val[0] : ""},${
-  //         val[1] != undefined ? val[1] : ""
-  //       },${val[2] != undefined ? val[2] : ""}, ${
-  //         num_Extension.value != null ? num_Extension.value : ""
-  //       }`;
-  //       break;
-  //     case "sindico_propietario":
-  //       propietario_2.value.telefono = `${val[0] != undefined ? val[0] : ""},${
-  //         val[1] != undefined ? val[1] : ""
-  //       },${val[2] != undefined ? val[2] : ""}, ${
-  //         num_Extension.value != null ? num_Extension.value : ""
-  //       }`;
-  //       break;
-  //     case "sindico_suplente":
-  //       suplente_2.value.telefono = `${val[0] != undefined ? val[0] : ""},${
-  //         val[1] != undefined ? val[1] : ""
-  //       },${val[2] != undefined ? val[2] : ""}, ${
-  //         num_Extension.value != null ? num_Extension.value : ""
-  //       }`;
-  //       break;
-  //     default:
-  //       break;
-  //   }
-  // }
-});
-
 //--------------------------------------------------------------------
 
 const especificacionesFoto = () => {
@@ -573,7 +703,7 @@ const especificacionesFoto = () => {
     title: `Especificaciones para la fotografía`,
     style: "width: 800px; max-width: 80vw",
     message: `
-    <div class="text-bold text-grey-8">La fotografía que se divulgada en el Sistema no deberá tener una antiguedad mayor a 3 meses previos a su publicación.</div>
+    <div class="text-bold text-grey-8">La fotografía que sea divulgada en el Sistema no deberá tener una antiguedad mayor a 3 meses previos a su publicación.</div>
 
     <ol>
       <div class="text-bold text-pink-7">Sólo se podrá publicar la imagen de la candidatura que cumpla con las especificaciones técnicas siguientes.</div>
@@ -588,7 +718,7 @@ const especificacionesFoto = () => {
       <li>Imágenes de otras candidaturas o personajes políticos.</li>
       <li>Imágenes religiosas o alguna otra que se encuentre restringida por la normativa electoral.</li>
       <li>Imágenes que integren expresiones de denostación o de discriminación de cualquier índole.</li>
-      <li>Imágenes que contengan lenguaje sexista, ofensivo o discriminatorio</li>
+      <li>Imágenes que contengan lenguaje sexista, ofensivo o discriminatorio.</li>
     </ol>`,
     html: true,
     ok: "Cerrar",
@@ -604,30 +734,42 @@ const onRejected = () => {
 
 const calcularEdad = (fecha_Nacimiento, tipo) => {
   if (fecha_Nacimiento != null) {
-    var fechaNace = new Date(fecha_Nacimiento);
-    var fechaActual = new Date();
-    var mes = fechaActual.getMonth();
-    var dia = fechaActual.getDate();
-    var año = fechaActual.getFullYear();
-    fechaActual.setDate(dia);
-    fechaActual.setMonth(mes);
-    fechaActual.setFullYear(año);
+    let hoy = new Date("2024/06/02");
+    let fechaNacimiento = new Date(fecha_Nacimiento);
+    let edad = hoy.getFullYear() - fechaNacimiento.getFullYear();
+    let diferenciaMeses = hoy.getMonth() - fechaNacimiento.getMonth();
     if (tipo == "propietario_1") {
-      propietario_1.value.edad = Math.floor(
-        (fechaActual - fechaNace) / (1000 * 60 * 60 * 24) / 365
-      );
+      if (
+        diferenciaMeses < 0 ||
+        (diferenciaMeses === 0 && hoy.getDate() < fechaNacimiento.getDate())
+      ) {
+        edad--;
+      }
+      propietario_1.value.edad = edad;
     } else if (tipo == "propietario_2") {
-      propietario_2.value.edad = Math.floor(
-        (fechaActual - fechaNace) / (1000 * 60 * 60 * 24) / 365
-      );
+      if (
+        diferenciaMeses < 0 ||
+        (diferenciaMeses === 0 && hoy.getDate() < fechaNacimiento.getDate())
+      ) {
+        edad--;
+      }
+      propietario_2.value.edad = edad;
     } else if (tipo == "suplente_1") {
-      suplente_1.value.edad = Math.floor(
-        (fechaActual - fechaNace) / (1000 * 60 * 60 * 24) / 365
-      );
+      if (
+        diferenciaMeses < 0 ||
+        (diferenciaMeses === 0 && hoy.getDate() < fechaNacimiento.getDate())
+      ) {
+        edad--;
+      }
+      suplente_1.value.edad = edad;
     } else if (tipo == "suplente_2") {
-      suplente_2.value.edad = Math.floor(
-        (fechaActual - fechaNace) / (1000 * 60 * 60 * 24) / 365
-      );
+      if (
+        diferenciaMeses < 0 ||
+        (diferenciaMeses === 0 && hoy.getDate() < fechaNacimiento.getDate())
+      ) {
+        edad--;
+      }
+      suplente_2.value.edad = edad;
     }
   }
 };

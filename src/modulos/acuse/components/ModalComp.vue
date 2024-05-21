@@ -25,9 +25,10 @@
               ser exactamente igual al que fue registrado para poder guardar el
               acuse, en caso contrario no se podrá subir. Es necesario que el
               nombre del archivo siga el siguiente formato:
-              <div class="text-red text-center">
+              <div class="text-red text-center text-bold">
                 Nombres_ApellidoPaterno_ApellidoMaterno.pdf
               </div>
+              Nota: Puedes subir de uno a muchos archivos.
             </q-card-section>
           </q-card>
         </q-card-section>

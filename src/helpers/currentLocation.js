@@ -2,7 +2,6 @@ const getCurrentLocation = () => {
   return new Promise((resolve, reject) => {
     navigator.geolocation.getCurrentPosition(
       (position) => {
-        console.log(position);
         // Resolve the promise with the location object
         resolve({
           latitude: position.coords.latitude,

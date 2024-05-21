@@ -9,9 +9,31 @@ import axios from "axios";
 // "export default () => {}" function below (which runs individually
 // for each client)
 const encryptStorage = new EncryptStorage("SECRET_KEY", "sessionStorage");
+
+//------PRODUCCION------
+// const api = axios.create({
+//   baseURL: "http://sistema.ieenayarit.org:9470/api",
+// });
+//------ELETORAL------
+// const api = axios.create({
+//   baseURL: "https://a050-44-220-242-27.ngrok-free.app/api",
+//   //baseURL: "http://sistema.ieenayarit.org:9370/api",
+// });
+
+// const api = axios.create({
+//   baseURL: "https://bce3-177-226-124-12.ngrok-free.app/api",
+// });
+//------SIMULACROS-----
+// const api = axios.create({
+//   baseURL: "http://sistema.ieenayarit.org:9670/api",
+// });
+//-----SIMULACRO PRUEBAS----
+// const api = axios.create({
+//   baseURL: "https://ieen.c5qocwcce22m.us-east-1.rds.amazonaws.com/9676",
+// });
+//----- PRODUCCION----
 const api = axios.create({
-  baseURL: "http://sistema.ieenayarit.org:9370/api",
-  //baseURL: "https://192.168.0.156:7077/api",
+  baseURL: "https://api.sistemas-ieenayarit.org/api",
 });
 
 api.interceptors.request.use((config) => {
@@ -26,8 +48,8 @@ api.interceptors.response.use(
   (error) => {
     if (error.response.status == 401) {
       alert("Su sesión ha expirado, sera redireccionado al logín");
-      localStorage.clear();
-      window.location = "http://sistema.ieenayarit.org:9371?return=false";
+      sessionStorage.clear();
+      window.location = "https://acceso.sistemas-ieenayarit.org";
     }
     return Promise.reject();
   }

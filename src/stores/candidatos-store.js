@@ -3,12 +3,16 @@ import { api } from "src/boot/axios";
 
 export const useCandidatosStore = defineStore("useCandidatosStore", {
   state: () => ({
+    foto: null,
     isDocumentacion: false,
+    puesto: null,
     modal: false,
+    modalFotografia: false,
     modalDocumento: false,
     visualizar: false,
     actualizar: false,
     loadDocs: false,
+    isEditarRequisito: false,
     isEditar: false,
     modalSustituir: false,
     loading: false,
@@ -31,19 +35,25 @@ export const useCandidatosStore = defineStore("useCandidatosStore", {
       orden: null,
       activo: null,
       fecha_Registro: null,
-      pertenece_Grupo_Vulnerable_Propietario: null,
+      pertenece_Grupo_Vulnerable_Propietario: false,
       grupo_Vulnerable_Propietario: null,
-      grupo_Vulnerable_1: null,
-      grupo_Vulnerable_2: null,
-      grupo_Vulnerable_3: null,
-      grupo_Vulnerable_4: null,
+      grupo_Vulnerable_1: false,
+      grupo_Vulnerable_2: false,
+      grupo_Vulnerable_3: false,
+      grupo_Vulnerable_4: false,
       acuse_URL: null,
       postulacion: null,
+      comun_Id: null,
     },
     candidato2: {
       tipo: null,
       nombre_Completo: null,
       partido: null,
+      tipo_Candidato: null,
+      postulacion: null,
+      is_Comun: null,
+      comun_Id: null,
+      coalicion_Id: null,
     },
     foto_1: {
       url_Foto: null,
@@ -74,17 +84,23 @@ export const useCandidatosStore = defineStore("useCandidatosStore", {
       curp: null,
       fecha_Nacimiento: null,
       ocupacion: null,
-      telefono: null,
+      telefono: [],
+      telefonos: [],
       correo: null,
       pertenece_Grupo_Vulnerable: false,
       grupo_Vulnerable: null,
       partido_Id: null,
       partido_Propietario: null,
       url_Logo_Partido: null,
-      grupo_Vulnerable_1: null,
-      grupo_Vulnerable_2: null,
-      grupo_Vulnerable_3: null,
-      grupo_Vulnerable_4: null,
+      grupo_Vulnerable_1: false,
+      grupo_Vulnerable_2: false,
+      grupo_Vulnerable_3: false,
+      grupo_Vulnerable_4: false,
+      describir_Pueblos: null,
+      describir_Diversidad: null,
+      describir_Discapacidad: null,
+      describir_Migrante: null,
+      consecutivo: false,
       edad: null,
       consentimiento_URL: null,
       acuse_URL: null,
@@ -107,17 +123,23 @@ export const useCandidatosStore = defineStore("useCandidatosStore", {
       fecha_Nacimiento: null,
       ocupacion: null,
       telefono: [],
+      telefonos: [],
       correo: null,
       pertenece_Grupo_Vulnerable: false,
       grupo_Vulnerable: null,
       partido_Id: null,
       partido_Propietario_2: null,
       url_Logo_Partido: null,
-      grupo_Vulnerable_1: null,
-      grupo_Vulnerable_2: null,
-      grupo_Vulnerable_3: null,
-      grupo_Vulnerable_4: null,
+      grupo_Vulnerable_1: false,
+      grupo_Vulnerable_2: false,
+      grupo_Vulnerable_3: false,
+      grupo_Vulnerable_4: false,
+      describir_Pueblos: null,
+      describir_Diversidad: null,
+      describir_Discapacidad: null,
+      describir_Migrante: null,
       edad: null,
+      consecutivo: false,
       consentimiento_URL: null,
       acuse_URL: null,
     },
@@ -139,16 +161,21 @@ export const useCandidatosStore = defineStore("useCandidatosStore", {
       fecha_Nacimiento: null,
       ocupacion: null,
       telefono: [],
+      telefonos: [],
       correo: null,
       pertenece_Grupo_Vulnerable: false,
       grupo_Vulnerable: null,
       partido_Id: null,
       partido_Suplente: null,
       url_Logo_Partido: null,
-      grupo_Vulnerable_1: null,
-      grupo_Vulnerable_2: null,
-      grupo_Vulnerable_3: null,
-      grupo_Vulnerable_4: null,
+      grupo_Vulnerable_1: false,
+      grupo_Vulnerable_2: false,
+      grupo_Vulnerable_3: false,
+      grupo_Vulnerable_4: false,
+      describir_Pueblos: null,
+      describir_Diversidad: null,
+      describir_Discapacidad: null,
+      describir_Migrante: null,
       edad: null,
       consentimiento_URL: null,
       acuse_URL: null,
@@ -170,17 +197,25 @@ export const useCandidatosStore = defineStore("useCandidatosStore", {
       curp: null,
       fecha_Nacimiento: null,
       ocupacion: null,
-      telefono: null,
+      telefono: [],
+      telefonos: [],
+      tel1: null,
+      tel2: null,
+      tel3: null,
       correo: null,
       pertenece_Grupo_Vulnerable: false,
       grupo_Vulnerable: null,
       partido_Id: null,
       partido_Suplente_2: null,
       url_Logo_Partido: null,
-      grupo_Vulnerable_1: null,
-      grupo_Vulnerable_2: null,
-      grupo_Vulnerable_3: null,
-      grupo_Vulnerable_4: null,
+      grupo_Vulnerable_1: false,
+      grupo_Vulnerable_2: false,
+      grupo_Vulnerable_3: false,
+      grupo_Vulnerable_4: false,
+      describir_Pueblos: null,
+      describir_Diversidad: null,
+      describir_Discapacidad: null,
+      describir_Migrante: null,
       edad: null,
       consentimiento_URL: null,
       acuse_URL: null,
@@ -214,6 +249,13 @@ export const useCandidatosStore = defineStore("useCandidatosStore", {
     actualizarModalSustituir(valor) {
       this.modalSustituir = valor;
     },
+    updateRequisitoDoc(valor) {
+      this.isEditarRequisito = valor;
+    },
+    actualizarModalFoto(valor) {
+      this.modalFotografia = valor;
+    },
+
     //-----------------------------------------------------------
     initIsCoalicion() {
       this.candidato.is_Coalicion = null;
@@ -234,10 +276,10 @@ export const useCandidatosStore = defineStore("useCandidatosStore", {
       this.candidato.partido_Id = null;
       this.candidato.pertenece_Grupo_Vulnerable_Propietario = false;
       this.candidato.grupo_Vulnerable_Propietario = null;
-      this.candidato.grupo_Vulnerable_1 = null;
-      this.candidato.grupo_Vulnerable_2 = null;
-      this.candidato.grupo_Vulnerable_3 = null;
-      this.candidato.grupo_Vulnerable_4 = null;
+      this.candidato.grupo_Vulnerable_1 = false;
+      this.candidato.grupo_Vulnerable_2 = false;
+      this.candidato.grupo_Vulnerable_3 = false;
+      this.candidato.grupo_Vulnerable_4 = false;
       this.foto_1.url_Foto = null;
       this.foto_2.url_Foto = null;
       this.foto_3.url_Foto = null;
@@ -258,15 +300,19 @@ export const useCandidatosStore = defineStore("useCandidatosStore", {
       this.propietario_1.fecha_Nacimiento = null;
       this.propietario_1.ocupacion = null;
       this.propietario_1.telefono = null;
+      this.propietario_1.telefonos = [];
       this.propietario_1.correo = null;
       this.propietario_1.pertenece_Grupo_Vulnerable = false;
       this.propietario_1.grupo_Vulnerable = null;
       this.propietario_1.partido_Id = null;
       this.propietario_1.url_Logo_Partido = null;
-      this.propietario_1.grupo_Vulnerable_1 = null;
-      this.propietario_1.grupo_Vulnerable_2 = null;
-      this.propietario_1.grupo_Vulnerable_3 = null;
-      this.propietario_1.grupo_Vulnerable_4 = null;
+      this.propietario_1.grupo_Vulnerable_1 = false;
+      this.propietario_1.grupo_Vulnerable_2 = false;
+      this.propietario_1.grupo_Vulnerable_3 = false;
+      this.propietario_1.grupo_Vulnerable_4 = false;
+      this.propietario_1.describir_Diversidad = null;
+      this.propietario_1.describir_Pueblos = null;
+      this.propietario_1.consecutivo = false;
       this.propietario_1.edad = null;
       //---------------------------------
       //PROPIETARIO 2
@@ -283,16 +329,20 @@ export const useCandidatosStore = defineStore("useCandidatosStore", {
       this.propietario_2.fecha_Nacimiento = null;
       this.propietario_2.ocupacion = null;
       this.propietario_2.telefono = null;
+      this.propietario_2.telefonos = [];
       this.propietario_2.correo = null;
       this.propietario_2.pertenece_Grupo_Vulnerable = false;
       this.propietario_2.grupo_Vulnerable = null;
       this.propietario_2.partido_Id = null;
       this.propietario_2.url_Logo_Partido = null;
-      this.propietario_2.grupo_Vulnerable_1 = null;
-      this.propietario_2.grupo_Vulnerable_2 = null;
-      this.propietario_2.grupo_Vulnerable_3 = null;
-      this.propietario_2.grupo_Vulnerable_4 = null;
+      this.propietario_2.grupo_Vulnerable_1 = false;
+      this.propietario_2.grupo_Vulnerable_2 = false;
+      this.propietario_2.grupo_Vulnerable_3 = false;
+      this.propietario_2.grupo_Vulnerable_4 = false;
       this.propietario_2.edad = null;
+      this.propietario_2.describir_Diversidad = null;
+      this.propietario_2.describir_Pueblos = null;
+      this.propietario_2.consecutivo = false;
       //---------------------------------
       //SUPLENTE 1
       this.suplente_1.nombre_Completo = null;
@@ -308,16 +358,19 @@ export const useCandidatosStore = defineStore("useCandidatosStore", {
       this.suplente_1.fecha_Nacimiento = null;
       this.suplente_1.ocupacion = null;
       this.suplente_1.telefono = null;
+      this.suplente_1.telefonos = [];
       this.suplente_1.correo = null;
       this.suplente_1.pertenece_Grupo_Vulnerable = false;
       this.suplente_1.grupo_Vulnerable = null;
       this.suplente_1.partido_Id = null;
       this.suplente_1.url_Logo_Partido = null;
-      this.suplente_1.grupo_Vulnerable_1 = null;
-      this.suplente_1.grupo_Vulnerable_2 = null;
-      this.suplente_1.grupo_Vulnerable_3 = null;
-      this.suplente_1.grupo_Vulnerable_4 = null;
+      this.suplente_1.grupo_Vulnerable_1 = false;
+      this.suplente_1.grupo_Vulnerable_2 = false;
+      this.suplente_1.grupo_Vulnerable_3 = false;
+      this.suplente_1.grupo_Vulnerable_4 = false;
       this.suplente_1.edad = null;
+      this.suplente_1.describir_Diversidad = null;
+      this.suplente_1.describir_Pueblos = null;
       //---------------------------------
       //SUPLENTE 2
       this.suplente_2.nombre_Completo = null;
@@ -333,16 +386,31 @@ export const useCandidatosStore = defineStore("useCandidatosStore", {
       this.suplente_2.fecha_Nacimiento = null;
       this.suplente_2.ocupacion = null;
       this.suplente_2.telefono = null;
+      this.suplente_2.telefonos = [];
       this.suplente_2.correo = null;
       this.suplente_2.pertenece_Grupo_Vulnerable = false;
       this.suplente_2.grupo_Vulnerable = null;
       this.suplente_2.partido_Id = null;
       this.suplente_2.url_Logo_Partido = null;
-      this.suplente_2.grupo_Vulnerable_1 = null;
-      this.suplente_2.grupo_Vulnerable_2 = null;
-      this.suplente_2.grupo_Vulnerable_3 = null;
-      this.suplente_2.grupo_Vulnerable_4 = null;
+      this.suplente_2.grupo_Vulnerable_1 = false;
+      this.suplente_2.grupo_Vulnerable_2 = false;
+      this.suplente_2.grupo_Vulnerable_3 = false;
+      this.suplente_2.grupo_Vulnerable_4 = false;
       this.suplente_2.edad = null;
+      this.suplente_2.describir_Diversidad = null;
+      this.suplente_2.describir_Pueblos = null;
+    },
+
+    initCandidato2() {
+      this.candidato2.id = null;
+      this.candidato2.tipo = null;
+      this.candidato2.nombre_Completo = null;
+      this.candidato2.partido = null;
+      this.candidato2.tipo_Candidato = null;
+      this.candidato2.postulacion = null;
+      this.candidato2.is_Comun = null;
+      this.candidato2.comun_Id = null;
+      this.candidato2.coalicion_Id = null;
     },
 
     //-----------------------------------------------------------
@@ -354,9 +422,9 @@ export const useCandidatosStore = defineStore("useCandidatosStore", {
           },
         });
         if (resp.status == 200) {
-          const { success, data } = resp.data;
+          const { success, data, id } = resp.data;
           if (success === true) {
-            return { success, data };
+            return { success, data, id };
           } else {
             return { success, data };
           }
@@ -414,6 +482,7 @@ export const useCandidatosStore = defineStore("useCandidatosStore", {
             aprobar: false,
             id: candidato.id,
             id_Expand: candidato.id,
+            url_Logo_Comun: candidato.url_Logo_Comun,
             tipo_Eleccion_Id: candidato.tipo_Eleccion_Id,
             tipo_Eleccion: candidato.tipo_Eleccion,
             municipio_Id: candidato.municipio_Id,
@@ -561,13 +630,22 @@ export const useCandidatosStore = defineStore("useCandidatosStore", {
     },
 
     //-----------------------------------------------------------
-    async loadCandidatosByEleccion(eleccion) {
+    async loadCandidatosIndividual(eleccion) {
       try {
-        this.loading = true;
-        let resp = await api.get(`/Candidatos/ByTipoEleccion/${eleccion}`);
+        let ultimo_Id = 0;
+        let color = true;
+        let resp = await api.get(`/Candidatos/Candidatos_Genero/${eleccion}`);
         let { data } = resp.data;
-        this.list_Candidatos_By_Eleccion = data.map((candidato) => {
+        this.list_Candidatos = data.map((candidato) => {
+          if (candidato.id != ultimo_Id) {
+            ultimo_Id = candidato.id;
+            color = !color;
+          }
           return {
+            logo_Comun: candidato.logo_Comun,
+            comun_Id: candidato.comun_Id,
+            aprobar: false,
+            color: color,
             id: candidato.id,
             puesto: candidato.puesto,
             candidatura:
@@ -576,8 +654,91 @@ export const useCandidatosStore = defineStore("useCandidatosStore", {
                 : candidato.puesto == 1
                 ? "Suplente"
                 : candidato.puesto == 2
+                ? "Propietaria síndico"
+                : "Suplente síndico",
+            url_Foto: candidato.foto_Url,
+            estatus_Aprobado: candidato.estatus_Aprobado,
+            municipio_Id: candidato.municipio_Id,
+            municipio: candidato.municipio,
+            distrito_Id: candidato.distrito_Id,
+            no_Distrito: candidato.no_Distrito,
+            distrito: candidato.distrito,
+            demarcacion_Id: candidato.demarcacion_Id,
+            demarcacion: candidato.demarcacion,
+            tipo_Candidato: candidato.tipo_Candidato,
+            orden: candidato.orden,
+            nombres: candidato.nombres,
+            apellido_Paterno: candidato.apellido_Paterno,
+            apellido_Materno: candidato.apellido_Materno,
+            nombre_Completo: `${
+              candidato.nombres == null ? "" : candidato.nombres
+            } ${
+              candidato.apellido_Paterno == null
+                ? ""
+                : candidato.apellido_Paterno
+            } ${
+              candidato.apellido_Materno == null
+                ? ""
+                : candidato.apellido_Materno
+            }`,
+            genero: candidato.sexo,
+            fecha_Nacimiento: candidato.fecha_Nacimiento,
+            edad: candidato.edad,
+            is_Coalicion: candidato.is_Coalicion,
+            is_Comun: candidato.is_Comun,
+            coalicion_Id: candidato.coalicion_Id,
+            coalicion: candidato.coalicion,
+            logo_Coalicion: candidato.logo_Coalicion,
+            partido_Id: candidato.partido_Id,
+            partido: candidato.partido,
+            logo_Partido: candidato.logo_Partido,
+            pertenece_Grupo_Vulnerable: candidato.pertenece_Grupo_Vulerable,
+            grupo_Vulnerable: candidato.grupo_Vulnerable,
+            postulacion:
+              candidato.is_Comun == true
+                ? "Candidatura común"
+                : candidato.is_Coalicion == true
+                ? "Coalición"
+                : "Partido político",
+            fecha_Registro: candidato.fecha_Registro,
+            correo: candidato.correo,
+          };
+        });
+      } catch (error) {
+        return {
+          success: false,
+          data: "Ocurrió un error, intentelo de nuevo. Si el error perisiste, contacte a soporte",
+        };
+      }
+    },
+
+    //-----------------------------------------------------------
+    async loadCandidatosByEleccion(eleccion) {
+      try {
+        this.loading = true;
+        let ultimo_Id = 0;
+        let color = true;
+        let resp = await api.get(`/Candidatos/ByTipoEleccion/${eleccion}`);
+        let { data } = resp.data;
+        this.list_Candidatos_By_Eleccion = data.map((candidato) => {
+          if (candidato.id != ultimo_Id) {
+            ultimo_Id = candidato.id;
+            color = !color;
+          }
+          return {
+            logo_Comun: candidato.comun_Id,
+            is_Comun: candidato.is_Comun,
+            id: candidato.id,
+            color: color,
+            puesto: candidato.puesto,
+            candidatura:
+              candidato.puesto == 0
+                ? "Propietaria"
+                : candidato.puesto == 1
+                ? "Suplente"
+                : candidato.puesto == 2
                 ? "Propietaria sindico"
-                : "Suplenete sindico",
+                : "Suplente sindico",
             estatus: candidato.estatus,
             municipio: candidato.municipio,
             distrito: candidato.distrito,
@@ -591,8 +752,14 @@ export const useCandidatosStore = defineStore("useCandidatosStore", {
             validado: candidato.validado,
             validado_IEEN: candidato.validado_IEEN,
             aprobado: candidato.aprobado,
-            nombre_Completo: `${candidato.nombres} ${
-              candidato.apellido_Paterno
+            nombre_Completo: `${
+              candidato.nombres == null
+                ? "Pendiente de Registrar"
+                : candidato.nombres
+            } ${
+              candidato.apellido_Paterno == null
+                ? ""
+                : candidato.apellido_Paterno
             } ${
               candidato.apellido_Materno != null
                 ? candidato.apellido_Materno
@@ -667,6 +834,7 @@ export const useCandidatosStore = defineStore("useCandidatosStore", {
             this.candidato.partido_Id = data.partido_Id;
             this.candidato.fecha_Registro = data.fecha_Registro;
             this.candidato.estatus = data.estatus;
+            this.candidato.comun_Id = data.comun_Id;
             //-----------------------------------------------------
             //PROPIETARIO 1
             this.propietario_1.nombre_Completo = `${data.nombres_Propietario} ${data.apellido_Paterno_Propietario} ${data.apellido_Materno_Propietario}`;
@@ -692,14 +860,16 @@ export const useCandidatosStore = defineStore("useCandidatosStore", {
             this.propietario_1.partido_Id = data.partido_Id;
             this.propietario_1.partido_Propietario = data.partido_Propietario;
             if (data.telefono_Propietario != null) {
-              this.propietario_1.telefono =
-                data.telefono_Propietario.split(",");
+              data.telefono_Propietario.split(",").forEach((element) => {
+                this.propietario_1.telefonos.push(element);
+              });
             }
             this.propietario_1.distrito = data.distrito;
             this.propietario_1.edad = data.edad_Propietario;
             this.propietario_1.consentimiento_URL =
               data.consentimiento_Candidato_Propietario_URL;
             this.propietario_1.acuse_URL = data.acuse_Candidato_Propietario_URL;
+            this.propietario_1.consecutivo = data.consecutivo_Propietario;
             //-----------------------------------------------------
             //PROPIETARIO 2
             this.propietario_2.nombre_Completo = `${data.nombres_Propietario_2} ${data.apellido_Paterno_Propietario_2} ${data.apellido_Materno_Propietario_2}`;
@@ -718,8 +888,9 @@ export const useCandidatosStore = defineStore("useCandidatosStore", {
               data.fecha_Nacimiento_Propietario_2;
             this.propietario_2.ocupacion = data.ocupacion_Propietario_2;
             if (data.telefono_Propietario_2 != null) {
-              this.propietario_2.telefono =
-                data.telefono_Propietario_2.split(",");
+              data.telefono_Propietario_2.split(",").forEach((element) => {
+                this.propietario_2.telefonos.push(element);
+              });
             }
             this.propietario_2.correo = data.correo_Propietario_2;
             this.propietario_2.pertenece_Grupo_Vulnerable =
@@ -739,6 +910,7 @@ export const useCandidatosStore = defineStore("useCandidatosStore", {
               data.consentimiento_Candidato_Propietario_2_URL;
             this.propietario_2.acuse_URL =
               data.consentimiento_Candidato_Propietario_2_URL;
+            this.propietario_2.consecutivo = data.consecutivo_Propietario_2;
             //-----------------------------------------------------
             //SUPLENTE 1
             this.suplente_1.nombre_Completo = `${data.nombres_Suplente} ${data.apellido_Paterno_Suplente} ${data.apellido_Materno_Suplente}`;
@@ -754,7 +926,9 @@ export const useCandidatosStore = defineStore("useCandidatosStore", {
             this.suplente_1.fecha_Nacimiento = data.fecha_Nacimiento_Suplente;
             this.suplente_1.ocupacion = data.ocupacion_Suplente;
             if (data.telefono_Suplente != null) {
-              this.suplente_1.telefono = data.telefono_Suplente.split(",");
+              data.telefono_Suplente.split(",").forEach((element) => {
+                this.suplente_1.telefonos.push(element);
+              });
             }
             this.suplente_1.correo = data.correo_Suplente;
             this.suplente_1.pertenece_Grupo_Vulnerable =
@@ -784,7 +958,9 @@ export const useCandidatosStore = defineStore("useCandidatosStore", {
             this.suplente_2.fecha_Nacimiento = data.fecha_Nacimiento_Suplente_2;
             this.suplente_2.ocupacion = data.ocupacion_Suplente_2;
             if (data.telefono_Suplente_2 != null) {
-              this.suplente_2.telefono = data.telefono_Suplente_2.split(",");
+              data.telefono_Suplente_2.split(",").forEach((element) => {
+                this.suplente_2.telefonos.push(element);
+              });
             }
             this.suplente_2.correo = data.correo_Suplente_2;
             this.suplente_2.pertenece_Grupo_Vulnerable =
@@ -802,64 +978,114 @@ export const useCandidatosStore = defineStore("useCandidatosStore", {
             this.suplente_2.acuse_URL = data.acuse_Candidato_Suplente_2_URL;
 
             if (data.pertenece_Grupo_Vulnerable_Propietario == true) {
-              let elementos = data.grupo_Vulnerable_Propietario.split("|");
-
-              if (elementos[0] != undefined) {
-                this.propietario_1.grupo_Vulnerable_1 = elementos[0];
+              let elementosGrupos =
+                data.grupo_Vulnerable_Propietario.split("||");
+              if (elementosGrupos[0].split("|") != undefined) {
+                this.propietario_1.grupo_Vulnerable_1 =
+                  elementosGrupos[0].split("|")[0] == "true" ? true : false;
+                this.propietario_1.describir_Pueblos =
+                  elementosGrupos[0].split("|")[1];
               }
-              if (elementos[1] != undefined) {
-                this.propietario_1.grupo_Vulnerable_2 = elementos[1];
+              if (elementosGrupos[1].split("|") != undefined) {
+                this.propietario_1.grupo_Vulnerable_2 =
+                  elementosGrupos[1].split("|")[0] == "true" ? true : false;
+                this.propietario_1.describir_Diversidad =
+                  elementosGrupos[1].split("|")[1];
               }
-              if (elementos[2] != undefined) {
-                this.propietario_1.grupo_Vulnerable_3 = elementos[2];
+              if (elementosGrupos[2].split("|") != undefined) {
+                this.propietario_1.grupo_Vulnerable_3 =
+                  elementosGrupos[2].split("|")[0] == "true" ? true : false;
+                this.propietario_1.describir_Discapacidad =
+                  elementosGrupos[2].split("|")[1];
               }
-              if (elementos[3] != undefined) {
-                this.propietario_1.grupo_Vulnerable_4 = elementos[3];
+              if (elementosGrupos[3].split("|") != undefined) {
+                this.propietario_1.grupo_Vulnerable_4 =
+                  elementosGrupos[3].split("|")[0] == "true" ? true : false;
+                this.propietario_1.describir_Migrante =
+                  elementosGrupos[3].split("|")[1];
               }
             }
             if (data.pertenece_Grupo_Vulnerable_Suplente == true) {
-              let elementos = data.grupo_Vulnerable_Suplente.split("|");
-              if (elementos[0] != undefined) {
-                this.suplente_1.grupo_Vulnerable_1 = elementos[0];
+              let elementosGrupos = data.grupo_Vulnerable_Suplente.split("||");
+              if (elementosGrupos[0].split("|") != undefined) {
+                this.suplente_1.grupo_Vulnerable_1 =
+                  elementosGrupos[0].split("|")[0] == "true" ? true : false;
+                this.suplente_1.describir_Pueblos =
+                  elementosGrupos[0].split("|")[1];
               }
-              if (elementos[1] != undefined) {
-                this.suplente_1.grupo_Vulnerable_2 = elementos[1];
+              if (elementosGrupos[1].split("|") != undefined) {
+                this.suplente_1.grupo_Vulnerable_2 =
+                  elementosGrupos[1].split("|")[0] == "true" ? true : false;
+                this.suplente_1.describir_Diversidad =
+                  elementosGrupos[1].split("|")[1];
               }
-              if (elementos[2] != undefined) {
-                this.suplente_1.grupo_Vulnerable_3 = elementos[2];
+              if (elementosGrupos[2].split("|") != undefined) {
+                this.suplente_1.grupo_Vulnerable_3 =
+                  elementosGrupos[2].split("|")[0] == "true" ? true : false;
+                this.suplente_1.describir_Discapacidad =
+                  elementosGrupos[2].split("|")[1];
               }
-              if (elementos[3] != undefined) {
-                this.suplente_1.grupo_Vulnerable_4 = elementos[3];
+              if (elementosGrupos[3].split("|") != undefined) {
+                this.suplente_1.grupo_Vulnerable_4 =
+                  elementosGrupos[3].split("|")[0] == "true" ? true : false;
+                this.suplente_1.describir_Migrante =
+                  elementosGrupos[3].split("|")[1];
               }
             }
             if (data.pertenece_Grupo_Vulnerable_Propietario_2 == true) {
-              let elementos = data.grupo_Vulnerable_Propietario_2.split("|");
-              if (elementos[0] != undefined) {
-                this.propietario_2.grupo_Vulnerable_1 = elementos[0];
+              let elementosGrupos =
+                data.grupo_Vulnerable_Propietario_2.split("||");
+              if (elementosGrupos[0].split("|") != undefined) {
+                this.propietario_2.grupo_Vulnerable_1 =
+                  elementosGrupos[0].split("|")[0] == "true" ? true : false;
+                this.propietario_2.describir_Pueblos =
+                  elementosGrupos[0].split("|")[1];
               }
-              if (elementos[1] != undefined) {
-                this.propietario_2.grupo_Vulnerable_2 = elementos[1];
+              if (elementosGrupos[1].split("|") != undefined) {
+                this.propietario_2.grupo_Vulnerable_2 =
+                  elementosGrupos[1].split("|")[0] == "true" ? true : false;
+                this.propietario_2.describir_Diversidad =
+                  elementosGrupos[1].split("|")[1];
               }
-              if (elementos[2] != undefined) {
-                this.propietario_2.grupo_Vulnerable_3 = elementos[2];
+              if (elementosGrupos[2].split("|") != undefined) {
+                this.propietario_2.grupo_Vulnerable_3 =
+                  elementosGrupos[2].split("|")[0] == "true" ? true : false;
+                this.propietario_2.describir_Discapacidad =
+                  elementosGrupos[2].split("|")[1];
               }
-              if (elementos[3] != undefined) {
-                this.propietario_2.grupo_Vulnerable_4 = elementos[3];
+              if (elementosGrupos[3].split("|") != undefined) {
+                this.propietario_2.grupo_Vulnerable_4 =
+                  elementosGrupos[3].split("|")[0] == "true" ? true : false;
+                this.propietario_2.describir_Migrante =
+                  elementosGrupos[3].split("|")[1];
               }
             }
             if (data.pertenece_Grupo_Vulnerable_Suplente_2 == true) {
-              let elementos = data.grupo_Vulnerable_Suplente_2.split("|");
-              if (elementos[0] != undefined) {
-                this.suplente_2.grupo_Vulnerable_1 = elementos[0];
+              let elementosGrupos =
+                data.grupo_Vulnerable_Suplente_2.split("||");
+              if (elementosGrupos[0].split("|") != undefined) {
+                this.suplente_2.grupo_Vulnerable_1 =
+                  elementosGrupos[0].split("|")[0] == "true" ? true : false;
+                this.suplente_2.describir_Pueblos =
+                  elementosGrupos[0].split("|")[1];
               }
-              if (elementos[1] != undefined) {
-                this.suplente_2.grupo_Vulnerable_2 = elementos[1];
+              if (elementosGrupos[1].split("|") != undefined) {
+                this.suplente_2.grupo_Vulnerable_2 =
+                  elementosGrupos[1].split("|")[0] == "true" ? true : false;
+                this.suplente_2.describir_Diversidad =
+                  elementosGrupos[1].split("|")[1];
               }
-              if (elementos[2] != undefined) {
-                this.suplente_2.grupo_Vulnerable_3 = elementos[2];
+              if (elementosGrupos[2].split("|") != undefined) {
+                this.suplente_2.grupo_Vulnerable_3 =
+                  elementosGrupos[2].split("|")[0] == "true" ? true : false;
+                this.suplente_2.describir_Discapacidad =
+                  elementosGrupos[2].split("|")[1];
               }
-              if (elementos[3] != undefined) {
-                this.suplente_2.grupo_Vulnerable_4 = elementos[3];
+              if (elementosGrupos[3].split("|") != undefined) {
+                this.suplente_2.grupo_Vulnerable_4 =
+                  elementosGrupos[3].split("|")[0] == "true" ? true : false;
+                this.suplente_2.describir_Migrante =
+                  elementosGrupos[3].split("|")[1];
               }
             }
           }
@@ -880,16 +1106,31 @@ export const useCandidatosStore = defineStore("useCandidatosStore", {
         if (resp.status == 200) {
           const { success, data } = resp.data;
           if (success == true) {
-            this.propietario_2.tipo_Eleccion = data.tipo_Eleccion;
-            this.suplente_1.tipo_Eleccion = data.tipo_Eleccion;
-            this.suplente_2.tipo_Eleccion = data.tipo_Eleccion;
-            this.suplente_1.tipo_Candidato = data.tipo_Candidato;
             this.propietario_2.tipo_Candidato = data.tipo_Candidato;
+            this.propietario_2.tipo_Eleccion = data.tipo_Eleccion;
+            this.propietario_2.tipo_Eleccion_Id = data.tipo_Eleccion_Id;
+            this.suplente_1.tipo_Eleccion = data.tipo_Eleccion;
+            this.suplente_1.tipo_Eleccion_Id = data.tipo_Eleccion_Id;
+            this.suplente_1.tipo_Candidato = data.tipo_Candidato;
             this.suplente_2.tipo_Candidato = data.tipo_Candidato;
+            this.suplente_2.tipo_Eleccion_Id = data.tipo_Eleccion_Id;
+            this.suplente_2.tipo_Eleccion = data.tipo_Eleccion;
+            this.propietario_1.comun_Id = data.comun_Id;
+            this.propietario_2.comun_Id = data.comun_Id;
+            this.suplente_1.comun_Id = data.comun_Id;
+            this.suplente_2.comun_Id = data.comun_Id;
             //-----------------------------------------------------
             //PROPIETARIO 1
+            this.propietario_1.postulacion =
+              data.is_Coalicion == true
+                ? "Coalición"
+                : data.is_Comun == true
+                ? "Candidatura común"
+                : "Partido político";
             this.propietario_1.validado = data.validado;
             this.propietario_1.tipo_Eleccion = data.tipo_Eleccion;
+            this.propietario_1.tipo_Eleccion_Id = data.tipo_Eleccion_Id;
+            this.propietario_1.municipio_Id = data.municipio_Id;
             this.propietario_1.tipo_Candidato = data.tipo_Candidato;
             this.propietario_1.id = data.id;
             this.propietario_1.tipo = "Propietario";
@@ -940,6 +1181,7 @@ export const useCandidatosStore = defineStore("useCandidatosStore", {
               data.apellido_Paterno_Propietario_2;
             this.propietario_2.apellido_Materno =
               data.apellido_Materno_Propietario_2;
+            this.propietario_2.municipio_Id = data.municipio_Id;
             this.propietario_2.mote = data.mote_Propietario_2;
             this.propietario_2.estatus = data.estatus;
             this.propietario_2.sexo = data.sexo_Propietario_2;
@@ -985,6 +1227,7 @@ export const useCandidatosStore = defineStore("useCandidatosStore", {
             this.suplente_1.url_Foto = data.url_Foto_Suplente;
             this.suplente_1.rfc = data.rfC_Suplente;
             this.suplente_1.estatus = data.estatus;
+            this.suplente_1.municipio_Id = data.municipio_Id;
             this.suplente_1.curp = data.curP_Suplente;
             this.suplente_1.fecha_Nacimiento = data.fecha_Nacimiento_Suplente;
             this.suplente_1.ocupacion = data.ocupacion_Suplente;
@@ -1022,6 +1265,7 @@ export const useCandidatosStore = defineStore("useCandidatosStore", {
             this.suplente_2.curp = data.curP_Suplente_2;
             this.suplente_2.fecha_Nacimiento = data.fecha_Nacimiento_Suplente_2;
             this.suplente_2.ocupacion = data.ocupacion_Suplente_2;
+            this.suplente_2.municipio_Id = data.municipio_Id;
             this.suplente_2.edad = data.edad_Suplente_2;
             if (data.telefono_Suplente_2 != null) {
               this.suplente_2.telefono = data.telefono_Suplente_2.split(",");
@@ -1079,9 +1323,20 @@ export const useCandidatosStore = defineStore("useCandidatosStore", {
         if (resp.status == 200) {
           const { success, data } = resp.data;
           if (success == true) {
+            this.candidato2.id = data.id;
+            this.candidato2.comun_Id = data.comun_Id;
+            this.candidato2.is_Comun = data.is_Comun;
+            this.candidato2.postulacion =
+              data.is_Comun == true
+                ? "Candidatura común"
+                : data.is_Coalicion == true
+                ? "Coalición"
+                : "Partido político";
             this.candidato2.tipo = cargo;
             this.candidato2.is_Coalicion = data.is_Coalicion;
             this.candidato2.coalicion_Id = data.coalicion_Id;
+            this.candidato2.tipo_Candidato = data.tipo_Candidato;
+            this.candidato2.partido_Id = data.partido_Id;
             if (cargo == "Propietario") {
               this.candidato2.nombre_Completo = `${data.nombres_Propietario} ${data.apellido_Paterno_Propietario} ${data.apellido_Materno_Propietario}`;
               this.candidato2.partido = data.partido;
@@ -1198,6 +1453,39 @@ export const useCandidatosStore = defineStore("useCandidatosStore", {
     },
 
     //-----------------------------------------------------------
+    async actualizarFotografia(foto, id, puesto) {
+      try {
+        const resp = await api.post(
+          `/Candidatos/ActualizarFoto/${id}/${puesto}`,
+          foto,
+          {
+            headers: {
+              "Conten-Type": "multipart/form-data",
+            },
+          }
+        );
+        if (resp.status == 200) {
+          const { success, data } = resp.data;
+          if (success === true) {
+            return { success, data };
+          } else {
+            return { success, data };
+          }
+        } else {
+          return {
+            success: false,
+            data: "Ocurrió un error, inténtelo de nuevo. Si el error persiste, contacte a soporte",
+          };
+        }
+      } catch (error) {
+        return {
+          success: false,
+          data: "Ocurrió un error, inténtelo de nuevo. Si el error persiste, contacte a soporte",
+        };
+      }
+    },
+
+    //-----------------------------------------------------------
     async updateRequisito(requisito) {
       try {
         const resp = await api.put("/Tipos_Eleccion_Cumplimiento", requisito, {
@@ -1229,22 +1517,34 @@ export const useCandidatosStore = defineStore("useCandidatosStore", {
     //----------------------------------------------------------------------
     async loadDocumentacionCompleta() {
       try {
+        let ultimo_Id = 0;
+        let color = true;
         let resp = await api.get(
           "/Tipos_Eleccion_Cumplimiento/Progreso_Documentos"
         );
         let { data } = resp.data;
         this.list_Documentacion_Completa = data.map((item) => {
+          if (item.candidato_Id != ultimo_Id) {
+            ultimo_Id = item.candidato_Id;
+            color = !color;
+          }
           return {
+            color: color,
             candidato_Id: item.candidato_Id,
             no_Formula: item.no_Formula,
             puesto: item.puesto,
             completo: item.completo,
             documentos: item.documentos,
+            complementarios: item.complementarios,
             tipo_Candidato: item.tipo_Candidato,
             tipo_Eleccion_Id: item.tipo_Eleccion_Id,
             tipo_Eleccion: item.tipo_Eleccion,
             aprobado: item.aprobado,
-            nombre_Completo: `${item.nombres} ${item.apellido_Paterno} ${item.apellido_Materno}`,
+            nombre_Completo: `${
+              item.nombres == null ? "Pendiente de Registrar" : item.nombres
+            } ${item.apellido_Paterno == null ? "" : item.apellido_Paterno} ${
+              item.apellido_Materno == null ? "" : item.apellido_Materno
+            }`,
             nombres: item.nombres,
             apellido_Paterno: item.apellido_Paterno,
             apellido_Materno: item.apellido_Materno,
@@ -1255,8 +1555,74 @@ export const useCandidatosStore = defineStore("useCandidatosStore", {
             coalicion_Id: item.coalicion_Id,
             coalicion: item.coalicion,
             logo_Coalicion: item.logo_Coalicion,
+            disrito_Id: item.disrito_Id,
+            distrito: item.distrito,
+            no_Distrito: item.no_Distrito,
+            municipio_Id: item.municipio_Id,
+            municipio: item.municipio,
+            demarcacion_Id: item.demarcacion_Id,
+            demarcacion: item.demarcacion,
+            is_Comun: item.is_Comun,
+            logo_Comun: item.logo_Comun,
+            comun_Id: item.comun_Id,
           };
         });
+      } catch (error) {
+        return {
+          success: false,
+          data: "Ocurrió un error, inténtelo de nuevo. Si el error persiste, contacte a soporte",
+        };
+      }
+    },
+
+    //-----------------------------------------------------------
+    async coindidenciasClaveCurp(clave, curp) {
+      try {
+        let resp = null;
+        if (this.candidato.id == null) {
+          resp = await api.get(
+            `/Candidatos/Validar_Existencia_Candidatos?CURP=${curp}&CLAVE=${clave}`
+          );
+        } else {
+          resp = await api.get(
+            `/Candidatos/Validar_Existencia_Candidatos?CandidatoId=${this.candidato.id}&CURP=${curp}&CLAVE=${clave}`
+          );
+        }
+
+        if (resp.status == 200) {
+          const { success, data } = resp.data;
+          if (success == true) {
+            return { success: success, data: data };
+          }
+        }
+      } catch (error) {
+        return {
+          success: false,
+          data: "Ocurrió un error, intentelo de nuevo. Si el error perisiste, contacte a soporte",
+        };
+      }
+    },
+
+    //----------------------------------------------------------------------
+    //DELETE DOCUMENTO
+    async deleteFoto(candidato_Id, puesto) {
+      try {
+        const resp = await api.delete(
+          `/Candidatos/EliminarFoto/${candidato_Id}/${puesto}`
+        );
+        if (resp.status == 200) {
+          let { success, data } = resp.data;
+          if (success === true) {
+            return { success, data };
+          } else {
+            return { success, data };
+          }
+        } else {
+          return {
+            success: false,
+            data: "Ocurrio un error, intentelo de nuevo",
+          };
+        }
       } catch (error) {
         return {
           success: false,

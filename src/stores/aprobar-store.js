@@ -12,6 +12,7 @@ export const useAprobarStore = defineStore("useAprobarStore", {
     aprobacion: {
       acuerdo: null,
       fecha_Aprobacion: null,
+      acuerdo_Url: null,
       archivo_Acuerdo: null,
       detalle: [],
     },
@@ -33,7 +34,8 @@ export const useAprobarStore = defineStore("useAprobarStore", {
     initAprobacion() {
       this.aprobacion.acuerdo = null;
       this.aprobacion.fecha_Aprobacion = null;
-      //this.list_Detalle = [];
+      this.aprobacion.acuerdo_Url = null;
+      this.aprobacion.archivo_Acuerdo = null;
       this.aprobacion.detalle = [];
     },
 
@@ -54,6 +56,9 @@ export const useAprobarStore = defineStore("useAprobarStore", {
             fecha_Registro: aprobacion.fecha_Registro,
             fecha_Aprobacion_Tabla: aprobacion.fecha_Aprobacion_Tabla,
             acuerdo_Url: aprobacion.acuerdo_Url,
+            oficina_Id: aprobacion.oficina_Id,
+            tipo_Eleccion: aprobacion.tipo_Eleccion,
+            tipo_Eleccion_Id: aprobacion.tipo_Eleccion_Id,
           };
         });
         this.list_Aprobacion_Candidaturas = listAprobados;
@@ -74,13 +79,28 @@ export const useAprobarStore = defineStore("useAprobarStore", {
         let { data } = resp.data;
         let listDetalle = data.map((detalle) => {
           return {
+            tipo_Candidato: detalle.tipo_Candidato,
             id: detalle.id,
             candidato_Id: detalle.candidato_Id,
             candidato: detalle.candidato,
             partido_Siglas: detalle.partido_Siglas,
-            partido_Logo: detalle.partido_Logo,
+            logo_Partido: detalle.partido_Logo,
             coalicion_Siglas: detalle.coalicion_Siglas,
-            coalicion_Logo: detalle.coalicion_Logo,
+            logo_Coalicion: detalle.coalicion_Logo,
+            distrito_Id: detalle.distrito_Id,
+            municipio_Id: detalle.municipio_Id,
+            demarcacion_Id: detalle.demarcacion_Id,
+            distrito: detalle.distrito,
+            municipio: detalle.municipio,
+            demarcacion: detalle.demarcacion,
+            puesto_Letra:
+              detalle.puesto == 0
+                ? "Propietario"
+                : detalle.puesto == 1
+                ? "Suplente"
+                : detalle.puesto == 2
+                ? "Propietario sindico"
+                : "Suplente sindico",
           };
         });
         this.list_Detalle = listDetalle;
@@ -132,6 +152,7 @@ export const useAprobarStore = defineStore("useAprobarStore", {
             this.aprobacion.id = data.id;
             this.aprobacion.acuerdo = data.acuerdo;
             this.aprobacion.fecha_Aprobacion = data.fecha_Aprobacion;
+            this.aprobacion.acuerdo_Url = data.acuerdo_Url;
           }
         }
       } catch (error) {

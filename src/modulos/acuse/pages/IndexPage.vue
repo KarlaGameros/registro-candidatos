@@ -30,6 +30,15 @@
         <div class="text-right">
           <q-btn
             type="button"
+            color="pink-1"
+            icon-right="sync"
+            label="Actualizar"
+            @click="actualizar()"
+            class="q-mr-sm"
+          />
+          <q-btn
+            v-if="modulo == null ? false : modulo.registrar"
+            type="button"
             class="q-ma-sm"
             color="pink-1"
             icon-right="upload"
@@ -45,12 +54,49 @@
   </q-page>
 </template>
 <script setup>
+import { useQuasar, QSpinnerCube } from "quasar";
+import { onBeforeMount } from "vue";
+import { storeToRefs } from "pinia";
+import { useAuthStore } from "src/stores/auth-store";
 import { useAcusesStore } from "src/stores/acuses-store";
 import TablaComp from "../components/TablaComp.vue";
 import ModalComp from "../components/ModalComp.vue";
 import ModalAcuse from "../components/ModalAcuse.vue";
 
+//--------------------------------------------------------------------
+
+const $q = useQuasar();
 const acusesStore = useAcusesStore();
+const authStore = useAuthStore();
+const { modulo } = storeToRefs(authStore);
+const siglas = "SRC-ACU-CU";
+
+//--------------------------------------------------------------------
+
+onBeforeMount(() => {
+  leerPermisos();
+});
+
+//--------------------------------------------------------------------
+
+const actualizar = () => {
+  $q.loading.show({
+    spinner: QSpinnerCube,
+    spinnerColor: "pink",
+    spinnerSize: 140,
+    backgroundColor: "purple-2",
+    message: "Espere un momento porfavor...",
+    messageColor: "black",
+  });
+  acusesStore.actualizarTabla(true);
+  $q.loading.hide();
+};
+
+const leerPermisos = async () => {
+  $q.loading.show();
+  await authStore.loadModulo(siglas);
+  $q.loading.hide();
+};
 
 const actualizarModal = (valor) => {
   acusesStore.actualizarModal(valor);

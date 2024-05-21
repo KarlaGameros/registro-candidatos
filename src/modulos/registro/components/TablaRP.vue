@@ -2,7 +2,7 @@
   <q-table
     class="my-table"
     title="Tabla RP: Propietarios"
-    :rows="list_RP"
+    :rows="list_Propietarios"
     :columns="columnsPropietario"
     row-key="name"
     v-model:pagination="pagination"
@@ -31,7 +31,7 @@
   <q-table
     class="my-table"
     title="Tabla RP: Suplentes"
-    :rows="list_RP"
+    :rows="list_Suplentes"
     :columns="columnsSuplente"
     row-key="name"
     v-model:pagination="pagination"
@@ -73,6 +73,8 @@ const props = defineProps({
   partido_Id: { type: Number, required: true },
   municipio_Id: { type: Number, required: true },
 });
+const list_Propietarios = ref([]);
+const list_Suplentes = ref([]);
 
 //--------------------------------------------------------------------
 
@@ -80,26 +82,26 @@ watchEffect(() => {
   switch (props.tab) {
     case "DIP":
       list_RP.value = list_Candidatos.value.filter(
-        (x) =>
-          x.tipo_Candidato == "RP" &&
-          x.partido_Id == props.partido_Id &&
-          x.tipo_Eleccion_Id == props.tipo_Id
+        (x) => x.tipo_Candidato == "RP" && x.partido_Id == props.partido_Id
       );
       list_RP.value.sort(function (a, b) {
         return a.orden - b.orden;
       });
+      list_Propietarios.value = list_RP.value.filter((x) => x.puesto == 0);
+      list_Suplentes.value = list_RP.value.filter((x) => x.puesto == 1);
       break;
     case "REG":
       list_RP.value = list_Candidatos.value.filter(
         (x) =>
           x.tipo_Candidato == "RP" &&
           x.municipio_Id == props.municipio_Id &&
-          x.partido_Id == props.partido_Id &&
-          x.tipo_Eleccion_Id == props.tipo_Id
+          x.partido_Id == props.partido_Id
       );
       list_RP.value.sort(function (a, b) {
         return a.orden - b.orden;
       });
+      list_Propietarios.value = list_RP.value.filter((x) => x.puesto == 0);
+      list_Suplentes.value = list_RP.value.filter((x) => x.puesto == 1);
       break;
     default:
       break;
@@ -110,24 +112,24 @@ watchEffect(() => {
 
 const columnsPropietario = [
   {
-    name: "nombres_Propietario",
+    name: "nombres",
     align: "center",
     label: "Nombres",
-    field: "nombres_Propietario",
+    field: "nombres",
     sortable: true,
   },
   {
-    name: "apellido_Paterno_Propietario",
+    name: "apellido_Paterno",
     align: "center",
     label: "Apellido paterno",
-    field: "apellido_Paterno_Propietario",
+    field: "apellido_Paterno",
     sortable: true,
   },
   {
-    name: "apellido_Materno_Propietario",
+    name: "apellido_Materno",
     align: "center",
     label: "Apellido materno",
-    field: "apellido_Materno_Propietario",
+    field: "apellido_Materno",
     sortable: true,
   },
   {
@@ -138,26 +140,27 @@ const columnsPropietario = [
     sortable: true,
   },
 ];
+
 const columnsSuplente = [
   {
-    name: "nombres_Suplente",
+    name: "nombres",
     align: "center",
     label: "Nombres",
-    field: "nombres_Suplente",
+    field: "nombres",
     sortable: true,
   },
   {
-    name: "apellido_Paterno_Suplente",
+    name: "apellido_Paterno",
     align: "center",
     label: "Apellido paterno",
-    field: "apellido_Paterno_Suplente",
+    field: "apellido_Paterno",
     sortable: true,
   },
   {
-    name: "apellido_Materno_Suplente",
+    name: "apellido_Materno",
     align: "center",
     label: "Apellido materno",
-    field: "apellido_Materno_Suplente",
+    field: "apellido_Materno",
     sortable: true,
   },
   {
@@ -168,6 +171,7 @@ const columnsSuplente = [
     sortable: true,
   },
 ];
+
 const filterPropietario = ref("");
 const filterSuplente = ref("");
 const pagination = ref({

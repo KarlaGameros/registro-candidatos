@@ -5,6 +5,7 @@ export const useAcusesStore = defineStore("useAcusesStore", {
   state: () => ({
     modal: false,
     modalAcuse: false,
+    loadTabla: false,
     list_Acuses: [],
   }),
   actions: {
@@ -13,6 +14,10 @@ export const useAcusesStore = defineStore("useAcusesStore", {
     },
     actualizarModalAcuse(valor) {
       this.modalAcuse = valor;
+    },
+
+    actualizarTabla(valor) {
+      this.loadTabla = valor;
     },
 
     initAcuse() {
