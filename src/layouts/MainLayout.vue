@@ -206,11 +206,12 @@ const show = () => {
     if (action.label == "Cerrar sesión") {
       localStorage.clear();
       sessionStorage.clear();
-      window.location = "https://acceso.sistemas-ieenayarit.org";
+      window.location = "http://sistema.ieenayarit.org:9471?return=false";
     } else if (action.label == "Ir a universo") {
-      window.location = `https://acceso.sistemas-ieenayarit.org?key=${encryptStorage.decrypt(
-        "key"
-      )}&UserName=${encryptStorage.decrypt("userNameL")}`;
+      // window.location = `http://sistema.ieenayarit.org:9471?key=${encryptStorage.decrypt(
+      //   "key"
+      // )}&UserName=${encryptStorage.decrypt("userNameL")}`;
+      window.location = `http://sistema.ieenayarit.org:9471?return=true`;
     } else {
       window.location =
         action.url +

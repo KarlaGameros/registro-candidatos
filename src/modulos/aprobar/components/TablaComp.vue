@@ -167,7 +167,7 @@ const subirAcuerdo = async (id) => {
 const verDocumento = async (row) => {
   let url = row.acuerdo_Url;
   if (row.acuerdo_Url.startsWith("http")) {
-    url = url.replace("http", "https");
+    url = url.replace("http", "http");
   }
   $q.dialog({
     title: `Acuerdo ${row.acuerdo}`,

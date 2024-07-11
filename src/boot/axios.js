@@ -15,10 +15,9 @@ const encryptStorage = new EncryptStorage("SECRET_KEY", "sessionStorage");
 //   baseURL: "http://sistema.ieenayarit.org:9470/api",
 // });
 //------ELETORAL------
-// const api = axios.create({
-//   baseURL: "https://a050-44-220-242-27.ngrok-free.app/api",
-//   //baseURL: "http://sistema.ieenayarit.org:9370/api",
-// });
+const api = axios.create({
+  baseURL: "http://sistema.ieenayarit.org:9483/api",
+});
 
 // const api = axios.create({
 //   baseURL: "https://bce3-177-226-124-12.ngrok-free.app/api",
@@ -32,9 +31,10 @@ const encryptStorage = new EncryptStorage("SECRET_KEY", "sessionStorage");
 //   baseURL: "https://ieen.c5qocwcce22m.us-east-1.rds.amazonaws.com/9676",
 // });
 //----- PRODUCCION----
-const api = axios.create({
-  baseURL: "https://api.sistemas-ieenayarit.org/api",
-});
+// const api = axios.create({
+//   baseURL: "https://sim-api.sistemas-ieenayarit.org/api",
+//   //baseURL: "https://api.sistemas-ieenayarit.org/api",
+// });
 
 api.interceptors.request.use((config) => {
   config.headers = {
@@ -49,7 +49,7 @@ api.interceptors.response.use(
     if (error.response.status == 401) {
       alert("Su sesión ha expirado, sera redireccionado al logín");
       sessionStorage.clear();
-      window.location = "https://acceso.sistemas-ieenayarit.org";
+      window.location = "http://sistema.ieenayarit.org:9471";
     }
     return Promise.reject();
   }
